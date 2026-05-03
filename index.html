@@ -30,7 +30,6 @@
   }
 
   #mainApp, #authScreen { display: none; }
-
   .app-wrapper { display: flex; flex-direction: row; height: 100vh; width: 100vw; overflow: hidden; backdrop-filter: blur(8px); }
   
   .left-sidebar { width: 240px; background: var(--sidebar-bg); padding: 20px; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; z-index: 10; overflow-y: hidden;}
@@ -52,42 +51,28 @@
   
   .game-card { background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); padding: 15px; border-radius: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(5px); }
   .delete-btn { background: #ff5252; color: white; }
-  .resume-btn { background: var(--btn-show); color: #111; }
+  .util-btn { background: rgba(255,255,255,0.15); color: white; }
 
   table { width: 100%; border-collapse: collapse; margin-top: 10px; }
   th { text-align: left; font-size: 12px; color: #aaa; padding: 10px; text-transform: uppercase; border-bottom: 1px solid var(--glass-border); }
   td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
   .eliminated { opacity: 0.4; background: rgba(255,0,0,0.05); }
 
-  #authScreen { 
-    display: none; 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100vw; 
-    height: 100vh; 
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .auth-box { 
-    background: rgba(15, 32, 39, 0.92); 
-    padding: 40px; 
-    border-radius: 15px; 
-    width: 350px; 
-    border: 1px solid var(--glass-border); 
-    backdrop-filter: blur(15px);
-    text-align: center;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-  }
+  #authScreen { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1000; display: flex; justify-content: center; align-items: center; }
+  .auth-box { background: rgba(15, 32, 39, 0.92); padding: 40px; border-radius: 15px; width: 350px; border: 1px solid var(--glass-border); backdrop-filter: blur(15px); text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
 
   #notesModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
   .notes-content { background: #1a2a3a; width: 90%; max-width: 600px; max-height: 80vh; padding: 30px; border-radius: 15px; border: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(20px); position: relative;}
-  .notes-content h2 { color: var(--btn-show); margin-top: 0; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;}
-  .notes-content h3 { font-size: 16px; margin-top: 20px; color: #fff;}
-  .notes-content ul { padding-left: 20px; color: #ccc; font-size: 14px;}
   .version-link { display: block; margin-top: 20px; color: #777; font-size: 11px; cursor: pointer; text-decoration: underline; }
+
+  /* Print Specific Styles */
+  @media print {
+    body { background: white !important; color: black !important; }
+    .left-sidebar, .rhs-pane, .bigBtn, .navBtn, .delete-btn, .util-btn, #notesModal, #authScreen { display: none !important; }
+    .main-pane { width: 100%; padding: 0; }
+    .game-card { border: 1px solid #ccc; background: none; }
+    table, th, td { border: 1px solid #ddd !important; color: black !important; }
+  }
 
   @media (max-width: 900px) {
     .app-wrapper { flex-direction: column; overflow: auto; height: auto;}
@@ -101,35 +86,24 @@
 <!-- RELEASE NOTES MODAL -->
 <div id="notesModal">
   <div class="notes-content">
-    <h2>Elite Rummy Circle - Release Notes</h2>
-    
-    <h3>v22.0 (Latest)</h3>
+    <h2 style="color:var(--btn-show); margin-top:0;">Elite Rummy Circle - Release Notes</h2>
+    <h3>v23.0 (Latest)</h3>
     <ul>
-      <li>Streamlined "New Match" setup: Starting players reduced to one slot.</li>
-      <li>Initial player slot now defaults to empty, requiring explicit selection.</li>
-      <li>Maintained 2-player minimum requirement for match starts.</li>
+      <li><strong>Reports Restored:</strong> Re-added dedicated Reports section with League Leaderboard.</li>
+      <li><strong>Match Reports:</strong> Individual match breakdowns now available in History.</li>
+      <li><strong>PDF Export:</strong> Added ability to view and print match reports as downloadable PDFs.</li>
     </ul>
-
-    <h3>v21.0</h3>
+    <h3>v22.0</h3>
     <ul>
-      <li>Fixed UI layout to ensure Login and Signup boxes are perfectly centered on all screens.</li>
+      <li>Simplified Match Setup: Starting with a single, empty player slot.</li>
     </ul>
-
-    <h3>v20.0</h3>
+    <h3>v1.0 - v21.0</h3>
     <ul>
-      <li>Consolidated full release notes history into the app link.</li>
-      <li>Restored version tracking link to Auth screen and Sidebar.</li>
+      <li>Firebase Cloud Sync & Secure Authentication.</li>
+      <li>Rules: SHOW, FC, DROP, OUT, and Re-entry logic.</li>
+      <li>Centered Login UI and Duplicate Protection.</li>
     </ul>
-
-    <h3>v1.0 - v19.0</h3>
-    <ul>
-      <li>Cloud Sync: Firebase Firestore integration for real-time play.</li>
-      <li>Rules: SHOW, FC, DROP, OUT, and Re-entry logic (Max+1).</li>
-      <li>History Management: Full ability to delete matches from History or Continue.</li>
-      <li>Security: Google Sign-In and Duplicate Protection.</li>
-    </ul>
-
-    <button class="bigBtn" style="background:var(--btn-fc); color:white; margin-top:30px;" onclick="closeNotes()">Close History</button>
+    <button class="bigBtn" style="background:var(--btn-fc); color:white;" onclick="closeNotes()">Close</button>
   </div>
 </div>
 
@@ -138,30 +112,23 @@
   <div class="auth-box">
     <h1 style="color:var(--btn-show)">Elite Rummy</h1>
     <p style="color:#aaa; font-size:14px; margin-top:-10px; margin-bottom:25px;">League Portal</p>
-    
     <div id="loginView">
-      <input id="loginEmail" class="bigInput" placeholder="Email Address">
+      <input id="loginEmail" class="bigInput" placeholder="Email">
       <input id="loginPassword" class="bigInput" type="password" placeholder="Password">
       <button class="bigBtn" onclick="login()">Log In</button>
       <button class="bigBtn" style="background:white; color:#444; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="googleLogin()">
         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="16"> Sign in with Google
       </button>
       <a onclick="toggleAuthView('signup')" style="cursor:pointer; font-size:12px; text-decoration:underline; display:block; margin-top:15px;">Create Account</a>
-      <span class="version-link" onclick="openNotes()">Version 22.0 - Release Notes</span>
+      <span class="version-link" onclick="openNotes()">Version 23.0 - Release Notes</span>
     </div>
-
     <div id="signupView" style="display:none">
-      <div style="display:flex; gap:10px;">
-        <input id="signupFirst" class="bigInput" placeholder="First Name">
-        <input id="signupLast" class="bigInput" placeholder="Surname">
-      </div>
-      <input id="signupEmail" class="bigInput" placeholder="Email Address">
+      <div style="display:flex; gap:10px;"><input id="signupFirst" class="bigInput" placeholder="First Name"><input id="signupLast" class="bigInput" placeholder="Surname"></div>
+      <input id="signupEmail" class="bigInput" placeholder="Email">
       <input id="signupPass" class="bigInput" type="password" placeholder="Password">
-      <button class="bigBtn" onclick="signup()">Sign Up & Enter Valhalla</button>
+      <button class="bigBtn" onclick="signup()">Sign Up</button>
       <a onclick="toggleAuthView('login')" style="cursor:pointer; font-size:12px; text-decoration:underline; display:block; margin-top:15px;">Back to Login</a>
-      <span class="version-link" onclick="openNotes()">Version 22.0 - Release Notes</span>
     </div>
-    <p id="authError" style="color:#ffb74d; font-size:12px; font-weight:bold; margin-top:10px;"></p>
   </div>
 </div>
 
@@ -173,13 +140,11 @@
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">New Game</button>
       <button id="navContinue" class="navBtn" onclick="showScreen('continue')">Continue</button>
       <button id="navHistory" class="navBtn" onclick="showScreen('history')">History</button>
+      <button id="navReports" class="navBtn" onclick="showScreen('reports')">Reports</button>
     </div>
-    <div class="player-roster-section">
-        <h4 style="font-size:11px; color:#00e676; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Players</h4>
-        <div id="sidebarRoster"></div>
-    </div>
-    <button class="navBtn" style="background:var(--btn-fc); margin-top:10px; color:white; font-weight:bold;" onclick="logout()">Logout</button>
-    <small style="margin-top:15px; cursor:pointer; text-decoration:underline; color:#777;" onclick="openNotes()">v22.0 - Notes</small>
+    <div class="player-roster-section"><h4 style="font-size:11px; color:#00e676; text-transform:uppercase;">Players</h4><div id="sidebarRoster"></div></div>
+    <button class="navBtn" style="background:var(--btn-fc); margin-top:10px; color:white;" onclick="logout()">Logout</button>
+    <small style="margin-top:15px; cursor:pointer; text-decoration:underline; color:#777;" onclick="openNotes()">v23.0 - Notes</small>
   </div>
   <div class="content-area">
     <div class="main-pane" id="mainPane"></div>
@@ -225,18 +190,13 @@ auth.onAuthStateChanged(user => {
 });
 
 function loadData() {
-  db.collection('eliteData').doc('playersData').onSnapshot(doc => { 
-    if(doc.exists) { playersDb = doc.data().list; renderRoster(); if(currentScreen==='newGame') renderNewGame(); }
-  });
+  db.collection('eliteData').doc('playersData').onSnapshot(doc => { if(doc.exists) { playersDb = doc.data().list; renderRoster(); if(currentScreen==='newGame') renderNewGame(); }});
   db.collection('eliteGames').onSnapshot(snap => {
     savedGames = []; snap.forEach(d => savedGames.push(d.data()));
-    if(state) { 
-        let s = savedGames.find(g => g.id === state.id); 
-        if(s) { state = s; renderActive(); } 
-        else { state = null; showScreen('continue'); }
-    }
+    if(state) { let s = savedGames.find(g => g.id === state.id); if(s) { state = s; renderActive(); } else { state = null; showScreen('continue'); } }
     if(currentScreen==='continue') renderContinue();
     if(currentScreen==='history') renderHistory();
+    if(currentScreen==='reports') renderReports();
   });
 }
 
@@ -276,40 +236,29 @@ function showScreen(s) {
   if(s==='newGame') { document.getElementById('navNewGame').classList.add('active-nav'); renderNewGame(); }
   if(s==='continue') { document.getElementById('navContinue').classList.add('active-nav'); renderContinue(); }
   if(s==='history') { document.getElementById('navHistory').classList.add('active-nav'); renderHistory(); }
+  if(s==='reports') { document.getElementById('navReports').classList.add('active-nav'); renderReports(); }
 }
 
 function appendTime(inputId) {
   let input = document.getElementById(inputId);
-  let now = new Date();
-  let timeStr = now.toLocaleDateString() + " - " + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  let timeStr = new Date().toLocaleDateString() + " - " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
   input.value = input.value.trim() !== "" ? input.value.trim() + " (" + timeStr + ")" : timeStr;
 }
 
-function getPlayerOptionsHtml() {
-  let opts = `<option value="">-- Choose Player --</option>`;
-  playersDb.forEach(p => opts += `<option value="${p.fullName}">${p.fullName}</option>`);
-  return opts;
-}
-
 function renderNewGame() {
-  const opts = getPlayerOptionsHtml();
+  let opts = `<option value="">-- Choose Player --</option>` + playersDb.map(p => `<option value="${p.fullName}">${p.fullName}</option>`).join('');
   document.getElementById('mainPane').innerHTML = `
     <h2>Start New Match</h2>
     <div class="game-card" style="display:block; padding:25px;">
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <input id="gName" class="bigInput" placeholder="Enter Match Name" style="margin-bottom:0;">
-            <button class="navBtn" style="background:rgba(255,255,255,0.1); width:auto; white-space:nowrap;" onclick="appendTime('gName')">🕒 Add Time</button>
-        </div>
-        <div id="selArea">
-            <select class="bigSelect p-sel">${opts}</select>
-        </div>
+        <div style="display:flex; gap:10px; margin-bottom:15px;"><input id="gName" class="bigInput" placeholder="Enter Match Name" style="margin-bottom:0;"><button class="navBtn" style="background:rgba(255,255,255,0.1); width:auto;" onclick="appendTime('gName')">🕒 Add Time</button></div>
+        <div id="selArea"><select class="bigSelect p-sel">${opts}</select></div>
         <button class="navBtn" style="background:rgba(0,230,118,0.1); color:#00e676; width:auto;" onclick="addSlot()">+ Add Player Slot</button>
         <button class="bigBtn" onclick="startMatch()">Start Game</button>
     </div>`;
 }
 
 function addSlot() {
-  const opts = getPlayerOptionsHtml();
+  let opts = `<option value="">-- Choose Player --</option>` + playersDb.map(p => `<option value="${p.fullName}">${p.fullName}</option>`).join('');
   const div = document.createElement('div'); div.style="display:flex; gap:10px; margin-bottom:10px;";
   div.innerHTML = `<select class="bigSelect p-sel" style="margin-bottom:0;">${opts}</select><button class="delete-btn" onclick="this.parentElement.remove()" style="width:50px;">✕</button>`;
   document.getElementById('selArea').appendChild(div);
@@ -317,9 +266,8 @@ function addSlot() {
 
 function startMatch() {
   const players = Array.from(document.querySelectorAll('.p-sel')).map(s => s.value).filter(val => val !== "");
-  if(new Set(players).size !== players.length) return alert("Error: Duplicate players selected!");
-  if(players.length < 2) return alert("Select at least 2 players to begin.");
-
+  if(new Set(players).size !== players.length) return alert("Duplicates not allowed");
+  if(players.length < 2) return alert("Select at least 2 players");
   state = { id: Date.now().toString(), name: document.getElementById('gName').value||"Game", players, totals: {}, round: 1, history: [], eliminated: {}, reentered: {}, winner: null };
   players.forEach(p => { state.totals[p]=0; state.eliminated[p]=false; state.reentered[p]=false; });
   db.collection('eliteGames').doc(state.id).set(state);
@@ -328,17 +276,12 @@ function startMatch() {
 
 function renderActive() {
   document.getElementById('rhsPane').style.display='block';
-  let html = `<h2 style="margin-bottom:20px; color:var(--btn-show);">${state.name}</h2><table><tr><th>Player</th><th>Score Entry</th><th>Actions</th><th>Total</th></tr>`;
+  let html = `<h2>${state.name}</h2><table><tr><th>Player</th><th>Entry</th><th>Actions</th><th>Total</th></tr>`;
   state.players.forEach(p => {
     let isOut = state.eliminated[p];
     html += `<tr class="${isOut?'eliminated':''}">
       <td><b>${p}</b></td>
-      <td>
-        <div style="display:flex; gap:5px;">
-            <input type="number" id="manual-${p}" class="score-input" placeholder="0">
-            <button style="background:rgba(255,255,255,0.1); color:white;" onclick="scoreManual('${p}')">Add</button>
-        </div>
-      </td>
+      <td><div style="display:flex; gap:5px;"><input type="number" id="manual-${p}" class="score-input" placeholder="0"><button style="background:rgba(255,255,255,0.1); color:white;" onclick="scoreManual('${p}')">+</button></div></td>
       <td>
         <button style="background:var(--btn-show)" onclick="score('${p}',0)" ${isOut?'disabled':''}>SHOW</button>
         <button style="background:var(--btn-fc); color:white;" onclick="score('${p}',80)" ${isOut?'disabled':''}>FC</button>
@@ -353,24 +296,11 @@ function renderActive() {
   renderHistoryPane();
 }
 
-function score(p, val) {
-  state.totals[p] += val;
-  if(state.totals[p] >= 240) state.eliminated[p] = true;
-  db.collection('eliteGames').doc(state.id).set(state);
-}
-
-function scoreManual(p) {
-  let val = parseInt(document.getElementById(`manual-${p}`).value) || 0;
-  score(p, val);
-  document.getElementById(`manual-${p}`).value = "";
-}
-
+function score(p, val) { state.totals[p] += val; if(state.totals[p] >= 240) state.eliminated[p] = true; db.collection('eliteGames').doc(state.id).set(state); }
+function scoreManual(p) { let val = parseInt(document.getElementById(`manual-${p}`).value) || 0; score(p, val); document.getElementById(`manual-${p}`).value = ""; }
 function reenter(p) {
-  let max = 0;
-  state.players.forEach(player => { if(!state.eliminated[player] && state.totals[player] > max) max = state.totals[player]; });
-  state.totals[p] = max + 1;
-  state.eliminated[p] = false; state.reentered[p] = true;
-  db.collection('eliteGames').doc(state.id).set(state);
+  let max = 0; state.players.forEach(player => { if(!state.eliminated[player] && state.totals[player] > max) max = state.totals[player]; });
+  state.totals[p] = max + 1; state.eliminated[p] = false; state.reentered[p] = true; db.collection('eliteGames').doc(state.id).set(state);
 }
 
 function nextRound() {
@@ -382,52 +312,58 @@ function nextRound() {
 }
 
 function renderHistoryPane() {
-  let h = "<h3>Round History</h3>";
-  state.history.forEach(r => h += `<div style="font-size:12px; margin-bottom:8px; background:rgba(255,255,255,0.05); padding:8px; border-radius:4px;"><b>R${r.round}:</b> ${JSON.stringify(r.totals).replace(/"/g,'')}</div>`);
+  let h = "<h3>Round Logs</h3>";
+  state.history.forEach(r => h += `<div style="font-size:11px; margin-bottom:5px; background:rgba(255,255,255,0.05); padding:5px;">R${r.round}: ${JSON.stringify(r.totals).replace(/[{}"]/g,'')}</div>`);
   document.getElementById('rhsPane').innerHTML = h;
 }
 
 function renderContinue() {
-  let html = "<h2>Active Matches</h2>";
   let active = savedGames.filter(g => !g.winner);
-  if(active.length === 0) html += "<p style='color:#777'>No games in progress.</p>";
-  active.forEach(g => {
-    html += `<div class="game-card">
-      <div><b>${g.name}</b><br><small style="color:#aaa;">Round ${g.round}</small></div>
-      <div>
-        <button class="resume-btn" onclick="resume('${g.id}')">Resume</button>
-        <button class="delete-btn" onclick="deleteGame('${g.id}')">Delete</button>
-      </div>
-    </div>`;
-  });
-  document.getElementById('mainPane').innerHTML = html;
+  document.getElementById('mainPane').innerHTML = "<h2>Active Matches</h2>" + (active.length === 0 ? "<p>No active matches.</p>" : active.map(g => `<div class="game-card"><div><b>${g.name}</b><br><small>Round ${g.round}</small></div><div><button class="resume-btn" onclick="resume('${g.id}')">Resume</button><button class="delete-btn" onclick="deleteGame('${g.id}')">Delete</button></div></div>`).join(''));
 }
-
 function resume(id) { state = savedGames.find(g => g.id === id); renderActive(); }
 
 function renderHistory() {
-  let html = "<h2>Completed Matches</h2>";
   let finished = savedGames.filter(g => g.winner);
-  if(finished.length === 0) html += "<p style='color:#777'>No history available.</p>";
-  finished.forEach(g => {
-    html += `<div class="game-card">
-      <div><b>${g.name}</b><br>Winner: <span style="color:var(--btn-show)">${g.winner}</span></div>
-      <button class="delete-btn" onclick="deleteGame('${g.id}')">Delete</button>
-    </div>`;
+  document.getElementById('mainPane').innerHTML = "<h2>Completed Matches</h2>" + (finished.length === 0 ? "<p>No history yet.</p>" : finished.map(g => `<div class="game-card"><div><b>${g.name}</b><br>Winner: <span style="color:var(--btn-show)">${g.winner}</span></div><div><button class="util-btn" onclick="viewMatchReport('${g.id}')">View Report</button><button class="delete-btn" onclick="deleteGame('${g.id}')">Delete</button></div></div>`).join(''));
+}
+function deleteGame(id) { if(confirm("Delete this match?")) db.collection('eliteGames').doc(id).delete(); }
+
+/* --- REPORTS LOGIC --- */
+function renderReports() {
+  let html = `<h2>League Leaderboard</h2><table><tr><th>Player</th><th>Played</th><th>Won</th><th>Win %</th></tr>`;
+  let stats = {}; playersDb.forEach(p => stats[p.fullName] = { played: 0, won: 0 });
+  savedGames.filter(g => g.winner).forEach(g => {
+    g.players.forEach(p => { if(stats[p]) stats[p].played++; });
+    if(stats[g.winner]) stats[g.winner].won++;
   });
-  document.getElementById('mainPane').innerHTML = html;
+  Object.keys(stats).sort((a,b) => stats[b].won - stats[a].won).forEach(p => {
+    let s = stats[p]; if(s.played > 0) html += `<tr><td><b>${p}</b></td><td>${s.played}</td><td>${s.won}</td><td>${((s.won/s.played)*100).toFixed(1)}%</td></tr>`;
+  });
+  document.getElementById('mainPane').innerHTML = html + `</table>`;
 }
 
-function deleteGame(id) { 
-  if(confirm("Permanently delete this match from the cloud? This cannot be undone.")) {
-    db.collection('eliteGames').doc(id).delete();
-  }
+function viewMatchReport(id) {
+  let g = savedGames.find(x => x.id === id);
+  if(!g) return;
+  let html = `<div style="text-align:center;"><h2>Match Report: ${g.name}</h2><h3>🏆 Winner: ${g.winner}</h3></div>
+    <table><tr><th>Player</th><th>Final Score</th><th>Status</th></tr>`;
+  g.players.forEach(p => {
+    let stat = g.eliminated[p] ? 'Eliminated' : 'Winner';
+    html += `<tr><td>${p}</td><td>${g.totals[p]}</td><td style="color:${g.eliminated[p]?'#ff5252':'#00e676'}">${stat}</td></tr>`;
+  });
+  html += `</table><h3 style="margin-top:20px;">Round-by-Round Breakdown</h3><table><tr><th>Round</th>`;
+  g.players.forEach(p => html += `<th>${p.split(' ')[0]}</th>`);
+  html += `</tr>`;
+  g.history.forEach(r => {
+    html += `<tr><td>R${r.round}</td>`;
+    g.players.forEach(p => html += `<td>${r.totals[p]}</td>`);
+    html += `</tr>`;
+  });
+  document.getElementById('mainPane').innerHTML = html + `</table><button class="bigBtn" style="background:#444; color:white; margin-top:20px;" onclick="window.print()">📄 Export Report as PDF (Print)</button><button class="bigBtn" onclick="showScreen('history')">Back to History</button>`;
 }
 
-function toggleAuthView(v) { 
-  document.getElementById('loginView').style.display = v==='login'?'block':'none'; 
-  document.getElementById('signupView').style.display = v==='signup'?'block':'none'; 
-}
+function toggleAuthView(v) { document.getElementById('loginView').style.display = v==='login'?'block':'none'; document.getElementById('signupView').style.display = v==='signup'?'block':'none'; }
 </script>
 </body>
 </html>
