@@ -12,7 +12,7 @@
 <style>
   :root {
     --panel-bg: rgba(255, 255, 255, 0.12);
-    --sidebar-bg: rgba(15, 32, 39, 0.95);
+    --sidebar-bg: rgba(15, 32, 39, 0.98);
     --btn-show: #00e676;
     --btn-fc: #ff5252;
     --btn-drop: #ff9800;
@@ -35,17 +35,19 @@
     background-attachment: fixed;
   }
 
-  /* Initial state: hidden to prevent flashing */
   #mainApp, #authScreen { display: none; }
 
   .app-wrapper { display: flex; flex-direction: row; height: 100vh; width: 100vw; overflow: hidden; backdrop-filter: blur(8px); }
   
-  .left-sidebar { width: 220px; background: var(--sidebar-bg); padding: 15px; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; z-index: 10; overflow-y: hidden;}
+  .left-sidebar { width: 240px; background: var(--sidebar-bg); padding: 20px; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; z-index: 10; overflow-y: hidden;}
   .nav-section { flex-shrink: 0; margin-bottom: 20px; }
-  .player-roster-section { flex-grow: 1; overflow-y: auto; margin-top: 10px; border-top: 1px solid var(--glass-border); padding-top: 15px; }
-  .player-roster-section h4 { font-size: 11px; text-transform: uppercase; color: #aaa; letter-spacing: 1px; margin-bottom: 10px; }
-  .roster-item { font-size: 13px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ddd; display: flex; align-items: center; }
-  .roster-item span { color: var(--btn-show); font-weight: bold; margin-right: 8px; font-size: 14px;}
+  
+  .player-roster-section { flex-grow: 1; overflow-y: auto; margin-top: 15px; border-top: 1px solid var(--glass-border); padding-top: 15px; }
+  .roster-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .roster-header h4 { font-size: 11px; text-transform: uppercase; color: #00e676; letter-spacing: 1px; margin: 0; }
+  .live-dot { width: 8px; height: 8px; background: #00e676; border-radius: 50%; box-shadow: 0 0 5px #00e676; }
+  
+  .roster-item { font-size: 13px; padding: 8px 12px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); color: #efefef; }
 
   .content-area { display: flex; flex: 1; overflow: hidden; }
   .main-pane { flex: 2; padding: 20px 30px; overflow-y: auto; }
@@ -128,13 +130,18 @@
     </div>
 
     <div class="player-roster-section">
-      <h4>Registered Players</h4>
-      <div id="sidebarRoster"></div>
+      <div class="roster-header">
+        <h4>Online Roster</h4>
+        <div class="live-dot"></div>
+      </div>
+      <div id="sidebarRoster">
+        <!-- Players will appear here -->
+      </div>
     </div>
 
     <div class="app-footer">
       <button class="deleteBtn" style="width:100%; padding:8px; margin-bottom:10px;" onclick="logout()">Log Out</button>
-      <small>Version 11 • May 2026</small>
+      <small>Version 12 • May 2026</small>
     </div>
   </div>
 
@@ -166,18 +173,17 @@ let savedGames = [];
 let state = null;
 let currentScreen = '';
 
-/* AUTH OBSERVER - THE FIX IS HERE */
+/* AUTH OBSERVER */
 auth.onAuthStateChanged((user) => {
   if (user) {
     document.getElementById('authScreen').style.display = 'none';
     document.getElementById('mainApp').style.display = 'flex';
     loadCloudData();
-    // Only show the screen once auth is confirmed
     if(!currentScreen) showScreen('newGame');
   } else {
     document.getElementById('authScreen').style.display = 'flex';
     document.getElementById('mainApp').style.display = 'none';
-    currentScreen = ''; // Reset screen state
+    currentScreen = '';
     toggleAuthView('login');
     document.getElementById('loginEmail').value = "";
     document.getElementById('loginPassword').value = "";
@@ -197,10 +203,11 @@ function toggleAuthView(view) {
 }
 
 function loadCloudData() {
+  // Fixed Sidebar Listener
   db.collection('eliteData').doc('playersData').onSnapshot((doc) => {
     if (doc.exists) {
       playersDb = doc.data().list || [];
-      updateSidebarRoster();
+      renderSidebarRoster();
       if (currentScreen === 'newGame') renderNewGameScreen();
     }
   });
@@ -218,12 +225,18 @@ function loadCloudData() {
   });
 }
 
-function updateSidebarRoster() {
+function renderSidebarRoster() {
   const container = document.getElementById('sidebarRoster');
+  if (!container) return;
+  
   let html = "";
-  playersDb.sort((a,b) => a.fullName.localeCompare(b.fullName)).forEach(p => {
-    html += `<div class="roster-item"><span>•</span> ${p.fullName}</div>`;
-  });
+  if (playersDb.length === 0) {
+    html = `<div style="font-size:12px; color:#777; text-align:center;">No players found.</div>`;
+  } else {
+    playersDb.sort((a,b) => a.fullName.localeCompare(b.fullName)).forEach(p => {
+      html += `<div class="roster-item">${p.fullName}</div>`;
+    });
+  }
   container.innerHTML = html;
 }
 
@@ -235,8 +248,8 @@ function login() {
 }
 
 function signup() {
-  const f = document.getElementById('signupFirstName').value;
-  const s = document.getElementById('signupSurname').value;
+  const f = document.getElementById('signupFirstName').value.trim();
+  const s = document.getElementById('signupSurname').value.trim();
   const v = document.getElementById('signupVikingName').value;
   const e = document.getElementById('signupEmail').value;
   const p = document.getElementById('signupPassword').value;
@@ -256,7 +269,8 @@ function googleLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).then(res => {
     if (res.additionalUserInfo.isNewUser) {
-      playersDb.push({ id: res.user.uid, fullName: res.user.displayName.toUpperCase(), vikingName: generateVikingNameString() });
+      const name = res.user.displayName.toUpperCase();
+      playersDb.push({ id: res.user.uid, fullName: name, vikingName: generateVikingNameString() });
       db.collection('eliteData').doc('playersData').set({ list: playersDb });
     }
   });
@@ -321,7 +335,9 @@ function startMatch() {
 
 function renderContinueScreen() {
   let html = `<h2>Active Games</h2>`;
-  savedGames.filter(g => !g.winner).forEach(g => {
+  const act = savedGames.filter(g => !g.winner);
+  if(act.length === 0) html += `<p>No games in progress.</p>`;
+  act.forEach(g => {
     html += `<div class="game-card"><div><b>${g.gameName}</b><br><small>Round ${g.round}</small></div><button class="resumeBtn" onclick="resume('${g.id}')">Resume</button></div>`;
   });
   document.getElementById('mainPane').innerHTML = html;
@@ -372,7 +388,9 @@ function renderHistory() {
 
 function renderHistoryScreen() {
   let html = `<h2>Completed</h2>`;
-  savedGames.filter(g => g.winner).forEach(g => {
+  const comp = savedGames.filter(g => g.winner);
+  if(comp.length === 0) html += `<p>No history yet.</p>`;
+  comp.forEach(g => {
     html += `<div class="game-card"><b>${g.gameName}</b><br>Winner: ${g.winner}</div>`;
   });
   document.getElementById('mainPane').innerHTML = html;
