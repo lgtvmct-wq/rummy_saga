@@ -33,7 +33,9 @@
   .app-wrapper { display: flex; flex-direction: row; height: 100vh; width: 100vw; overflow: hidden; backdrop-filter: blur(8px); }
   
   .left-sidebar { width: 240px; background: var(--sidebar-bg); padding: 20px; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; z-index: 10; overflow-y: hidden;}
-  .player-roster-section { flex-grow: 1; overflow-y: auto; margin-top: 15px; border-top: 1px solid var(--glass-border); padding-top: 15px; }
+  .nav-section { flex-shrink: 0; margin-bottom: 10px; }
+  
+  .player-roster-section { flex-grow: 1; overflow-y: auto; margin-top: 10px; border-top: 1px solid var(--glass-border); padding-top: 15px; }
   .roster-item { display: flex; align-items: center; font-size: 13px; padding: 8px 12px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
   .status-dot { width: 8px; height: 8px; background: #00e676; border-radius: 50%; margin-right: 10px; box-shadow: 0 0 5px #00e676; }
   
@@ -41,17 +43,16 @@
   .main-pane { flex: 2.5; padding: 20px 30px; overflow-y: auto; }
   .rhs-pane { flex: 1; min-width: 320px; background: rgba(0,0,0,0.3); padding: 20px; border-left: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(15px);}
 
-  /* FIX: Explicit Black text for all inputs */
+  /* Visibility Fix: Black text on Light inputs */
   .bigInput, .bigSelect { 
     width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; 
     border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.95); 
     color: #000 !important; font-weight: 600; box-sizing: border-box; 
   }
-  /* TARGET PLACEHOLDER SPECIFICALLY */
-  .bigInput::placeholder { color: #333 !important; opacity: 1; }
+  .bigInput::placeholder { color: #444 !important; opacity: 1; }
   
   .score-input { 
-    width: 60px; padding: 8px; background: rgba(255,255,255,0.95); 
+    width: 65px; padding: 8px; background: rgba(255,255,255,0.95); 
     border: 1px solid var(--glass-border); color: #000 !important; border-radius: 4px; 
     text-align: center; font-weight: bold; 
   }
@@ -66,9 +67,9 @@
   .util-btn { background: rgba(255,255,255,0.15); color: white; }
 
   table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  th { text-align: left; font-size: 12px; color: #aaa; padding: 10px; text-transform: uppercase; border-bottom: 1px solid var(--glass-border); }
-  td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  .eliminated { opacity: 0.4; background: rgba(255,0,0,0.05); }
+  th { text-align: left; font-size: 11px; color: #aaa; padding: 10px; text-transform: uppercase; border-bottom: 1px solid var(--glass-border); }
+  td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .eliminated { opacity: 0.35; background: rgba(255,0,0,0.08); }
 
   #authScreen { 
     display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
@@ -82,9 +83,6 @@
 
   #notesModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
   .notes-content { background: #1a2a3a; width: 90%; max-width: 600px; max-height: 80vh; padding: 30px; border-radius: 15px; border: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(20px); position: relative;}
-  .notes-content h2 { color: var(--btn-show); margin-top: 0; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;}
-  .notes-content h3 { font-size: 16px; margin-top: 20px; color: #fff;}
-  .notes-content ul { padding-left: 20px; color: #ccc; font-size: 14px;}
   .version-link { display: block; margin-top: 20px; color: #777; font-size: 11px; cursor: pointer; text-decoration: underline; }
 
   @media (max-width: 900px) {
@@ -99,37 +97,22 @@
 <!-- RELEASE NOTES MODAL -->
 <div id="notesModal">
   <div class="notes-content">
-    <h2>Elite Rummy Circle - Release Notes</h2>
-    <p style="color:#00e676; font-size:12px; margin-top:-10px;">Last Updated: May 4, 2026 - 3:00 AM</p>
+    <h2 style="color:var(--btn-show); margin-top:0;">Elite Rummy Circle - Release Notes</h2>
+    <p style="color:#00e676; font-size:11px; margin-top:-10px;">Last Sync: May 4, 2026 - 3:05 AM</p>
     
-    <h3>v25.0 (Latest)</h3>
+    <h3>v26.0 (Latest)</h3>
     <ul>
-      <li><strong>Visibility Fix:</strong> Forced Match Name and all input text to Black for better legibility on high-contrast backgrounds.</li>
-      <li><strong>Placeholder Update:</strong> Set input placeholders to dark gray to prevent them from "vanishing."</li>
-      <li><strong>Release Tracking:</strong> Added current Date and Time to the Release Notes header.</li>
+      <li><strong>Sidebar Fixed:</strong> Restored the "Players" section to the sidebar with online status dots.</li>
+      <li><strong>Terminology Update:</strong> Replaced "Match" with "Game" and "Add player slot" with "Add Player".</li>
+      <li><strong>Scoreboard Audit:</strong> Verified Manual Entry, Re-entry (Max+1), and 240-limit rules.</li>
+      <li><strong>Visibility:</strong> Guaranteed black text on all Game Name and Player inputs.</li>
     </ul>
-
-    <h3>v24.0</h3>
+    <h3>v25.0</h3>
+    <ul><li>Updated placeholder colors for immediate visibility.</li></ul>
+    <h3>v23.0 - v24.0</h3>
     <ul>
-      <li>Refined background transparency for main data tables.</li>
+      <li>Added Reports section with Leaderboard and PDF Match Exports.</li>
     </ul>
-
-    <h3>v23.0</h3>
-    <ul>
-      <li>Restored Reports section with League Leaderboard and PDF Match Exports.</li>
-    </ul>
-
-    <h3>v22.0</h3>
-    <ul>
-      <li>Match setup reduced to a single-slot default for cleaner workflow.</li>
-    </ul>
-
-    <h3>v1.0 - v21.0</h3>
-    <ul>
-      <li>Firebase real-time sync, Viking names, and League rules (Re-entry).</li>
-      <li>Fixed center-aligned Login/Signup layout.</li>
-    </ul>
-
     <button class="bigBtn" style="background:var(--btn-fc); color:white; margin-top:20px;" onclick="closeNotes()">Close</button>
   </div>
 </div>
@@ -147,7 +130,7 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="16"> Sign in with Google
       </button>
       <a onclick="toggleAuthView('signup')" style="cursor:pointer; font-size:12px; text-decoration:underline; display:block; margin-top:15px;">Create Account</a>
-      <span class="version-link" onclick="openNotes()">Version 25.0 - Release Notes</span>
+      <span class="version-link" onclick="openNotes()">Version 26.0 - Release Notes</span>
     </div>
     <div id="signupView" style="display:none">
       <div style="display:flex; gap:10px;"><input id="signupFirst" class="bigInput" placeholder="First Name"><input id="signupLast" class="bigInput" placeholder="Surname"></div>
@@ -155,7 +138,7 @@
       <input id="signupPass" class="bigInput" type="password" placeholder="Password">
       <button class="bigBtn" onclick="signup()">Sign Up</button>
       <a onclick="toggleAuthView('login')" style="cursor:pointer; font-size:12px; text-decoration:underline; display:block; margin-top:15px;">Back to Login</a>
-      <span class="version-link" onclick="openNotes()">Version 25.0 - Release Notes</span>
+      <span class="version-link" onclick="openNotes()">Version 26.0 - Release Notes</span>
     </div>
   </div>
 </div>
@@ -163,16 +146,19 @@
 <!-- MAIN APP -->
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
-    <h3>Elite Rummy</h3>
+    <h2 style="color:var(--btn-show); font-size: 20px; text-align:center; margin-bottom:20px;">Elite Rummy</h2>
     <div class="nav-section">
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">New Game</button>
       <button id="navContinue" class="navBtn" onclick="showScreen('continue')">Continue</button>
       <button id="navHistory" class="navBtn" onclick="showScreen('history')">History</button>
       <button id="navReports" class="navBtn" onclick="showScreen('reports')">Reports</button>
     </div>
-    <div class="player-roster-section"><h4 style="font-size:11px; color:#00e676; text-transform:uppercase;">Players</h4><div id="sidebarRoster"></div></div>
+    <div class="player-roster-section">
+        <h4 style="font-size:11px; color:#00e676; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Players</h4>
+        <div id="sidebarRoster"></div>
+    </div>
     <button class="navBtn" style="background:var(--btn-fc); margin-top:10px; color:white;" onclick="logout()">Logout</button>
-    <small style="margin-top:15px; cursor:pointer; text-decoration:underline; color:#777;" onclick="openNotes()">v25.0 - Notes</small>
+    <small style="margin-top:15px; cursor:pointer; text-decoration:underline; color:#777;" onclick="openNotes()">v26.0 - Notes</small>
   </div>
   <div class="content-area">
     <div class="main-pane" id="mainPane"></div>
@@ -218,10 +204,16 @@ auth.onAuthStateChanged(user => {
 });
 
 function loadData() {
-  db.collection('eliteData').doc('playersData').onSnapshot(doc => { if(doc.exists) { playersDb = doc.data().list; renderRoster(); if(currentScreen==='newGame') renderNewGame(); }});
+  db.collection('eliteData').doc('playersData').onSnapshot(doc => { 
+    if(doc.exists) { playersDb = doc.data().list; renderRoster(); if(currentScreen==='newGame') renderNewGame(); }
+  });
   db.collection('eliteGames').onSnapshot(snap => {
     savedGames = []; snap.forEach(d => savedGames.push(d.data()));
-    if(state) { let s = savedGames.find(g => g.id === state.id); if(s) { state = s; renderActive(); } else { state = null; showScreen('continue'); } }
+    if(state) { 
+        let s = savedGames.find(g => g.id === state.id); 
+        if(s) { state = s; renderActive(); } 
+        else { state = null; showScreen('continue'); }
+    }
     if(currentScreen==='continue') renderContinue();
     if(currentScreen==='history') renderHistory();
     if(currentScreen==='reports') renderReports();
@@ -229,7 +221,7 @@ function loadData() {
 }
 
 function renderRoster() {
-  const c = document.getElementById('sidebarRoster'); c.innerHTML = "";
+  const c = document.getElementById('sidebarRoster'); if(!c) return; c.innerHTML = "";
   playersDb.sort((a,b)=>a.fullName.localeCompare(b.fullName)).forEach(p => {
     c.innerHTML += `<div class="roster-item"><div class="status-dot"></div> ${p.fullName}</div>`;
   });
@@ -282,11 +274,11 @@ function getPlayerOptionsHtml() {
 function renderNewGame() {
   const opts = getPlayerOptionsHtml();
   document.getElementById('mainPane').innerHTML = `
-    <h2>Start New Match</h2>
+    <h2>Start New Game</h2>
     <div class="game-card" style="display:block; padding:25px;">
-        <div style="display:flex; gap:10px; margin-bottom:15px;"><input id="gName" class="bigInput" placeholder="Enter Match Name" style="margin-bottom:0;"><button class="navBtn" style="background:rgba(255,255,255,0.1); width:auto;" onclick="appendTime('gName')">🕒 Add Time</button></div>
+        <div style="display:flex; gap:10px; margin-bottom:15px;"><input id="gName" class="bigInput" placeholder="Enter Game Name" style="margin-bottom:0;"><button class="navBtn" style="background:rgba(255,255,255,0.1); width:auto;" onclick="appendTime('gName')">🕒 Add Time</button></div>
         <div id="selArea"><select class="bigSelect p-sel">${opts}</select></div>
-        <button class="navBtn" style="background:rgba(0,230,118,0.1); color:#00e676; width:auto;" onclick="addSlot()">+ Add Player Slot</button>
+        <button class="navBtn" style="background:rgba(0,230,118,0.1); color:#00e676; width:auto;" onclick="addSlot()">+ Add Player</button>
         <button class="bigBtn" onclick="startMatch()">Start Game</button>
     </div>`;
 }
@@ -294,7 +286,7 @@ function renderNewGame() {
 function addSlot() {
   const opts = getPlayerOptionsHtml();
   const div = document.createElement('div'); div.style="display:flex; gap:10px; margin-bottom:10px;";
-  div.innerHTML = `<select class="bigSelect p-sel" style="margin-bottom:0;">${opts}</select><button class="delete-btn" onclick="this.parentElement.remove()" style="width:50px; background:#ff5252; color:white; border-radius:6px; border:none; cursor:pointer;">✕</button>`;
+  div.innerHTML = `<select class="bigSelect p-sel" style="margin-bottom:0;">${opts}</select><button class="delete-btn" onclick="this.parentElement.remove()" style="width:50px; background:#ff5252; color:white; border-radius:6px; border:none;">✕</button>`;
   document.getElementById('selArea').appendChild(div);
 }
 
@@ -310,19 +302,19 @@ function startMatch() {
 
 function renderActive() {
   document.getElementById('rhsPane').style.display='block';
-  let html = `<h2 style="margin-bottom:20px; color:var(--btn-show);">${state.name}</h2><table><tr><th>Player</th><th>Entry</th><th>Actions</th><th>Total</th></tr>`;
+  let html = `<h2 style="margin-bottom:15px; color:var(--btn-show);">${state.name}</h2><table><tr><th>Player</th><th>Score Entry</th><th>Actions</th><th>Total</th></tr>`;
   state.players.forEach(p => {
-    let isOut = state.eliminated[p];
+    let isOut = state.totals[p] >= 240;
     html += `<tr class="${isOut?'eliminated':''}">
       <td><b>${p}</b></td>
-      <td><div style="display:flex; gap:5px;"><input type="number" id="manual-${p}" class="score-input" placeholder="0"><button style="background:rgba(255,255,255,0.1); color:white;" onclick="scoreManual('${p}')">+</button></div></td>
+      <td><div style="display:flex; gap:5px;"><input type="number" id="manual-${p}" class="score-input" placeholder="0"><button style="background:rgba(255,255,255,0.1); color:white; padding:8px;" onclick="scoreManual('${p}')">Add</button></div></td>
       <td>
         <button style="background:var(--btn-show)" onclick="score('${p}',0)" ${isOut?'disabled':''}>SHOW</button>
         <button style="background:var(--btn-fc); color:white;" onclick="score('${p}',80)" ${isOut?'disabled':''}>FC</button>
         <button style="background:var(--btn-drop); color:white;" onclick="score('${p}',20)" ${isOut?'disabled':''}>DROP</button>
         ${(isOut && !state.reentered[p]) ? `<button style="background:var(--btn-md)" onclick="reenter('${p}')">RE-ENTER</button>` : ''}
       </td>
-      <td><h3>${state.totals[p]}</h3></td>
+      <td><h3 style="margin:0">${state.totals[p]}</h3></td>
     </tr>`;
   });
   html += `</table><button class="bigBtn" onclick="nextRound()">End Round</button>`;
@@ -330,17 +322,17 @@ function renderActive() {
   renderHistoryPane();
 }
 
-function score(p, val) { state.totals[p] += val; if(state.totals[p] >= 240) state.eliminated[p] = true; db.collection('eliteGames').doc(state.id).set(state); }
+function score(p, val) { state.totals[p] += val; db.collection('eliteGames').doc(state.id).set(state); }
 function scoreManual(p) { let val = parseInt(document.getElementById(`manual-${p}`).value) || 0; score(p, val); document.getElementById(`manual-${p}`).value = ""; }
 function reenter(p) {
-  let max = 0; state.players.forEach(player => { if(!state.eliminated[player] && state.totals[player] > max) max = state.totals[player]; });
-  state.totals[p] = max + 1; state.eliminated[p] = false; state.reentered[p] = true; db.collection('eliteGames').doc(state.id).set(state);
+  let max = 0; state.players.forEach(player => { if(state.totals[player] < 240 && state.totals[player] > max) max = state.totals[player]; });
+  state.totals[p] = max + 1; state.reentered[p] = true; db.collection('eliteGames').doc(state.id).set(state);
 }
 
 function nextRound() {
   state.history.push({ round: state.round, totals: {...state.totals} });
   state.round++;
-  let active = state.players.filter(p => !state.eliminated[p]);
+  let active = state.players.filter(p => state.totals[p] < 240);
   if(active.length === 1) state.winner = active[0];
   db.collection('eliteGames').doc(state.id).set(state);
 }
@@ -353,15 +345,15 @@ function renderHistoryPane() {
 
 function renderContinue() {
   let active = savedGames.filter(g => !g.winner);
-  document.getElementById('mainPane').innerHTML = "<h2>Active Matches</h2>" + (active.length === 0 ? "<p>No active matches.</p>" : active.map(g => `<div class="game-card"><div><b>${g.name}</b><br><small>Round ${g.round}</small></div><div><button class="resume-btn" onclick="resume('${g.id}')">Resume</button><button class="delete-btn" style="background:#ff5252; color:white;" onclick="deleteGame('${g.id}')">Delete</button></div></div>`).join(''));
+  document.getElementById('mainPane').innerHTML = "<h2>Active Games</h2>" + (active.length === 0 ? "<p>No active games.</p>" : active.map(g => `<div class="game-card"><div><b>${g.name}</b><br><small>Round ${g.round}</small></div><div><button class="resume-btn" onclick="resume('${g.id}')">Resume</button><button class="delete-btn" style="background:#ff5252; color:white;" onclick="deleteGame('${g.id}')">Delete</button></div></div>`).join(''));
 }
 function resume(id) { state = savedGames.find(g => g.id === id); renderActive(); }
 
 function renderHistory() {
   let finished = savedGames.filter(g => g.winner);
-  document.getElementById('mainPane').innerHTML = "<h2>Completed Matches</h2>" + (finished.length === 0 ? "<p>No history yet.</p>" : finished.map(g => `<div class="game-card"><div><b>${g.name}</b><br>Winner: <span style="color:var(--btn-show)">${g.winner}</span></div><div><button class="util-btn" style="background:#444; color:white;" onclick="viewMatchReport('${g.id}')">Report</button><button class="delete-btn" style="background:#ff5252; color:white;" onclick="deleteGame('${g.id}')">Delete</button></div></div>`).join(''));
+  document.getElementById('mainPane').innerHTML = "<h2>Completed Games</h2>" + (finished.length === 0 ? "<p>No history yet.</p>" : finished.map(g => `<div class="game-card"><div><b>${g.name}</b><br>Winner: <span style="color:var(--btn-show)">${g.winner}</span></div><div><button class="util-btn" style="background:#444; color:white;" onclick="viewMatchReport('${g.id}')">Report</button><button class="delete-btn" style="background:#ff5252; color:white;" onclick="deleteGame('${g.id}')">Delete</button></div></div>`).join(''));
 }
-function deleteGame(id) { if(confirm("Delete this match?")) db.collection('eliteGames').doc(id).delete(); }
+function deleteGame(id) { if(confirm("Delete this game?")) db.collection('eliteGames').doc(id).delete(); }
 
 function renderReports() {
   let html = `<h2>League Leaderboard</h2><table><tr><th>Player</th><th>Played</th><th>Won</th><th>Win %</th></tr>`;
@@ -379,13 +371,13 @@ function renderReports() {
 function viewMatchReport(id) {
   let g = savedGames.find(x => x.id === id);
   if(!g) return;
-  let html = `<div style="text-align:center;"><h2>Match Report: ${g.name}</h2><h3>🏆 Winner: ${g.winner}</h3></div>
+  let html = `<div style="text-align:center;"><h2>Game Report: ${g.name}</h2><h3>🏆 Winner: ${g.winner}</h3></div>
     <table><tr><th>Player</th><th>Final Score</th><th>Status</th></tr>`;
   g.players.forEach(p => {
-    let stat = g.eliminated[p] ? 'Eliminated' : 'Winner';
-    html += `<tr><td>${p}</td><td>${g.totals[p]}</td><td style="color:${g.eliminated[p]?'#ff5252':'#00e676'}">${stat}</td></tr>`;
+    let stat = g.totals[p] >= 240 ? 'Eliminated' : 'Winner';
+    html += `<tr><td>${p}</td><td>${g.totals[p]}</td><td style="color:${g.totals[p]>=240?'#ff5252':'#00e676'}">${stat}</td></tr>`;
   });
-  html += `</table><h3 style="margin-top:20px;">Round Breakdown</h3><table><tr><th>Round</th>`;
+  html += `</table><h3 style="margin-top:20px;">Round breakdown</h3><table><tr><th>Round</th>`;
   g.players.forEach(p => html += `<th>${p.split(' ')[0]}</th>`);
   html += `</tr>`;
   g.history.forEach(r => {
@@ -393,7 +385,7 @@ function viewMatchReport(id) {
     g.players.forEach(p => html += `<td>${r.totals[p]}</td>`);
     html += `</tr>`;
   });
-  document.getElementById('mainPane').innerHTML = html + `</table><button class="bigBtn" style="background:#444; color:white; margin-top:20px;" onclick="window.print()">📄 Export Report as PDF</button><button class="bigBtn" onclick="showScreen('history')">Back</button>`;
+  document.getElementById('mainPane').innerHTML = html + `</table><button class="bigBtn" style="background:#444; color:white; margin-top:20px;" onclick="window.print()">📄 Export as PDF</button><button class="bigBtn" onclick="showScreen('history')">Back</button>`;
 }
 
 function toggleAuthView(v) { document.getElementById('loginView').style.display = v==='login'?'block':'none'; document.getElementById('signupView').style.display = v==='signup'?'block':'none'; }
