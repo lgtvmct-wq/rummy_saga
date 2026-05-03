@@ -29,7 +29,9 @@
     background-size: cover; background-position: center; background-attachment: fixed;
   }
 
+  /* Prevent flashing during load */
   #mainApp, #authScreen { display: none; }
+
   .app-wrapper { display: flex; flex-direction: row; height: 100vh; width: 100vw; overflow: hidden; backdrop-filter: blur(8px); }
   
   .left-sidebar { width: 240px; background: var(--sidebar-bg); padding: 20px; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; z-index: 10; overflow-y: hidden;}
@@ -58,6 +60,30 @@
   td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
   .eliminated { opacity: 0.4; background: rgba(255,0,0,0.05); }
 
+  /* FIX: Explicitly centered Auth Screen */
+  #authScreen { 
+    display: none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh; 
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .auth-box { 
+    background: rgba(15, 32, 39, 0.92); 
+    padding: 40px; 
+    border-radius: 15px; 
+    width: 350px; 
+    border: 1px solid var(--glass-border); 
+    backdrop-filter: blur(15px);
+    text-align: center;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+  }
+
   /* Release Notes Modal */
   #notesModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
   .notes-content { background: #1a2a3a; width: 90%; max-width: 600px; max-height: 80vh; padding: 30px; border-radius: 15px; border: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(20px); position: relative;}
@@ -65,6 +91,12 @@
   .notes-content h3 { font-size: 16px; margin-top: 20px; color: #fff;}
   .notes-content ul { padding-left: 20px; color: #ccc; font-size: 14px;}
   .version-link { display: block; margin-top: 20px; color: #777; font-size: 11px; cursor: pointer; text-decoration: underline; }
+
+  @media (max-width: 900px) {
+    .app-wrapper { flex-direction: column; overflow: auto; height: auto;}
+    .left-sidebar { width: auto; height: auto; border-right: none; border-bottom: 1px solid var(--glass-border); }
+    .player-roster-section { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -74,7 +106,13 @@
   <div class="notes-content">
     <h2>Elite Rummy Circle - Release Notes</h2>
     
-    <h3>v20.0 (Latest)</h3>
+    <h3>v21.0 (Latest)</h3>
+    <ul>
+      <li>Fixed UI layout to ensure Login and Signup boxes are perfectly centered on all screens.</li>
+      <li>Refined modal glass effects for better readability.</li>
+    </ul>
+
+    <h3>v20.0</h3>
     <ul>
       <li>Consolidated full release notes history into the app link.</li>
       <li>Restored version tracking link to Auth screen and Sidebar.</li>
@@ -93,32 +131,12 @@
       <li>Automated calculations for QUICK action buttons (SHOW, FC, DROP, OUT).</li>
     </ul>
 
-    <h3>v17.0</h3>
+    <h3>v1.0 - v17.0</h3>
     <ul>
-      <li>Implemented Duplicate Protection (No playing against yourself).</li>
-      <li>Added first-pass History Deletion feature.</li>
-    </ul>
-
-    <h3>v14.0 - v16.0</h3>
-    <ul>
-      <li>Introduced "🕒 Add Date & Time" feature for match naming.</li>
-      <li>Renamed roster to "Players" with Live Status indicators.</li>
-      <li>Created the initial Release Notes modal window.</li>
-    </ul>
-
-    <h3>v10.0 - v13.0</h3>
-    <ul>
-      <li>UI Overhaul: Brighter "Glassmorphism" frosted aesthetic.</li>
-      <li>Auth Fixes: Prevented logout flicker and forced reset to home.</li>
-      <li>Security: Removed Developer Bypass for production safety.</li>
-    </ul>
-
-    <h3>v1.0 - v9.0</h3>
-    <ul>
+      <li>Duplicate Protection: Prevented selecting the same player twice.</li>
       <li>Cloud Migration: Switched from Local Storage to Firebase Firestore.</li>
-      <li>Multiplayer: Enabled real-time syncing across all devices.</li>
-      <li>Gamification: Added the Viking Alias Generator for signups.</li>
-      <li>Auth Suite: Enabled Google Sign-In and Secure Email accounts.</li>
+      <li>Viking Alias Generator: Fun random names for new signups.</li>
+      <li>Auth Suite: Google Sign-In and Secure Email accounts.</li>
     </ul>
 
     <button class="bigBtn" style="background:var(--btn-fc); color:white; margin-top:30px;" onclick="closeNotes()">Close History</button>
@@ -127,7 +145,7 @@
 
 <!-- AUTH SCREEN -->
 <div id="authScreen">
-  <div style="text-align:center; background: rgba(15,32,39,0.9); padding:40px; border-radius:15px; width:340px; border:1px solid var(--glass-border); backdrop-filter: blur(10px);">
+  <div class="auth-box">
     <h1 style="color:var(--btn-show)">Elite Rummy</h1>
     <p style="color:#aaa; font-size:14px; margin-top:-10px; margin-bottom:25px;">League Portal</p>
     
@@ -139,7 +157,7 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="16"> Sign in with Google
       </button>
       <a onclick="toggleAuthView('signup')" style="cursor:pointer; font-size:12px; text-decoration:underline; display:block; margin-top:15px;">Create Account</a>
-      <span class="version-link" onclick="openNotes()">Version 20.0 - Release Notes</span>
+      <span class="version-link" onclick="openNotes()">Version 21.0 - Release Notes</span>
     </div>
 
     <div id="signupView" style="display:none">
@@ -151,7 +169,7 @@
       <input id="signupPass" class="bigInput" type="password" placeholder="Password">
       <button class="bigBtn" onclick="signup()">Sign Up & Enter Valhalla</button>
       <a onclick="toggleAuthView('login')" style="cursor:pointer; font-size:12px; text-decoration:underline; display:block; margin-top:15px;">Back to Login</a>
-      <span class="version-link" onclick="openNotes()">Version 20.0 - Release Notes</span>
+      <span class="version-link" onclick="openNotes()">Version 21.0 - Release Notes</span>
     </div>
     <p id="authError" style="color:#ffb74d; font-size:12px; font-weight:bold; margin-top:10px;"></p>
   </div>
@@ -171,7 +189,7 @@
         <div id="sidebarRoster"></div>
     </div>
     <button class="navBtn" style="background:var(--btn-fc); margin-top:10px; color:white; font-weight:bold;" onclick="logout()">Logout</button>
-    <small style="margin-top:15px; cursor:pointer; text-decoration:underline; color:#777;" onclick="openNotes()">v20.0 - Notes</small>
+    <small style="margin-top:15px; cursor:pointer; text-decoration:underline; color:#777;" onclick="openNotes()">v21.0 - Notes</small>
   </div>
   <div class="content-area">
     <div class="main-pane" id="mainPane"></div>
@@ -200,10 +218,17 @@ function closeNotes() { document.getElementById('notesModal').style.display='non
 
 auth.onAuthStateChanged(user => {
   if(user) { 
-    document.getElementById('authScreen').style.display='none';
-    document.getElementById('mainApp').style.display='flex';
-    loadData();
-    if(!currentScreen) showScreen('newGame');
+    document.getElementById('authScreen').style.display='flex'; // Ensure flex for centering
+    document.getElementById('authScreen').style.visibility = 'hidden'; // Hide during transition
+    
+    // Switch Views
+    setTimeout(() => {
+        document.getElementById('authScreen').style.display='none';
+        document.getElementById('authScreen').style.visibility = 'visible';
+        document.getElementById('mainApp').style.display='flex';
+        loadData();
+        if(!currentScreen) showScreen('newGame');
+    }, 100);
   } else { 
     document.getElementById('authScreen').style.display='flex';
     document.getElementById('mainApp').style.display='none';
