@@ -43,11 +43,28 @@
   .nav-section { flex-shrink: 0; margin-bottom: 20px; }
   
   .player-roster-section { flex-grow: 1; overflow-y: auto; margin-top: 15px; border-top: 1px solid var(--glass-border); padding-top: 15px; }
-  .roster-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .roster-header { margin-bottom: 12px; }
   .roster-header h4 { font-size: 11px; text-transform: uppercase; color: #00e676; letter-spacing: 1px; margin: 0; }
-  .live-dot { width: 8px; height: 8px; background: #00e676; border-radius: 50%; box-shadow: 0 0 5px #00e676; }
   
-  .roster-item { font-size: 13px; padding: 8px 12px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); color: #efefef; }
+  .roster-item { 
+    display: flex; 
+    align-items: center; 
+    font-size: 13px; 
+    padding: 8px 12px; 
+    margin-bottom: 5px; 
+    background: rgba(255,255,255,0.05); 
+    border-radius: 6px; 
+    border: 1px solid rgba(255,255,255,0.1); 
+    color: #efefef; 
+  }
+  .status-dot { 
+    width: 8px; 
+    height: 8px; 
+    background: #00e676; 
+    border-radius: 50%; 
+    margin-right: 10px; 
+    box-shadow: 0 0 5px #00e676; 
+  }
 
   .content-area { display: flex; flex: 1; overflow: hidden; }
   .main-pane { flex: 2; padding: 20px 30px; overflow-y: auto; }
@@ -62,7 +79,9 @@
   .navBtn.active-nav { background: var(--btn-show); color: #111; }
   
   .bigBtn { width: 100%; margin: 10px 0; font-size: 17px; padding: 15px; color: #111; background: var(--btn-show); }
-  .googleBtn { background: white; color: #444; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .timeBtn { background: rgba(255,255,255,0.1); color: white; font-size: 12px; padding: 12px; border: 1px solid var(--glass-border); margin-bottom: 10px; white-space: nowrap; }
+  .deleteBtn { background: #ff5252; color: white; }
+  .googleBtn { background: white; color: #444; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid #ddd; }
   
   .table-responsive { width: 100%; overflow-x: auto; border-radius: 12px; margin-top: 15px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--glass-border); }
   table { width: 100%; border-collapse: collapse; }
@@ -96,7 +115,6 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="18"> Sign in with Google
       </button>
       <a class="toggle-link" onclick="toggleAuthView('signup')">Create a new account</a>
-      <button style="background:transparent; border:1px dashed #555; color:#777; width:100%; padding:10px; margin-top:20px; font-size:11px;" onclick="devLogin()">🛠 DEV LOGIN</button>
     </div>
 
     <div id="signupView" style="display: none;">
@@ -131,17 +149,14 @@
 
     <div class="player-roster-section">
       <div class="roster-header">
-        <h4>Online Roster</h4>
-        <div class="live-dot"></div>
+        <h4>Players</h4>
       </div>
-      <div id="sidebarRoster">
-        <!-- Players will appear here -->
-      </div>
+      <div id="sidebarRoster"></div>
     </div>
 
     <div class="app-footer">
       <button class="deleteBtn" style="width:100%; padding:8px; margin-bottom:10px;" onclick="logout()">Log Out</button>
-      <small>Version 12 • May 2026</small>
+      <small>Version 15 • Production</small>
     </div>
   </div>
 
@@ -167,13 +182,13 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-/* APP STATE */
+/* STATE */
 let playersDb = [];
 let savedGames = [];
 let state = null;
 let currentScreen = '';
 
-/* AUTH OBSERVER */
+/* AUTH */
 auth.onAuthStateChanged((user) => {
   if (user) {
     document.getElementById('authScreen').style.display = 'none';
@@ -185,8 +200,6 @@ auth.onAuthStateChanged((user) => {
     document.getElementById('mainApp').style.display = 'none';
     currentScreen = '';
     toggleAuthView('login');
-    document.getElementById('loginEmail').value = "";
-    document.getElementById('loginPassword').value = "";
   }
 });
 
@@ -203,7 +216,6 @@ function toggleAuthView(view) {
 }
 
 function loadCloudData() {
-  // Fixed Sidebar Listener
   db.collection('eliteData').doc('playersData').onSnapshot((doc) => {
     if (doc.exists) {
       playersDb = doc.data().list || [];
@@ -228,15 +240,10 @@ function loadCloudData() {
 function renderSidebarRoster() {
   const container = document.getElementById('sidebarRoster');
   if (!container) return;
-  
   let html = "";
-  if (playersDb.length === 0) {
-    html = `<div style="font-size:12px; color:#777; text-align:center;">No players found.</div>`;
-  } else {
-    playersDb.sort((a,b) => a.fullName.localeCompare(b.fullName)).forEach(p => {
-      html += `<div class="roster-item">${p.fullName}</div>`;
-    });
-  }
+  playersDb.sort((a,b) => a.fullName.localeCompare(b.fullName)).forEach(p => {
+    html += `<div class="roster-item"><div class="status-dot"></div> ${p.fullName}</div>`;
+  });
   container.innerHTML = html;
 }
 
@@ -269,8 +276,7 @@ function googleLogin() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).then(res => {
     if (res.additionalUserInfo.isNewUser) {
-      const name = res.user.displayName.toUpperCase();
-      playersDb.push({ id: res.user.uid, fullName: name, vikingName: generateVikingNameString() });
+      playersDb.push({ id: res.user.uid, fullName: res.user.displayName.toUpperCase(), vikingName: generateVikingNameString() });
       db.collection('eliteData').doc('playersData').set({ list: playersDb });
     }
   });
@@ -278,10 +284,11 @@ function googleLogin() {
 
 function logout() { auth.signOut(); }
 
-function devLogin() {
-  auth.signInWithEmailAndPassword("admin@elite.com", "dev123456").catch(() => {
-    auth.createUserWithEmailAndPassword("admin@elite.com", "dev123456");
-  });
+function appendTime(inputId) {
+  let input = document.getElementById(inputId);
+  let now = new Date();
+  let timeStr = now.toLocaleDateString() + " - " + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  input.value = input.value.trim() !== "" ? input.value.trim() + " (" + timeStr + ")" : timeStr;
 }
 
 function generateVikingNameString() {
@@ -302,24 +309,40 @@ function showScreen(scr) {
   if(scr === 'reports') { document.getElementById('navReports').classList.add('active-nav'); renderReportsScreen(); }
 }
 
-function renderNewGameScreen() {
+function getPlayerOptionsHtml() {
   let opts = `<option value="">-- Choose Player --</option>`;
   playersDb.forEach(p => opts += `<option value="${p.fullName}">${p.fullName}</option>`);
+  return opts;
+}
+
+function renderNewGameScreen() {
+  const opts = getPlayerOptionsHtml();
   document.getElementById('mainPane').innerHTML = `
     <h2>Start New Match</h2>
     <div class="table-responsive" style="padding:20px;">
-      <input id="gName" class="bigInput" placeholder="Match Name">
-      <div id="selArea"><select class="bigSelect p-sel">${opts}</select><select class="bigSelect p-sel">${opts}</select></div>
-      <button class="util" onclick="addSlot()">+ Add Player</button>
+      <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+        <input id="gName" class="bigInput" placeholder="Enter Match Name" style="margin-bottom:0;">
+        <button class="timeBtn" onclick="appendTime('gName')">🕒 Add Date & Time</button>
+      </div>
+      <div id="selArea">
+        <select class="bigSelect p-sel">${opts}</select>
+        <select class="bigSelect p-sel">${opts}</select>
+      </div>
+      <button class="util" onclick="addSlot()">+ Add Player Slot</button>
       <button class="bigBtn" onclick="startMatch()">Start Game</button>
     </div>`;
 }
 
+// RESTORED AND UPDATED: Add Slot now includes a Remove button
 function addSlot() {
-  let opts = `<option value="">-- Choose Player --</option>`;
-  playersDb.forEach(p => opts += `<option value="${p.fullName}">${p.fullName}</option>`);
-  const s = document.createElement('select'); s.className = 'bigSelect p-sel'; s.innerHTML = opts;
-  document.getElementById('selArea').appendChild(s);
+  const opts = getPlayerOptionsHtml();
+  const wrapper = document.createElement('div');
+  wrapper.style = "display:flex; gap:10px; align-items:center; margin-bottom:10px;";
+  wrapper.innerHTML = `
+    <select class="bigSelect p-sel" style="margin-bottom:0;">${opts}</select>
+    <button class="deleteBtn" style="padding:14px; margin:0; width:50px;" onclick="this.parentElement.remove()" title="Remove this player">✕</button>
+  `;
+  document.getElementById('selArea').appendChild(wrapper);
 }
 
 function startMatch() {
