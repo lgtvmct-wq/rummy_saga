@@ -43,7 +43,6 @@
   .main-pane { flex: 2.5; padding: 20px 30px; overflow-y: auto; }
   .rhs-pane { flex: 1; min-width: 320px; background: rgba(0,0,0,0.3); padding: 20px; border-left: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(15px);}
 
-  /* Visibility Fix: Black text on Light inputs */
   .bigInput, .bigSelect { 
     width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; 
     border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.95); 
@@ -85,10 +84,13 @@
   .notes-content { background: #1a2a3a; width: 90%; max-width: 600px; max-height: 80vh; padding: 30px; border-radius: 15px; border: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(20px); position: relative;}
   .version-link { display: block; margin-top: 20px; color: #777; font-size: 11px; cursor: pointer; text-decoration: underline; }
 
+  /* MOBILE FIX: Ensure Player Roster is visible on Mobile */
   @media (max-width: 900px) {
-    .app-wrapper { flex-direction: column; overflow: auto; height: auto;}
-    .left-sidebar { width: auto; height: auto; border-right: none; border-bottom: 1px solid var(--glass-border); }
-    .player-roster-section { display: none; }
+    .app-wrapper { flex-direction: column; overflow-y: auto; height: 100vh; }
+    .left-sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--glass-border); padding: 10px; box-sizing: border-box;}
+    .player-roster-section { max-height: 150px; overflow-y: auto; margin-top: 10px; }
+    .content-area { flex-direction: column; height: auto; overflow: visible; }
+    .rhs-pane { border-left: none; border-top: 1px solid var(--glass-border); min-width: 100%; }
   }
 </style>
 </head>
@@ -98,20 +100,17 @@
 <div id="notesModal">
   <div class="notes-content">
     <h2 style="color:var(--btn-show); margin-top:0;">Elite Rummy Circle - Release Notes</h2>
-    <p style="color:#00e676; font-size:11px; margin-top:-10px;">Last Sync: May 4, 2026 - 3:05 AM</p>
+    <p style="color:#00e676; font-size:11px; margin-top:-10px;">Last Sync: May 4, 2026 - 3:10 AM</p>
     
-    <h3>v26.0 (Latest)</h3>
+    <h3>v27.0 (Latest)</h3>
     <ul>
-      <li><strong>Sidebar Fixed:</strong> Restored the "Players" section to the sidebar with online status dots.</li>
-      <li><strong>Terminology Update:</strong> Replaced "Match" with "Game" and "Add player slot" with "Add Player".</li>
-      <li><strong>Scoreboard Audit:</strong> Verified Manual Entry, Re-entry (Max+1), and 240-limit rules.</li>
-      <li><strong>Visibility:</strong> Guaranteed black text on all Game Name and Player inputs.</li>
+      <li><strong>Mobile Visibility:</strong> Restored the Players list for mobile devices. It now appears as a scrollable section below the main navigation.</li>
+      <li><strong>Responsive Design:</strong> Optimized the sidebar layout for small screens to ensure content doesn't get cut off.</li>
     </ul>
-    <h3>v25.0</h3>
-    <ul><li>Updated placeholder colors for immediate visibility.</li></ul>
-    <h3>v23.0 - v24.0</h3>
+    <h3>v26.0</h3>
     <ul>
-      <li>Added Reports section with Leaderboard and PDF Match Exports.</li>
+      <li>Unified terminology to "Game" (Start New Game, Game Name, Add Player).</li>
+      <li>Audit of all league scoring rules (Re-entry, Manual Entry).</li>
     </ul>
     <button class="bigBtn" style="background:var(--btn-fc); color:white; margin-top:20px;" onclick="closeNotes()">Close</button>
   </div>
@@ -130,7 +129,7 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="16"> Sign in with Google
       </button>
       <a onclick="toggleAuthView('signup')" style="cursor:pointer; font-size:12px; text-decoration:underline; display:block; margin-top:15px;">Create Account</a>
-      <span class="version-link" onclick="openNotes()">Version 26.0 - Release Notes</span>
+      <span class="version-link" onclick="openNotes()">Version 27.0 - Release Notes</span>
     </div>
     <div id="signupView" style="display:none">
       <div style="display:flex; gap:10px;"><input id="signupFirst" class="bigInput" placeholder="First Name"><input id="signupLast" class="bigInput" placeholder="Surname"></div>
@@ -138,7 +137,7 @@
       <input id="signupPass" class="bigInput" type="password" placeholder="Password">
       <button class="bigBtn" onclick="signup()">Sign Up</button>
       <a onclick="toggleAuthView('login')" style="cursor:pointer; font-size:12px; text-decoration:underline; display:block; margin-top:15px;">Back to Login</a>
-      <span class="version-link" onclick="openNotes()">Version 26.0 - Release Notes</span>
+      <span class="version-link" onclick="openNotes()">Version 27.0 - Release Notes</span>
     </div>
   </div>
 </div>
@@ -158,7 +157,7 @@
         <div id="sidebarRoster"></div>
     </div>
     <button class="navBtn" style="background:var(--btn-fc); margin-top:10px; color:white;" onclick="logout()">Logout</button>
-    <small style="margin-top:15px; cursor:pointer; text-decoration:underline; color:#777;" onclick="openNotes()">v26.0 - Notes</small>
+    <small style="margin-top:15px; cursor:pointer; text-decoration:underline; color:#777;" onclick="openNotes()">v27.0 - Notes</small>
   </div>
   <div class="content-area">
     <div class="main-pane" id="mainPane"></div>
