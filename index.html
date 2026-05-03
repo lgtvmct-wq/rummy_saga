@@ -41,8 +41,20 @@
   .main-pane { flex: 2.5; padding: 20px 30px; overflow-y: auto; }
   .rhs-pane { flex: 1; min-width: 320px; background: rgba(0,0,0,0.3); padding: 20px; border-left: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(15px);}
 
-  .bigInput, .bigSelect { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.1); color: white; box-sizing: border-box; }
-  .score-input { width: 60px; padding: 8px; background: rgba(255,255,255,0.2); border: 1px solid var(--glass-border); color: white; border-radius: 4px; text-align: center; font-weight: bold; }
+  /* FIX: Explicit Black text for all inputs */
+  .bigInput, .bigSelect { 
+    width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; 
+    border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.95); 
+    color: #000 !important; font-weight: 600; box-sizing: border-box; 
+  }
+  /* TARGET PLACEHOLDER SPECIFICALLY */
+  .bigInput::placeholder { color: #333 !important; opacity: 1; }
+  
+  .score-input { 
+    width: 60px; padding: 8px; background: rgba(255,255,255,0.95); 
+    border: 1px solid var(--glass-border); color: #000 !important; border-radius: 4px; 
+    text-align: center; font-weight: bold; 
+  }
   
   button { padding: 8px 12px; margin: 2px; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
   .navBtn { width: 100%; margin-bottom: 8px; background: rgba(255,255,255,0.1); color: white; text-align: left; padding: 12px; }
@@ -58,21 +70,22 @@
   td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
   .eliminated { opacity: 0.4; background: rgba(255,0,0,0.05); }
 
-  #authScreen { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1000; display: flex; justify-content: center; align-items: center; }
-  .auth-box { background: rgba(15, 32, 39, 0.92); padding: 40px; border-radius: 15px; width: 350px; border: 1px solid var(--glass-border); backdrop-filter: blur(15px); text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+  #authScreen { 
+    display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+    z-index: 1000; display: flex; justify-content: center; align-items: center; 
+  }
+  .auth-box { 
+    background: rgba(15, 32, 39, 0.95); padding: 40px; border-radius: 15px; 
+    width: 350px; border: 1px solid var(--glass-border); backdrop-filter: blur(15px); 
+    text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5); 
+  }
 
   #notesModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
   .notes-content { background: #1a2a3a; width: 90%; max-width: 600px; max-height: 80vh; padding: 30px; border-radius: 15px; border: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(20px); position: relative;}
+  .notes-content h2 { color: var(--btn-show); margin-top: 0; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;}
+  .notes-content h3 { font-size: 16px; margin-top: 20px; color: #fff;}
+  .notes-content ul { padding-left: 20px; color: #ccc; font-size: 14px;}
   .version-link { display: block; margin-top: 20px; color: #777; font-size: 11px; cursor: pointer; text-decoration: underline; }
-
-  /* Print Specific Styles */
-  @media print {
-    body { background: white !important; color: black !important; }
-    .left-sidebar, .rhs-pane, .bigBtn, .navBtn, .delete-btn, .util-btn, #notesModal, #authScreen { display: none !important; }
-    .main-pane { width: 100%; padding: 0; }
-    .game-card { border: 1px solid #ccc; background: none; }
-    table, th, td { border: 1px solid #ddd !important; color: black !important; }
-  }
 
   @media (max-width: 900px) {
     .app-wrapper { flex-direction: column; overflow: auto; height: auto;}
@@ -86,24 +99,38 @@
 <!-- RELEASE NOTES MODAL -->
 <div id="notesModal">
   <div class="notes-content">
-    <h2 style="color:var(--btn-show); margin-top:0;">Elite Rummy Circle - Release Notes</h2>
-    <h3>v23.0 (Latest)</h3>
+    <h2>Elite Rummy Circle - Release Notes</h2>
+    <p style="color:#00e676; font-size:12px; margin-top:-10px;">Last Updated: May 4, 2026 - 3:00 AM</p>
+    
+    <h3>v25.0 (Latest)</h3>
     <ul>
-      <li><strong>Reports Restored:</strong> Re-added dedicated Reports section with League Leaderboard.</li>
-      <li><strong>Match Reports:</strong> Individual match breakdowns now available in History.</li>
-      <li><strong>PDF Export:</strong> Added ability to view and print match reports as downloadable PDFs.</li>
+      <li><strong>Visibility Fix:</strong> Forced Match Name and all input text to Black for better legibility on high-contrast backgrounds.</li>
+      <li><strong>Placeholder Update:</strong> Set input placeholders to dark gray to prevent them from "vanishing."</li>
+      <li><strong>Release Tracking:</strong> Added current Date and Time to the Release Notes header.</li>
     </ul>
+
+    <h3>v24.0</h3>
+    <ul>
+      <li>Refined background transparency for main data tables.</li>
+    </ul>
+
+    <h3>v23.0</h3>
+    <ul>
+      <li>Restored Reports section with League Leaderboard and PDF Match Exports.</li>
+    </ul>
+
     <h3>v22.0</h3>
     <ul>
-      <li>Simplified Match Setup: Starting with a single, empty player slot.</li>
+      <li>Match setup reduced to a single-slot default for cleaner workflow.</li>
     </ul>
+
     <h3>v1.0 - v21.0</h3>
     <ul>
-      <li>Firebase Cloud Sync & Secure Authentication.</li>
-      <li>Rules: SHOW, FC, DROP, OUT, and Re-entry logic.</li>
-      <li>Centered Login UI and Duplicate Protection.</li>
+      <li>Firebase real-time sync, Viking names, and League rules (Re-entry).</li>
+      <li>Fixed center-aligned Login/Signup layout.</li>
     </ul>
-    <button class="bigBtn" style="background:var(--btn-fc); color:white;" onclick="closeNotes()">Close</button>
+
+    <button class="bigBtn" style="background:var(--btn-fc); color:white; margin-top:20px;" onclick="closeNotes()">Close</button>
   </div>
 </div>
 
@@ -113,21 +140,22 @@
     <h1 style="color:var(--btn-show)">Elite Rummy</h1>
     <p style="color:#aaa; font-size:14px; margin-top:-10px; margin-bottom:25px;">League Portal</p>
     <div id="loginView">
-      <input id="loginEmail" class="bigInput" placeholder="Email">
+      <input id="loginEmail" class="bigInput" placeholder="Email Address">
       <input id="loginPassword" class="bigInput" type="password" placeholder="Password">
       <button class="bigBtn" onclick="login()">Log In</button>
       <button class="bigBtn" style="background:white; color:#444; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="googleLogin()">
         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="16"> Sign in with Google
       </button>
       <a onclick="toggleAuthView('signup')" style="cursor:pointer; font-size:12px; text-decoration:underline; display:block; margin-top:15px;">Create Account</a>
-      <span class="version-link" onclick="openNotes()">Version 23.0 - Release Notes</span>
+      <span class="version-link" onclick="openNotes()">Version 25.0 - Release Notes</span>
     </div>
     <div id="signupView" style="display:none">
       <div style="display:flex; gap:10px;"><input id="signupFirst" class="bigInput" placeholder="First Name"><input id="signupLast" class="bigInput" placeholder="Surname"></div>
-      <input id="signupEmail" class="bigInput" placeholder="Email">
+      <input id="signupEmail" class="bigInput" placeholder="Email Address">
       <input id="signupPass" class="bigInput" type="password" placeholder="Password">
       <button class="bigBtn" onclick="signup()">Sign Up</button>
       <a onclick="toggleAuthView('login')" style="cursor:pointer; font-size:12px; text-decoration:underline; display:block; margin-top:15px;">Back to Login</a>
+      <span class="version-link" onclick="openNotes()">Version 25.0 - Release Notes</span>
     </div>
   </div>
 </div>
@@ -144,7 +172,7 @@
     </div>
     <div class="player-roster-section"><h4 style="font-size:11px; color:#00e676; text-transform:uppercase;">Players</h4><div id="sidebarRoster"></div></div>
     <button class="navBtn" style="background:var(--btn-fc); margin-top:10px; color:white;" onclick="logout()">Logout</button>
-    <small style="margin-top:15px; cursor:pointer; text-decoration:underline; color:#777;" onclick="openNotes()">v23.0 - Notes</small>
+    <small style="margin-top:15px; cursor:pointer; text-decoration:underline; color:#777;" onclick="openNotes()">v25.0 - Notes</small>
   </div>
   <div class="content-area">
     <div class="main-pane" id="mainPane"></div>
@@ -245,8 +273,14 @@ function appendTime(inputId) {
   input.value = input.value.trim() !== "" ? input.value.trim() + " (" + timeStr + ")" : timeStr;
 }
 
+function getPlayerOptionsHtml() {
+  let opts = `<option value="">-- Choose Player --</option>`;
+  playersDb.forEach(p => opts += `<option value="${p.fullName}">${p.fullName}</option>`);
+  return opts;
+}
+
 function renderNewGame() {
-  let opts = `<option value="">-- Choose Player --</option>` + playersDb.map(p => `<option value="${p.fullName}">${p.fullName}</option>`).join('');
+  const opts = getPlayerOptionsHtml();
   document.getElementById('mainPane').innerHTML = `
     <h2>Start New Match</h2>
     <div class="game-card" style="display:block; padding:25px;">
@@ -258,9 +292,9 @@ function renderNewGame() {
 }
 
 function addSlot() {
-  let opts = `<option value="">-- Choose Player --</option>` + playersDb.map(p => `<option value="${p.fullName}">${p.fullName}</option>`).join('');
+  const opts = getPlayerOptionsHtml();
   const div = document.createElement('div'); div.style="display:flex; gap:10px; margin-bottom:10px;";
-  div.innerHTML = `<select class="bigSelect p-sel" style="margin-bottom:0;">${opts}</select><button class="delete-btn" onclick="this.parentElement.remove()" style="width:50px;">✕</button>`;
+  div.innerHTML = `<select class="bigSelect p-sel" style="margin-bottom:0;">${opts}</select><button class="delete-btn" onclick="this.parentElement.remove()" style="width:50px; background:#ff5252; color:white; border-radius:6px; border:none; cursor:pointer;">✕</button>`;
   document.getElementById('selArea').appendChild(div);
 }
 
@@ -276,7 +310,7 @@ function startMatch() {
 
 function renderActive() {
   document.getElementById('rhsPane').style.display='block';
-  let html = `<h2>${state.name}</h2><table><tr><th>Player</th><th>Entry</th><th>Actions</th><th>Total</th></tr>`;
+  let html = `<h2 style="margin-bottom:20px; color:var(--btn-show);">${state.name}</h2><table><tr><th>Player</th><th>Entry</th><th>Actions</th><th>Total</th></tr>`;
   state.players.forEach(p => {
     let isOut = state.eliminated[p];
     html += `<tr class="${isOut?'eliminated':''}">
@@ -319,17 +353,16 @@ function renderHistoryPane() {
 
 function renderContinue() {
   let active = savedGames.filter(g => !g.winner);
-  document.getElementById('mainPane').innerHTML = "<h2>Active Matches</h2>" + (active.length === 0 ? "<p>No active matches.</p>" : active.map(g => `<div class="game-card"><div><b>${g.name}</b><br><small>Round ${g.round}</small></div><div><button class="resume-btn" onclick="resume('${g.id}')">Resume</button><button class="delete-btn" onclick="deleteGame('${g.id}')">Delete</button></div></div>`).join(''));
+  document.getElementById('mainPane').innerHTML = "<h2>Active Matches</h2>" + (active.length === 0 ? "<p>No active matches.</p>" : active.map(g => `<div class="game-card"><div><b>${g.name}</b><br><small>Round ${g.round}</small></div><div><button class="resume-btn" onclick="resume('${g.id}')">Resume</button><button class="delete-btn" style="background:#ff5252; color:white;" onclick="deleteGame('${g.id}')">Delete</button></div></div>`).join(''));
 }
 function resume(id) { state = savedGames.find(g => g.id === id); renderActive(); }
 
 function renderHistory() {
   let finished = savedGames.filter(g => g.winner);
-  document.getElementById('mainPane').innerHTML = "<h2>Completed Matches</h2>" + (finished.length === 0 ? "<p>No history yet.</p>" : finished.map(g => `<div class="game-card"><div><b>${g.name}</b><br>Winner: <span style="color:var(--btn-show)">${g.winner}</span></div><div><button class="util-btn" onclick="viewMatchReport('${g.id}')">View Report</button><button class="delete-btn" onclick="deleteGame('${g.id}')">Delete</button></div></div>`).join(''));
+  document.getElementById('mainPane').innerHTML = "<h2>Completed Matches</h2>" + (finished.length === 0 ? "<p>No history yet.</p>" : finished.map(g => `<div class="game-card"><div><b>${g.name}</b><br>Winner: <span style="color:var(--btn-show)">${g.winner}</span></div><div><button class="util-btn" style="background:#444; color:white;" onclick="viewMatchReport('${g.id}')">Report</button><button class="delete-btn" style="background:#ff5252; color:white;" onclick="deleteGame('${g.id}')">Delete</button></div></div>`).join(''));
 }
 function deleteGame(id) { if(confirm("Delete this match?")) db.collection('eliteGames').doc(id).delete(); }
 
-/* --- REPORTS LOGIC --- */
 function renderReports() {
   let html = `<h2>League Leaderboard</h2><table><tr><th>Player</th><th>Played</th><th>Won</th><th>Win %</th></tr>`;
   let stats = {}; playersDb.forEach(p => stats[p.fullName] = { played: 0, won: 0 });
@@ -352,7 +385,7 @@ function viewMatchReport(id) {
     let stat = g.eliminated[p] ? 'Eliminated' : 'Winner';
     html += `<tr><td>${p}</td><td>${g.totals[p]}</td><td style="color:${g.eliminated[p]?'#ff5252':'#00e676'}">${stat}</td></tr>`;
   });
-  html += `</table><h3 style="margin-top:20px;">Round-by-Round Breakdown</h3><table><tr><th>Round</th>`;
+  html += `</table><h3 style="margin-top:20px;">Round Breakdown</h3><table><tr><th>Round</th>`;
   g.players.forEach(p => html += `<th>${p.split(' ')[0]}</th>`);
   html += `</tr>`;
   g.history.forEach(r => {
@@ -360,7 +393,7 @@ function viewMatchReport(id) {
     g.players.forEach(p => html += `<td>${r.totals[p]}</td>`);
     html += `</tr>`;
   });
-  document.getElementById('mainPane').innerHTML = html + `</table><button class="bigBtn" style="background:#444; color:white; margin-top:20px;" onclick="window.print()">📄 Export Report as PDF (Print)</button><button class="bigBtn" onclick="showScreen('history')">Back to History</button>`;
+  document.getElementById('mainPane').innerHTML = html + `</table><button class="bigBtn" style="background:#444; color:white; margin-top:20px;" onclick="window.print()">📄 Export Report as PDF</button><button class="bigBtn" onclick="showScreen('history')">Back</button>`;
 }
 
 function toggleAuthView(v) { document.getElementById('loginView').style.display = v==='login'?'block':'none'; document.getElementById('signupView').style.display = v==='signup'?'block':'none'; }
