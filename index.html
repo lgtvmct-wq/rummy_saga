@@ -35,6 +35,7 @@
     background-attachment: fixed;
   }
 
+  /* Prevent flashing during load */
   #mainApp, #authScreen { display: none; }
 
   .app-wrapper { display: flex; flex-direction: row; height: 100vh; width: 100vw; overflow: hidden; backdrop-filter: blur(8px); }
@@ -46,25 +47,8 @@
   .roster-header { margin-bottom: 12px; }
   .roster-header h4 { font-size: 11px; text-transform: uppercase; color: #00e676; letter-spacing: 1px; margin: 0; }
   
-  .roster-item { 
-    display: flex; 
-    align-items: center; 
-    font-size: 13px; 
-    padding: 8px 12px; 
-    margin-bottom: 5px; 
-    background: rgba(255,255,255,0.05); 
-    border-radius: 6px; 
-    border: 1px solid rgba(255,255,255,0.1); 
-    color: #efefef; 
-  }
-  .status-dot { 
-    width: 8px; 
-    height: 8px; 
-    background: #00e676; 
-    border-radius: 50%; 
-    margin-right: 10px; 
-    box-shadow: 0 0 5px #00e676; 
-  }
+  .roster-item { display: flex; align-items: center; font-size: 13px; padding: 8px 12px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); color: #efefef; }
+  .status-dot { width: 8px; height: 8px; background: #00e676; border-radius: 50%; margin-right: 10px; box-shadow: 0 0 5px #00e676; }
 
   .content-area { display: flex; flex: 1; overflow: hidden; }
   .main-pane { flex: 2; padding: 20px 30px; overflow-y: auto; }
@@ -88,9 +72,20 @@
   td, th { padding: 12px 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
   th { background: rgba(0,0,0,0.3); color: #ccc; font-size: 12px; text-transform: uppercase; }
 
+  /* Auth & Version Link */
   #authScreen { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; z-index: 1000;}
   .auth-box { background: rgba(20, 40, 50, 0.85); padding: 40px; border-radius: 15px; border: 1px solid var(--glass-border); text-align: center; width: 340px; backdrop-filter: blur(20px); box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
   .toggle-link { color: var(--btn-show); cursor: pointer; font-size: 14px; text-decoration: underline; margin-top: 15px; display: inline-block; }
+  .version-link { display: block; margin-top: 25px; color: #777; font-size: 11px; cursor: pointer; text-decoration: underline; }
+  .version-link:hover { color: #aaa; }
+
+  /* Release Notes Modal */
+  #notesModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
+  .notes-content { background: rgba(30, 45, 60, 0.95); width: 80%; max-width: 600px; max-height: 80vh; padding: 30px; border-radius: 15px; border: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(20px); position: relative; }
+  .notes-content h2 { color: var(--btn-show); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; }
+  .notes-content h3 { font-size: 16px; margin-top: 20px; color: #ddd; }
+  .notes-content p, .notes-content li { font-size: 14px; line-height: 1.6; color: #bbb; }
+  .close-notes { position: sticky; bottom: -30px; left: 0; width: 100%; padding: 15px; background: var(--btn-fc); color: white; border: none; border-radius: 8px; margin-top: 20px; }
 
   @media (max-width: 900px) {
     .app-wrapper { flex-direction: column; overflow: auto; height: auto;}
@@ -100,6 +95,48 @@
 </style>
 </head>
 <body>
+
+<!-- RELEASE NOTES MODAL -->
+<div id="notesModal">
+  <div class="notes-content">
+    <h2>Elite Rummy - Version History</h2>
+    
+    <h3>Version 16.0 (Latest)</h3>
+    <ul>
+      <li>Integrated Release Notes link at the base of the Login and Signup pages.</li>
+      <li>Built a dedicated Version History Modal for easier update tracking.</li>
+    </ul>
+
+    <h3>Version 15.0</h3>
+    <ul>
+      <li>Added dynamic "Add/Remove Player Slot" feature during match setup.</li>
+      <li>Implemented minimum 2-player safety constraint.</li>
+    </ul>
+
+    <h3>Version 14.0</h3>
+    <ul>
+      <li>Added "🕒 Add Date & Time" button for automated session logging.</li>
+      <li>Renamed roster to "Players" with individual Live Status Lights (Green).</li>
+    </ul>
+
+    <h3>Version 12.0 - 10.0</h3>
+    <ul>
+      <li>Overhauled UI with "Frosted Glass" (Glassmorphism) aesthetic.</li>
+      <li>Added Live Online Roster to the sidebar.</li>
+      <li>Fixed logout flicker and force-reset to home screen.</li>
+    </ul>
+
+    <h3>Version 9.0 - 1.0</h3>
+    <ul>
+      <li>Connected to Firebase Cloud Firestore for real-time multiplayer syncing.</li>
+      <li>Enabled Google Sign-In and Secure Email Authentication.</li>
+      <li>Added "Viking Alias" generator for new players.</li>
+      <li>Engineered core scoring logic: SHOW, FC, DROP, and OUT.</li>
+    </ul>
+
+    <button class="close-notes" onclick="closeNotes()">Close Release Notes</button>
+  </div>
+</div>
 
 <!-- AUTHENTICATION SCREEN -->
 <div id="authScreen">
@@ -115,6 +152,7 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="18"> Sign in with Google
       </button>
       <a class="toggle-link" onclick="toggleAuthView('signup')">Create a new account</a>
+      <span class="version-link" onclick="openNotes()">Version 16.0 - Release Notes</span>
     </div>
 
     <div id="signupView" style="display: none;">
@@ -131,6 +169,7 @@
       <input id="signupConfirm" class="bigInput" type="password" placeholder="Confirm Password">
       <button class="bigBtn" onclick="signup()">Enter Valhalla</button>
       <a class="toggle-link" onclick="toggleAuthView('login')">Back to Login</a>
+      <span class="version-link" onclick="openNotes()">Version 16.0 - Release Notes</span>
     </div>
     <p id="authError" style="color:#ffb74d; font-size:13px; margin-top:15px; font-weight:bold;"></p>
   </div>
@@ -156,7 +195,7 @@
 
     <div class="app-footer">
       <button class="deleteBtn" style="width:100%; padding:8px; margin-bottom:10px;" onclick="logout()">Log Out</button>
-      <small>Version 15 • Production</small>
+      <small style="cursor:pointer; text-decoration:underline;" onclick="openNotes()">Version 16.0</small>
     </div>
   </div>
 
@@ -187,6 +226,10 @@ let playersDb = [];
 let savedGames = [];
 let state = null;
 let currentScreen = '';
+
+/* MODAL LOGIC */
+function openNotes() { document.getElementById('notesModal').style.display = 'flex'; }
+function closeNotes() { document.getElementById('notesModal').style.display = 'none'; }
 
 /* AUTH */
 auth.onAuthStateChanged((user) => {
@@ -333,7 +376,6 @@ function renderNewGameScreen() {
     </div>`;
 }
 
-// RESTORED AND UPDATED: Add Slot now includes a Remove button
 function addSlot() {
   const opts = getPlayerOptionsHtml();
   const wrapper = document.createElement('div');
