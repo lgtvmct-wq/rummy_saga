@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin:0;
+  font-family:'Segoe UI';
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:white;
+}
+
+.container { display:flex; }
+
+.sidebar {
+  width:160px;
+  background:#111;
+  padding:10px;
+}
+.sidebar button {
+  width:100%;
+  padding:12px;
+  margin:5px 0;
+}
+
+.main { flex:1; padding:20px; }
+
+.lb {
+  width:200px;
+  background:#1e2a38;
+  padding:10px;
+}
+
+/* BIG HOME BUTTONS */
+.bigBtn {
+  width:90%;
+  padding:20px;
+  margin:10px auto;
+  display:block;
+  font-size:18px;
+  border-radius:12px;
+  background:#2c5364;
+}
+
+/* FORM STYLE */
+.formBox {
+  max-width:400px;
+  margin:auto;
+  text-align:center;
+}
+
+.bigInput {
+  width:95%;
+  padding:18px;
+  margin:10px 0;
+  font-size:18px;
+  border-radius:12px;
+  border:none;
+  text-align:center;
+}
+
+/* TABLE */
+table { width:100%; border-collapse:collapse; }
+td,th { padding:8px; text-align:center; }
+
+button { padding:6px; margin:2px; border:none; border-radius:6px; }
+
+.show { background:#00e676; }
+.fc { background:#ff5252; }
+.drop { background:#ff9800; }
+.md { background:#ffc107; }
+.out { background:#9c27b0; }
+
+button.active {
+  outline:2px solid white;
+}
+
+input {
+  padding:6px;
+  border-radius:6px;
+  border:none;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="sidebar">
+<button onclick="goHome()">🏠 Home</button>
+<button onclick="newGame()">🆕 New Game</button>
+<button onclick="loadGames()">🔄 Continue</button>
+</div>
+
+<div class="lb">
+<h3>Leaderboard</h3>
+<div id="lb"></div>
+</div>
+
+<div class="main" id="main"></div>
+
+</div>
+
+<script>
+
+let db = JSON.parse(localStorage.getItem("rummyDB") || '{"games":[]}');
+let state = {};
+
+/* HOME */
+function goHome(){
+  main.innerHTML=`
+    <h2>Greens Rummy</h2>
+    <button class="bigBtn" onclick="newGame()">New Game</button>
+    <button class="bigBtn" onclick="loadGames()">Continue Game</button>
+  `;
+}
+
+/* NEW GAME */
+function newGame(){
+  main.innerHTML=`
+    <div class="formBox">
+      <h3>Create Game</h3>
+
+      <input id="gname" class="bigInput" placeholder="Enter Game Name">
+
+      <div id="players"></div>
+
+      <button class="bigBtn" onclick="startGame()">Start Game</button>
+    </div>
+  `;
+
+  let html="";
+  for(let i=1;i<=6;i++){
+    html+=`<input id="p${i}" class="bigInput" placeholder="Player ${i}">`;
+  }
+  players.innerHTML=html;
+}
+
+/* START */
+function startGame(){
+  let name=(document.getElementById("gname").value || "")+" "+new Date().toLocaleString();
+
+  let players=[];
+  for(let i=1;i<=6;i++){
+    let v=document.getElementById("p"+i).value;
+    if(v) players.push(v.toUpperCase());
+  }
+
+  state={
+    name,
+    players,
+    totals:{},
+    roundScores:{},
+    round:1,
+    showPlayer:null
+  };
+
+  players.forEach(p=>{
+    state.totals[p]=0;
+    state.roundScores[p]=0;
+  });
+
+  db.games.push(state);
+  saveDB();
+
+  renderGame();
+}
+
+/* RENDER */
+function renderGame(){
+
+  let html=`<h3>${state.name}</h3>
+  <h4>Round ${state.round}</h4>
+  <p>Enter the Score</p>
+  <table>
+  <tr><th>Player</th><th>Actions</th><th>Round</th><th>Total</th></tr>`;
+
+  state.players.forEach(p=>{
+
+    html+=`
+    <tr>
+      <td>${p}</td>
+
+      <td>
+        ${toggleBtn(p,'FC',80,'fc')}
+        ${toggleBtn(p,'D',20,'drop')}
+        ${toggleBtn(p,'MD',40,'md')}
+        ${toggleBtn(p,'OUT',80,'out')}
+
+        <br>
+        <input type="number" placeholder="Manual"
+        onchange="manualScore('${p}',this)">
+      </td>
+
+      <td>${state.roundScores[p]}</td>
+      <td>${state.totals[p]}</td>
+    </tr>`;
+  });
+
+  html+=`</table>
+  <button class="bigBtn" onclick="nextRound()">Next Round</button>`;
+
+  main.innerHTML=html;
+  renderLB();
+}
+
+/* BUTTON TOGGLE */
+function toggleBtn(p,label,val,cls){
+  let active = state.roundScores[p] === val;
+
+  return `<button class="${cls} ${active?'active':''}"
+  onclick="toggleScore('${p}',${val})">${label}</button>`;
+}
+
+function toggleScore(p,val){
+
+  if(state.roundScores[p] === val){
+    state.totals[p] -= val;
+    state.roundScores[p] = 0;
+  } else {
+    state.totals[p] -= state.roundScores[p];
+    state.roundScores[p] = val;
+    state.totals[p] += val;
+  }
+
+  saveDB();
+  renderGame();
+}
+
+/* MANUAL */
+function manualScore(p,input){
+  let val = parseInt(input.value);
+  if(isNaN(val)) return;
+
+  if(val>80){
+    alert("Max 80 allowed");
+    return;
+  }
+
+  state.totals[p] -= state.roundScores[p];
+  state.roundScores[p] = val;
+  state.totals[p] += val;
+
+  input.value="";
+  saveDB();
+  renderGame();
+}
+
+/* NEXT */
+function nextRound(){
+  if(!state.showPlayer){
+    alert("Show required");
+    return;
+  }
+
+  state.players.forEach(p=>{
+    state.roundScores[p]=0;
+  });
+
+  state.round++;
+  state.showPlayer=null;
+
+  saveDB();
+  renderGame();
+}
+
+/* SHOW */
+function setShow(p){
+  if(state.showPlayer && state.showPlayer!==p){
+    alert("Only one Show allowed");
+    return;
+  }
+  state.showPlayer=p;
+}
+
+/* LB */
+function renderLB(){
+  let sorted = Object.entries(state.totals)
+    .sort((a,b)=>a[1]-b[1]);
+
+  lb.innerHTML = sorted.map(x=>`${x[0]} : ${x[1]}`).join("<br>");
+}
+
+/* CONTINUE */
+function loadGames(){
+  let html="<h3>Saved Games</h3>";
+
+  db.games.forEach((g,i)=>{
+    html+=`
+    <div>
+      ${g.name}
+      <button onclick="resume(${i})">Open</button>
+    </div>`;
+  });
+
+  main.innerHTML=html;
+}
+
+function resume(i){
+  state = JSON.parse(JSON.stringify(db.games[i]));
+  renderGame();
+}
+
+/* SAVE */
+function saveDB(){
+  localStorage.setItem("rummyDB",JSON.stringify(db));
+}
+
+goHome();
+
+</script>
+</body>
+</html>
