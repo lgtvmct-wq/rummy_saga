@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- CACHE CONTROL: Prevents old versions from sticking around -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v39.0</title>
+<title>Elite Rummy Circle - v40.0</title>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -53,8 +52,8 @@
   #authScreen { display: flex; position: fixed; inset: 0; justify-content: center; align-items: center; background: rgba(0,0,0,0.7); z-index: 2000; }
   .auth-box { background: #1a252f; padding: 40px; border-radius: 20px; width: 90%; max-width: 420px; text-align: center; border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
 
-  .profile-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; justify-content: center; align-items: center; }
-  .profile-card { background: #2c3e50; width: 90%; max-width: 500px; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); }
+  .profile-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; justify-content: center; align-items: center; }
+  .profile-card { background: #2c3e50; width: 95%; max-width: 500px; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); }
   
   .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 20px 0; }
   .stat-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
@@ -84,7 +83,7 @@
 <!-- PROFILE MODAL -->
 <div id="profileModal" class="profile-modal">
     <div class="profile-card">
-        <h2 id="pName" style="color:var(--accent); margin-bottom:5px;">User Profile</h2>
+        <h2 id="pName" style="color:var(--accent); margin-bottom:5px;">Loading Profile...</h2>
         <p id="pGender" style="font-size:12px; opacity:0.6; margin-bottom:20px;"></p>
         
         <div class="stat-grid">
@@ -106,7 +105,7 @@
 <div id="authScreen">
   <div class="auth-box">
     <h1 style="color:var(--accent); margin-bottom: 5px;">Elite Rummy Circle</h1>
-    <div style="background: var(--accent); color: white; display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; margin-bottom: 25px;">VERSION 39.0</div>
+    <div style="background: var(--accent); color: white; display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; margin-bottom: 25px;">VERSION 40.0</div>
     
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
@@ -136,7 +135,7 @@
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
     <h2 style="color:var(--accent); margin-bottom: 5px;">Menu</h2>
-    <div style="font-size:10px; opacity:0.4; margin-bottom: 25px; font-weight: bold;">BUILD v39.0</div>
+    <div style="font-size:10px; opacity:0.4; margin-bottom: 25px; font-weight: bold;">BUILD v40.0</div>
     
     <div class="nav-section">
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">Start New Game</button>
@@ -147,7 +146,7 @@
     </div>
     
     <div style="margin-top:auto; display:flex; gap:10px; padding-top:20px; border-top:1px solid var(--glass-border);">
-        <button style="background:var(--warning); flex:1;" onclick="viewMyProfile()">My Profile</button>
+        <button id="myProfBtn" style="background:var(--warning); flex:1;" onclick="viewMyProfile()">My Profile</button>
         <button style="background:var(--danger); color:white; flex:1;" onclick="handleLogout()">Logout</button>
     </div>
   </div>
@@ -196,11 +195,16 @@ function handleLogout() {
 }
 
 function loadData() {
+  // Enhanced listener with error handling
   db.collection('players').onSnapshot(snap => {
     playersDb = [];
     snap.forEach(doc => playersDb.push({id: doc.id, ...doc.data()}));
+    console.log("Players loaded:", playersDb.length);
     if(currentScreen === 'players') renderPlayers();
     if(currentScreen === 'newGame') renderNewGame();
+  }, err => {
+    console.error("Firestore Error:", err);
+    alert("Database Access Denied. Please check Firestore Rules.");
   });
 
   db.collection('eliteGames').onSnapshot(snap => {
@@ -229,6 +233,7 @@ async function signup() {
   try {
     const cred = await auth.createUserWithEmailAndPassword(e, p);
     const fullName = (f + " " + l).toUpperCase();
+    // Unique document per player
     await db.collection('players').doc(cred.user.uid).set({
         fullName, gender: g, isOnline: true, createdAt: new Date()
     });
@@ -254,7 +259,7 @@ function renderPlayers() {
   <table><tr><th>Full Name</th><th>Status</th><th>Profile</th></tr>`;
   
   if(!playersDb.length) {
-      html += `<tr><td colspan="3" class="empty-msg">Fetching players...</td></tr>`;
+      html += `<tr><td colspan="3" class="empty-msg">Fetching registered players... If stalled, check database rules.</td></tr>`;
   } else {
       playersDb.sort((a,b)=>a.fullName.localeCompare(b.fullName)).forEach(p => {
         html += `<tr>
@@ -375,9 +380,16 @@ function nextRound() {
   db.collection('eliteGames').doc(state.id).set(state);
 }
 
-function viewProfile(name) {
-    const p = playersDb.find(x => x.fullName === name);
-    if(!p) return;
+async function viewProfile(name) {
+    let p = playersDb.find(x => x.fullName === name);
+    
+    // Fallback: If not in list, fetch directly from DB
+    if(!p && auth.currentUser) {
+        const d = await db.collection('players').doc(auth.currentUser.uid).get();
+        if(d.exists) p = d.data();
+    }
+    
+    if(!p) return alert("Profile data not ready.");
     
     let finished = savedGames.filter(g => g.winner && g.players.includes(name));
     let wins = finished.filter(g => g.winner === name).length;
@@ -401,14 +413,14 @@ function viewProfile(name) {
     document.getElementById('statMD').innerText = md;
     document.getElementById('statTotal').innerText = finished.length;
 
-    let analysis = "No match history found for a deep analysis.";
+    let analysis = "No match history found.";
     if(finished.length > 0) {
         if(d + md > s + fc) {
-            analysis = `<b>Conservative Strategist:</b> ${p.fullName} prefers calculated safety. High frequency of Drops (${d}) and Mid-Drops (${md}) suggests a tactical player who knows when to retreat to minimize damage.`;
+            analysis = `<b>Conservative Strategist:</b> ${p.fullName} prefers calculated safety. High frequency of Drops suggests a tactical player.`;
         } else if (s > fc) {
-            analysis = `<b>Aggressive High-Roller:</b> ${p.fullName} is a risk-taker. With a high Show (${s}) count, they hunt for victory early and rarely settle for a Full Score loss.`;
+            analysis = `<b>Aggressive High-Roller:</b> ${p.fullName} hunts for victory early and rarely settles for a full loss.`;
         } else {
-            analysis = `<b>Balanced Competitor:</b> ${p.fullName} adapts well to the hand they are dealt. They show a mix of patience and aggression across their history.`;
+            analysis = `<b>Balanced Competitor:</b> Adapts well to the hand they are dealt.`;
         }
     }
     document.getElementById('aiAnalysis').innerHTML = "<b>AI ANALYSIS:</b><br>" + analysis;
@@ -418,7 +430,14 @@ function viewProfile(name) {
 function viewMyProfile() {
     if(!auth.currentUser) return;
     const me = playersDb.find(p => p.id === auth.currentUser.uid);
-    if(me) viewProfile(me.fullName);
+    if(me) {
+        viewProfile(me.fullName);
+    } else {
+        // Direct DB attempt if list isn't ready
+        db.collection('players').doc(auth.currentUser.uid).get().then(doc => {
+            if(doc.exists) viewProfile(doc.data().fullName);
+        });
+    }
 }
 
 function renderContinue() {
@@ -485,7 +504,7 @@ function renderReports() {
 
 function renderHistoryPane() {
   let h = "<h3>Game Logs</h3>";
-  if(!state.history.length) h += `<div style="font-size:11px; opacity:0.5;">Waiting for first round...</div>`;
+  if(!state.history.length) h += `<div style="font-size:11px; opacity:0.5;">Waiting for round completion...</div>`;
   state.history.forEach(r => h += `<div style="font-size:11px; margin-bottom:8px; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
     <b>Round ${r.round}:</b><br>${Object.entries(r.totals).map(([p, s]) => p + ": " + s).join(' | ')}
   </div>`);
