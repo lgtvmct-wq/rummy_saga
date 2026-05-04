@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- CACHE CONTROL: Prevents old versions from sticking around -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v40.0</title>
+<title>Elite Rummy Circle - v39.1</title>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -45,6 +46,7 @@
   }
 
   button { padding: 12px 18px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
   .navBtn { width: 100%; margin-bottom: 12px; background: rgba(255,255,255,0.08); color: white; text-align: left; padding: 15px; }
   .navBtn.active-nav { background: var(--accent); }
   .actionBtn { background: var(--accent); color: white; width: 100%; height: 55px; font-size: 16px; }
@@ -52,8 +54,8 @@
   #authScreen { display: flex; position: fixed; inset: 0; justify-content: center; align-items: center; background: rgba(0,0,0,0.7); z-index: 2000; }
   .auth-box { background: #1a252f; padding: 40px; border-radius: 20px; width: 90%; max-width: 420px; text-align: center; border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
 
-  .profile-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; justify-content: center; align-items: center; }
-  .profile-card { background: #2c3e50; width: 95%; max-width: 500px; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); }
+  .profile-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; justify-content: center; align-items: center; }
+  .profile-card { background: #2c3e50; width: 90%; max-width: 500px; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); }
   
   .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 20px 0; }
   .stat-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
@@ -83,7 +85,7 @@
 <!-- PROFILE MODAL -->
 <div id="profileModal" class="profile-modal">
     <div class="profile-card">
-        <h2 id="pName" style="color:var(--accent); margin-bottom:5px;">Loading Profile...</h2>
+        <h2 id="pName" style="color:var(--accent); margin-bottom:5px;">User Profile</h2>
         <p id="pGender" style="font-size:12px; opacity:0.6; margin-bottom:20px;"></p>
         
         <div class="stat-grid">
@@ -105,7 +107,7 @@
 <div id="authScreen">
   <div class="auth-box">
     <h1 style="color:var(--accent); margin-bottom: 5px;">Elite Rummy Circle</h1>
-    <div style="background: var(--accent); color: white; display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; margin-bottom: 25px;">VERSION 40.0</div>
+    <div style="background: var(--accent); color: white; display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; margin-bottom: 25px;">VERSION 39.1</div>
     
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
@@ -135,7 +137,7 @@
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
     <h2 style="color:var(--accent); margin-bottom: 5px;">Menu</h2>
-    <div style="font-size:10px; opacity:0.4; margin-bottom: 25px; font-weight: bold;">BUILD v40.0</div>
+    <div style="font-size:10px; opacity:0.4; margin-bottom: 25px; font-weight: bold;">BUILD v39.1</div>
     
     <div class="nav-section">
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">Start New Game</button>
@@ -146,7 +148,7 @@
     </div>
     
     <div style="margin-top:auto; display:flex; gap:10px; padding-top:20px; border-top:1px solid var(--glass-border);">
-        <button id="myProfBtn" style="background:var(--warning); flex:1;" onclick="viewMyProfile()">My Profile</button>
+        <button style="background:var(--warning); flex:1;" onclick="viewMyProfile()">My Profile</button>
         <button style="background:var(--danger); color:white; flex:1;" onclick="handleLogout()">Logout</button>
     </div>
   </div>
@@ -168,7 +170,8 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-let playersDb = [], savedGames = [], state = null, currentScreen = '';
+let playersDb = [], savedGames =[], state = null, currentScreen = '';
+let unsubPlayers = null, unsubGames = null;
 
 auth.onAuthStateChanged(user => {
   if(user) { 
@@ -180,7 +183,14 @@ auth.onAuthStateChanged(user => {
   } else { 
     document.getElementById('authScreen').style.display='flex';
     document.getElementById('mainApp').style.display='none';
+    if(unsubPlayers) { unsubPlayers(); unsubPlayers = null; }
+    if(unsubGames) { unsubGames(); unsubGames = null; }
   }
+});
+
+window.addEventListener('beforeunload', () => {
+   const user = auth.currentUser;
+   if(user) setOnlineStatus(user.uid, false);
 });
 
 async function setOnlineStatus(uid, status) {
@@ -195,22 +205,21 @@ function handleLogout() {
 }
 
 function loadData() {
-  // Enhanced listener with error handling
-  db.collection('players').onSnapshot(snap => {
-    playersDb = [];
+  if(unsubPlayers) unsubPlayers();
+  if(unsubGames) unsubGames();
+
+  unsubPlayers = db.collection('players').onSnapshot(snap => {
+    playersDb =[];
     snap.forEach(doc => playersDb.push({id: doc.id, ...doc.data()}));
-    console.log("Players loaded:", playersDb.length);
     if(currentScreen === 'players') renderPlayers();
-    if(currentScreen === 'newGame') renderNewGame();
-  }, err => {
-    console.error("Firestore Error:", err);
-    alert("Database Access Denied. Please check Firestore Rules.");
   });
 
-  db.collection('eliteGames').onSnapshot(snap => {
-    savedGames = []; 
+  unsubGames = db.collection('eliteGames').onSnapshot(snap => {
+    savedGames =[]; 
     snap.forEach(d => savedGames.push(d.data()));
-    if(state) { 
+    
+    // Only re-render screen-specific content if the user is ACTUALLY on that screen
+    if(currentScreen === 'activeGame' && state) { 
         let s = savedGames.find(g => g.id === state.id); 
         if(s) { state = s; renderActive(); } 
     }
@@ -233,7 +242,6 @@ async function signup() {
   try {
     const cred = await auth.createUserWithEmailAndPassword(e, p);
     const fullName = (f + " " + l).toUpperCase();
-    // Unique document per player
     await db.collection('players').doc(cred.user.uid).set({
         fullName, gender: g, isOnline: true, createdAt: new Date()
     });
@@ -242,6 +250,7 @@ async function signup() {
 
 function showScreen(s) {
   currentScreen = s;
+  if (s !== 'activeGame') state = null; // Important: Clear background game state when not playing 
   document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active-nav'));
   document.getElementById('rhsPane').style.display='none';
   if(s==='newGame') { document.getElementById('navNewGame').classList.add('active-nav'); renderNewGame(); }
@@ -259,13 +268,13 @@ function renderPlayers() {
   <table><tr><th>Full Name</th><th>Status</th><th>Profile</th></tr>`;
   
   if(!playersDb.length) {
-      html += `<tr><td colspan="3" class="empty-msg">Fetching registered players... If stalled, check database rules.</td></tr>`;
+      html += `<tr><td colspan="3" class="empty-msg">Fetching players...</td></tr>`;
   } else {
       playersDb.sort((a,b)=>a.fullName.localeCompare(b.fullName)).forEach(p => {
         html += `<tr>
           <td><b>${p.fullName}</b></td>
           <td><span class="status-tag ${p.isOnline?'online':'offline'}">${p.isOnline?'ONLINE':'OFFLINE'}</span></td>
-          <td><button onclick="viewProfile('${p.fullName}')">View Stats</button></td>
+          <td><button onclick="viewProfile('${p.fullName.replace(/'/g, "\\'")}')">View Stats</button></td>
         </tr>`;
       });
   }
@@ -290,7 +299,7 @@ function addPlayerField() {
   if(!onlineOnes.length) return alert("No players are currently online.");
   
   let opts = `<option value="">-- Choose Online Player --</option>` + 
-             onlineOnes.map(p => `<option value="${p.fullName}">${p.fullName}</option>`).join('');
+             onlineOnes.map(p => `<option value="${p.fullName.replace(/"/g, '&quot;')}">${p.fullName}</option>`).join('');
              
   const div = document.createElement('div');
   div.style="display:flex; gap:10px; margin-bottom:10px;";
@@ -316,7 +325,7 @@ function startGame() {
     players: players,
     totals: {},
     round: 1,
-    history: [],
+    history:[],
     winner: null,
     actionStats: {}
   };
@@ -327,69 +336,121 @@ function startGame() {
   });
 
   db.collection('eliteGames').doc(state.id).set(state);
+  
+  currentScreen = 'activeGame';
+  document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active-nav'));
   renderActive();
 }
 
 function renderActive() {
+  if (!state) return;
+
+  // Preserve manual input values + focus to prevent wiping when Firebase pushes an update
+  let activeInputs = {};
+  state.players.forEach(p => {
+    let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
+    let el = document.getElementById(safeId);
+    if(el) {
+        if(document.activeElement === el) activeInputs.focusId = safeId;
+        activeInputs[safeId] = el.value;
+    }
+  });
+
   document.getElementById('rhsPane').style.display='block';
   let html = `<div style="display:flex; justify-content:space-between; align-items:center;">
     <h2 style="color:var(--accent); margin:0;">${state.name}</h2>
     <span style="font-size:12px; opacity:0.7;">Started: ${state.startTime}</span>
-  </div>
-  <table><tr><th>Player</th><th>Tactics</th><th>Total</th></tr>`;
+  </div>`;
+
+  if(state.winner) {
+      html += `<div style="background:rgba(39, 174, 96, 0.2); border: 1px solid var(--accent); padding:10px; text-align:center; margin:15px 0; border-radius:8px;">
+          <strong style="color:var(--accent);">🎉 Game Over! Winner: ${state.winner} 🎉</strong>
+      </div>`;
+  }
+
+  html += `<table><tr><th>Player</th><th>Tactics</th><th>Total</th></tr>`;
 
   state.players.forEach(p => {
-    let isOut = state.totals[p] >= 240;
-    html += `<tr style="${isOut?'opacity:0.4; background:rgba(231,76,60,0.15);':''}">
-      <td><b>${p}</b><br><div style="display:flex; gap:4px; margin-top:5px;"><input type="number" id="manual-${p}" style="width:45px;" placeholder="0"><button onclick="scoreManual('${p}')">+</button></div></td>
+    let isEliminated = state.totals[p] >= 240;
+    let isOut = isEliminated || state.winner; 
+    let safeP = p.replace(/'/g, "\\'");
+    let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_'); // Fixes ID logic breaking for users with spaces in names
+
+    html += `<tr style="${isEliminated?'opacity:0.4; background:rgba(231,76,60,0.15);':''}">
+      <td><b>${p}</b><br><div style="display:flex; gap:4px; margin-top:5px;">
+        <input type="number" id="${safeId}" style="width:45px;" placeholder="0" ${state.winner?'disabled':''}>
+        <button onclick="scoreManual('${safeP}')" ${state.winner?'disabled':''}>+</button>
+      </div></td>
       <td>
-        <button style="background:var(--accent)" onclick="score('${p}',0,'shows')" ${isOut?'disabled':''}>S</button>
-        <button style="background:var(--warning)" onclick="score('${p}',20,'drops')" ${isOut?'disabled':''}>D</button>
-        <button style="background:#8e44ad; color:white;" onclick="score('${p}',40,'mds')" ${isOut?'disabled':''}>MD</button>
-        <button style="background:var(--danger); color:white;" onclick="score('${p}',80,'fcs')" ${isOut?'disabled':''}>FC</button>
+        <button style="background:var(--accent)" onclick="score('${safeP}',0,'shows')" ${isOut?'disabled':''}>S</button>
+        <button style="background:var(--warning)" onclick="score('${safeP}',20,'drops')" ${isOut?'disabled':''}>D</button>
+        <button style="background:#8e44ad; color:white;" onclick="score('${safeP}',40,'mds')" ${isOut?'disabled':''}>MD</button>
+        <button style="background:var(--danger); color:white;" onclick="score('${safeP}',80,'fcs')" ${isOut?'disabled':''}>FC</button>
       </td>
       <td><h3 style="margin:0">${state.totals[p]}</h3></td>
     </tr>`;
   });
 
-  document.getElementById('mainPane').innerHTML = html + `</table><button class="actionBtn" style="margin-top:20px;" onclick="nextRound()">End Round</button>`;
+  if (!state.winner) {
+      html += `</table><button class="actionBtn" style="margin-top:20px;" onclick="nextRound()">End Round</button>`;
+  } else {
+      html += `</table><button class="actionBtn" style="margin-top:20px;" onclick="showScreen('history')">Go to History</button>`;
+  }
+
+  document.getElementById('mainPane').innerHTML = html;
   renderHistoryPane();
+
+  // Restore preserved text values & input focus
+  state.players.forEach(p => {
+    let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
+    let el = document.getElementById(safeId);
+    if(el && activeInputs[safeId] !== undefined) el.value = activeInputs[safeId];
+  });
+  if(activeInputs.focusId) {
+     let focusedEl = document.getElementById(activeInputs.focusId);
+     if(focusedEl) focusedEl.focus();
+  }
 }
 
 function score(p, val, type) {
+  if (state.totals[p] >= 240 || state.winner) return; // Halt logic if already out or Game Over
   state.totals[p] += val;
   if(type) state.actionStats[p][type]++;
   db.collection('eliteGames').doc(state.id).set(state);
 }
 
 function scoreManual(p) {
-  let v = parseInt(document.getElementById(`manual-${p}`).value) || 0;
+  if (state.totals[p] >= 240 || state.winner) return;
+  let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
+  let inputEl = document.getElementById(safeId);
+  let v = parseInt(inputEl.value) || 0;
   score(p, v);
-  document.getElementById(`manual-${p}`).value = "";
+  inputEl.value = "";
 }
 
 function nextRound() {
   state.history.push({ round: state.round, totals: {...state.totals} });
   state.round++;
   let active = state.players.filter(p => state.totals[p] < 240);
-  if(active.length === 1) {
-    state.winner = active[0];
+  
+  if(active.length <= 1) {
+    if(active.length === 1) {
+        state.winner = active[0];
+    } else {
+        // Tie-breaker fallback if everyone exceeds 240 limit: Lower score wins.
+        let lowestScorePlayer = state.players.reduce((min, p) => state.totals[p] < state.totals[min] ? p : min, state.players[0]);
+        state.winner = lowestScorePlayer;
+    }
     const now = new Date();
     state.endTime = now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
   }
+  
   db.collection('eliteGames').doc(state.id).set(state);
 }
 
-async function viewProfile(name) {
-    let p = playersDb.find(x => x.fullName === name);
-    
-    // Fallback: If not in list, fetch directly from DB
-    if(!p && auth.currentUser) {
-        const d = await db.collection('players').doc(auth.currentUser.uid).get();
-        if(d.exists) p = d.data();
-    }
-    
-    if(!p) return alert("Profile data not ready.");
+function viewProfile(name) {
+    const p = playersDb.find(x => x.fullName === name);
+    if(!p) return;
     
     let finished = savedGames.filter(g => g.winner && g.players.includes(name));
     let wins = finished.filter(g => g.winner === name).length;
@@ -413,14 +474,14 @@ async function viewProfile(name) {
     document.getElementById('statMD').innerText = md;
     document.getElementById('statTotal').innerText = finished.length;
 
-    let analysis = "No match history found.";
+    let analysis = "No match history found for a deep analysis.";
     if(finished.length > 0) {
         if(d + md > s + fc) {
-            analysis = `<b>Conservative Strategist:</b> ${p.fullName} prefers calculated safety. High frequency of Drops suggests a tactical player.`;
+            analysis = `<b>Conservative Strategist:</b> ${p.fullName} prefers calculated safety. High frequency of Drops (${d}) and Mid-Drops (${md}) suggests a tactical player who knows when to retreat to minimize damage.`;
         } else if (s > fc) {
-            analysis = `<b>Aggressive High-Roller:</b> ${p.fullName} hunts for victory early and rarely settles for a full loss.`;
+            analysis = `<b>Aggressive High-Roller:</b> ${p.fullName} is a risk-taker. With a high Show (${s}) count, they hunt for victory early and rarely settle for a Full Score loss.`;
         } else {
-            analysis = `<b>Balanced Competitor:</b> Adapts well to the hand they are dealt.`;
+            analysis = `<b>Balanced Competitor:</b> ${p.fullName} adapts well to the hand they are dealt. They show a mix of patience and aggression across their history.`;
         }
     }
     document.getElementById('aiAnalysis').innerHTML = "<b>AI ANALYSIS:</b><br>" + analysis;
@@ -430,14 +491,7 @@ async function viewProfile(name) {
 function viewMyProfile() {
     if(!auth.currentUser) return;
     const me = playersDb.find(p => p.id === auth.currentUser.uid);
-    if(me) {
-        viewProfile(me.fullName);
-    } else {
-        // Direct DB attempt if list isn't ready
-        db.collection('players').doc(auth.currentUser.uid).get().then(doc => {
-            if(doc.exists) viewProfile(doc.data().fullName);
-        });
-    }
+    if(me) viewProfile(me.fullName);
 }
 
 function renderContinue() {
@@ -458,7 +512,12 @@ function renderContinue() {
   document.getElementById('mainPane').innerHTML = html;
 }
 
-function resume(id) { state = savedGames.find(g => g.id === id); renderActive(); }
+function resume(id) { 
+    state = savedGames.find(g => g.id === id); 
+    currentScreen = 'activeGame';
+    document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active-nav'));
+    renderActive(); 
+}
 
 function renderHistory() {
   let finished = savedGames.filter(g => g.winner);
@@ -504,8 +563,9 @@ function renderReports() {
 
 function renderHistoryPane() {
   let h = "<h3>Game Logs</h3>";
-  if(!state.history.length) h += `<div style="font-size:11px; opacity:0.5;">Waiting for round completion...</div>`;
-  state.history.forEach(r => h += `<div style="font-size:11px; margin-bottom:8px; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+  if(!state.history.length) h += `<div style="font-size:11px; opacity:0.5;">Waiting for first round...</div>`;
+  // Reverse applied so newly finalized rounds stay at the top of the feed instead of getting buried
+  state.history.slice().reverse().forEach(r => h += `<div style="font-size:11px; margin-bottom:8px; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
     <b>Round ${r.round}:</b><br>${Object.entries(r.totals).map(([p, s]) => p + ": " + s).join(' | ')}
   </div>`);
   document.getElementById('rhsPane').innerHTML = h;
