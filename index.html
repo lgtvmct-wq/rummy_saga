@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elite Rummy Circle</title>
+<title>Elite Rummy Circle - v38.0</title>
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -51,21 +51,27 @@
 
   /* Profiles & Tables */
   .profile-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; justify-content: center; align-items: center; }
-  .profile-card { background: #2c3e50; width: 90%; max-width: 450px; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); }
+  .profile-card { background: #2c3e50; width: 90%; max-width: 500px; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); }
   
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 20px 0; }
+  .stat-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+  .stat-val { font-size: 18px; font-weight: bold; color: var(--accent); display: block; }
+  .stat-lbl { font-size: 10px; color: #aaa; text-transform: uppercase; }
+
   table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-  th { text-align: left; padding: 12px; color: var(--accent); font-size: 12px; text-transform: uppercase; border-bottom: 2px solid var(--glass-border); }
-  td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  th { text-align: left; padding: 12px; color: var(--accent); font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--glass-border); }
+  td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
 
   .status-tag { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
   .online { background: var(--accent); color: white; }
   .offline { background: #555; color: white; }
 
+  .empty-msg { text-align: center; padding: 40px; opacity: 0.5; font-style: italic; }
+
   @media (max-width: 900px) {
     .app-wrapper { flex-direction: column; overflow-y: auto; }
     .left-sidebar { width: 100%; height: auto; border-right: none; padding: 15px; }
     .nav-section { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .main-pane { padding: 20px; }
     .rhs-pane { border-left: none; border-top: 1px solid var(--glass-border); min-width: 100%; }
   }
 </style>
@@ -75,28 +81,43 @@
 <!-- PROFILE MODAL -->
 <div id="profileModal" class="profile-modal">
     <div class="profile-card">
-        <h2 id="pName" style="color:var(--accent); margin-bottom:10px;">User Profile</h2>
-        <div id="pStats" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin:20px 0;"></div>
-        <button class="actionBtn" onclick="document.getElementById('profileModal').style.display='none'">Close</button>
+        <h2 id="pName" style="color:var(--accent); margin-bottom:5px;">User Profile</h2>
+        <p id="pGender" style="font-size:12px; opacity:0.6; margin-bottom:20px;"></p>
+        
+        <div class="stat-grid">
+            <div class="stat-item"><span class="stat-val" id="statWins">0</span><span class="stat-lbl">Wins</span></div>
+            <div class="stat-item"><span class="stat-val" id="statS">0</span><span class="stat-lbl">Shows (S)</span></div>
+            <div class="stat-item"><span class="stat-val" id="statFC">0</span><span class="stat-lbl">Full (FC)</span></div>
+            <div class="stat-item"><span class="stat-val" id="statD">0</span><span class="stat-lbl">Drop (D)</span></div>
+            <div class="stat-item"><span class="stat-val" id="statMD">0</span><span class="stat-lbl">Mid (MD)</span></div>
+            <div class="stat-item"><span class="stat-val" id="statTotal">0</span><span class="stat-lbl">Matches</span></div>
+        </div>
+
+        <div id="aiAnalysis" style="background:rgba(39, 174, 96, 0.1); border-left: 4px solid var(--accent); padding:15px; text-align:left; font-size:13px; border-radius:4px; margin-bottom:20px;"></div>
+
+        <button class="actionBtn" onclick="document.getElementById('profileModal').style.display='none'">Close Dashboard</button>
     </div>
 </div>
 
 <!-- AUTH SCREEN -->
 <div id="authScreen">
   <div class="auth-box">
-    <h1 style="color:var(--accent); margin-bottom: 30px;">Elite Rummy Circle</h1>
+    <h1 style="color:var(--accent); margin-bottom: 5px;">Elite Rummy</h1>
+    <p style="font-size:10px; opacity:0.4; margin-bottom: 25px;">VERSION 38.0</p>
+    
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
       <input id="loginPassword" class="std-input" type="password" placeholder="Password">
       <button class="actionBtn" onclick="login()">Log In</button>
       <a onclick="toggleAuthView('signup')" style="cursor:pointer; display:block; margin-top:20px; font-size:13px; text-decoration:underline;">Register New Account</a>
     </div>
+
     <div id="signupView" style="display:none">
       <div style="display:flex; gap:10px;"><input id="signupFirst" class="std-input" placeholder="First Name"><input id="signupLast" class="std-input" placeholder="Last Name"></div>
-      <div style="text-align:left; font-size:11px; margin-bottom:5px; color:var(--accent);">GENDER</div>
+      <div style="text-align:left; font-size:11px; margin-bottom:5px; color:var(--accent); font-weight:bold;">GENDER</div>
       <select id="signupGender" class="std-input">
-        <option value="male">Male</option>
-        <option value="female">Female</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
       </select>
       <input id="signupEmail" class="std-input" placeholder="Email Address">
       <input id="signupPass" class="std-input" type="password" placeholder="Password">
@@ -111,7 +132,8 @@
 <!-- MAIN APP -->
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
-    <h2 style="color:var(--accent); margin-bottom: 30px;">Menu</h2>
+    <h2 style="color:var(--accent); margin-bottom: 5px;">Menu</h2>
+    <p style="font-size:10px; opacity:0.4; margin-bottom: 25px;">VERSION 38.0</p>
     <div class="nav-section">
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">Start New Game</button>
       <button id="navPlayers" class="navBtn" onclick="showScreen('players')">Players List</button>
@@ -157,18 +179,9 @@ auth.onAuthStateChanged(user => {
   }
 });
 
-/* CRITICAL FIX: Update only the specific player in the list */
+// COLLECTION-BASED PLAYER STATUS
 async function setOnlineStatus(uid, status) {
-  const docRef = db.collection('eliteData').doc('playersData');
-  const doc = await docRef.get();
-  if(doc.exists) {
-    let list = doc.data().list || [];
-    let idx = list.findIndex(p => p.id === uid);
-    if(idx !== -1) {
-        list[idx].isOnline = status;
-        await docRef.set({ list: list });
-    }
-  }
+  await db.collection('players').doc(uid).update({ isOnline: status }).catch(() => {});
 }
 
 function handleLogout() {
@@ -179,16 +192,21 @@ function handleLogout() {
 }
 
 function loadData() {
-  db.collection('eliteData').doc('playersData').onSnapshot(doc => { 
-    if(doc.exists) { 
-        playersDb = doc.data().list || []; 
-        if(currentScreen === 'players') renderPlayers();
-        if(currentScreen === 'newGame') renderNewGame();
-    }
+  // Listener for individual player documents
+  db.collection('players').onSnapshot(snap => {
+    playersDb = [];
+    snap.forEach(doc => playersDb.push({id: doc.id, ...doc.data()}));
+    if(currentScreen === 'players') renderPlayers();
+    if(currentScreen === 'newGame') renderNewGame();
   });
+
   db.collection('eliteGames').onSnapshot(snap => {
-    savedGames = []; snap.forEach(d => savedGames.push(d.data()));
-    if(state) { let s = savedGames.find(g => g.id === state.id); if(s) { state = s; renderActive(); } }
+    savedGames = []; 
+    snap.forEach(d => savedGames.push(d.data()));
+    if(state) { 
+        let s = savedGames.find(g => g.id === state.id); 
+        if(s) { state = s; renderActive(); } 
+    }
     if(currentScreen==='continue') renderContinue();
     if(currentScreen==='history') renderHistory();
     if(currentScreen==='reports') renderReports();
@@ -208,11 +226,10 @@ async function signup() {
   try {
     const cred = await auth.createUserWithEmailAndPassword(e, p);
     const fullName = (f + " " + l).toUpperCase();
-    const docRef = db.collection('eliteData').doc('playersData');
-    const doc = await docRef.get();
-    let list = doc.exists ? (doc.data().list || []) : [];
-    list.push({ id: cred.user.uid, fullName, gender: g, isOnline: true });
-    await docRef.set({ list: list });
+    // Save to unique player document
+    await db.collection('players').doc(cred.user.uid).set({
+        fullName, gender: g, isOnline: true, createdAt: new Date()
+    });
   } catch (err) { alert(err.message); }
 }
 
@@ -233,13 +250,18 @@ function renderPlayers() {
     <button onclick="showScreen('newGame')" style="background:var(--accent)">← Back</button>
   </div>
   <table><tr><th>Full Name</th><th>Status</th><th>Profile</th></tr>`;
-  playersDb.sort((a,b)=>a.fullName.localeCompare(b.fullName)).forEach(p => {
-    html += `<tr>
-      <td><b>${p.fullName}</b></td>
-      <td><span class="status-tag ${p.isOnline?'online':'offline'}">${p.isOnline?'ONLINE':'OFFLINE'}</span></td>
-      <td><button onclick="viewProfile('${p.fullName}')">View Profile</button></td>
-    </tr>`;
-  });
+  
+  if(!playersDb.length) {
+      html += `<tr><td colspan="3" class="empty-msg">No players found in database.</td></tr>`;
+  } else {
+      playersDb.sort((a,b)=>a.fullName.localeCompare(b.fullName)).forEach(p => {
+        html += `<tr>
+          <td><b>${p.fullName}</b></td>
+          <td><span class="status-tag ${p.isOnline?'online':'offline'}">${p.isOnline?'ONLINE':'OFFLINE'}</span></td>
+          <td><button onclick="viewProfile('${p.fullName}')">View Stats</button></td>
+        </tr>`;
+      });
+  }
   document.getElementById('mainPane').innerHTML = html + `</table>`;
 }
 
@@ -271,7 +293,7 @@ function addPlayerField() {
 }
 
 function startGame() {
-  const name = document.getElementById('gName').value || "Unnamed Game";
+  const name = document.getElementById('gName').value || "Standard Game";
   const selects = Array.from(document.querySelectorAll('#dynamicPlayers select'));
   const players = selects.map(s => s.value).filter(v => v !== "");
   
@@ -354,66 +376,116 @@ function nextRound() {
 function viewProfile(name) {
     const p = playersDb.find(x => x.fullName === name);
     if(!p) return;
+    
+    // Aggregating Stats
+    let finished = savedGames.filter(g => g.winner && g.players.includes(name));
+    let wins = finished.filter(g => g.winner === name).length;
+    let s=0, fc=0, d=0, md=0;
+    
+    finished.forEach(g => {
+        if(g.actionStats && g.actionStats[name]) {
+            s += g.actionStats[name].shows || 0;
+            fc += g.actionStats[name].fcs || 0;
+            d += g.actionStats[name].drops || 0;
+            md += g.actionStats[name].mds || 0;
+        }
+    });
+
     document.getElementById('pName').innerText = p.fullName;
-    let matches = savedGames.filter(g => g.winner && g.players.includes(name));
-    let wins = matches.filter(g => g.winner === name).length;
-    document.getElementById('pStats').innerHTML = `
-        <div style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px;">Matches: ${matches.length}</div>
-        <div style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px;">Wins: ${wins}</div>
-        <div style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px;">Gender: ${p.gender}</div>
-        <div style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px;">Status: ${p.isOnline?'Online':'Offline'}</div>
-    `;
+    document.getElementById('pGender').innerText = "GENDER: " + (p.gender || "Not Specified");
+    document.getElementById('statWins').innerText = wins;
+    document.getElementById('statS').innerText = s;
+    document.getElementById('statFC').innerText = fc;
+    document.getElementById('statD').innerText = d;
+    document.getElementById('statMD').innerText = md;
+    document.getElementById('statTotal').innerText = finished.length;
+
+    // AI Pattern Analysis
+    let analysis = "No match history found for a deep analysis.";
+    if(finished.length > 0) {
+        if(d + md > s + fc) {
+            analysis = `<b>Conservative Strategist:</b> ${p.fullName} prefers calculated safety. High frequency of Drops (${d}) and Mid-Drops (${md}) suggests a tactical player who knows when to retreat to minimize damage.`;
+        } else if (s > fc) {
+            analysis = `<b>Aggressive High-Roller:</b> ${p.fullName} is a risk-taker. With a high Show (${s}) count, they hunt for victory early and rarely settle for a Full Score loss.`;
+        } else {
+            analysis = `<b>Balanced Competitor:</b> ${p.fullName} adapts well to the hand they are dealt. They show a mix of patience and aggression across their history.`;
+        }
+    }
+    document.getElementById('aiAnalysis').innerHTML = "<b>AI ANALYSIS:</b><br>" + analysis;
     document.getElementById('profileModal').style.display = 'flex';
 }
 
 function viewMyProfile() {
+    if(!auth.currentUser) return;
     const me = playersDb.find(p => p.id === auth.currentUser.uid);
     if(me) viewProfile(me.fullName);
 }
 
 function renderContinue() {
   let active = savedGames.filter(g => !g.winner);
-  document.getElementById('mainPane').innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center;">
+  let html = `<div style="display:flex; justify-content:space-between; align-items:center;">
         <h2>Active Games</h2>
         <button onclick="showScreen('newGame')" style="background:var(--accent)">← Back</button>
-    </div>` + 
-    active.map(g => `<div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+    </div>`;
+  
+  if(!active.length) {
+      html += `<div class="empty-msg">No Active Games to show.</div>`;
+  } else {
+      html += active.map(g => `<div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
         <div><b>${g.name}</b><br><small>Started: ${g.startTime}</small></div>
         <button onclick="resume('${g.id}')" style="background:var(--accent)">Resume</button>
     </div>`).join('');
+  }
+  document.getElementById('mainPane').innerHTML = html;
 }
 
 function resume(id) { state = savedGames.find(g => g.id === id); renderActive(); }
 
 function renderHistory() {
   let finished = savedGames.filter(g => g.winner);
-  document.getElementById('mainPane').innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center;">
+  let html = `<div style="display:flex; justify-content:space-between; align-items:center;">
         <h2>Game History</h2>
         <button onclick="showScreen('newGame')" style="background:var(--accent)">← Back</button>
-    </div>` + 
-    finished.map(g => `<div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:12px; margin-bottom:10px;">
+    </div>`;
+
+  if(!finished.length) {
+      html += `<div class="empty-msg">No History to show.</div>`;
+  } else {
+      html += finished.map(g => `<div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:12px; margin-bottom:10px;">
         <div style="display:flex; justify-content:space-between;"><b>${g.name}</b> <span style="color:var(--accent)">Winner: ${g.winner}</span></div>
         <div style="font-size:11px; opacity:0.6; margin-top:5px;">${g.startTime} — ${g.endTime}</div>
     </div>`).join('');
+  }
+  document.getElementById('mainPane').innerHTML = html;
 }
 
 function renderReports() {
+  let finished = savedGames.filter(g => g.winner);
   let html = `<div style="display:flex; justify-content:space-between; align-items:center;">
-    <h2>Reports</h2>
+    <h2>Game Reports</h2>
     <button onclick="showScreen('newGame')" style="background:var(--accent)">← Back</button>
-  </div><table><tr><th>Player</th><th>Win %</th><th>Matches</th></tr>`;
-  playersDb.forEach(p => {
-    let m = savedGames.filter(g => g.winner && g.players.includes(p.fullName));
-    let w = m.filter(g => g.winner === p.fullName).length;
-    html += `<tr><td><b>${p.fullName}</b></td><td>${m.length?((w/m.length)*100).toFixed(1):0}%</td><td>${m.length}</td></tr>`;
-  });
-  document.getElementById('mainPane').innerHTML = html + `</table>`;
+  </div>`;
+
+  if(!finished.length) {
+      html += `<div class="empty-msg">No Reports to show.</div>`;
+  } else {
+      html += `<table><tr><th>Game Name</th><th>Winner</th><th>Players</th><th>Date</th></tr>`;
+      finished.forEach(g => {
+        html += `<tr>
+            <td><b>${g.name}</b></td>
+            <td style="color:var(--accent)">${g.winner}</td>
+            <td>${g.players.length}</td>
+            <td>${g.startTime.split(' ')[0]}</td>
+        </tr>`;
+      });
+      html += `</table>`;
+  }
+  document.getElementById('mainPane').innerHTML = html;
 }
 
 function renderHistoryPane() {
   let h = "<h3>Game Logs</h3>";
+  if(!state.history.length) h += `<div style="font-size:11px; opacity:0.5;">Waiting for first round...</div>`;
   state.history.forEach(r => h += `<div style="font-size:11px; margin-bottom:8px; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
     <b>Round ${r.round}:</b><br>${Object.entries(r.totals).map(([p, s]) => p + ": " + s).join(' | ')}
   </div>`);
