@@ -37,22 +37,23 @@
   
   .player-roster-section { flex-grow: 1; overflow-y: auto; margin-top: 10px; border-top: 1px solid var(--glass-border); padding-top: 15px; }
   .roster-item { display: flex; align-items: center; font-size: 13px; padding: 6px 12px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.2s; }
-  .roster-item:hover { background: rgba(255,255,255,0.15); }
+  .roster-item:hover { background: rgba(0,230,118,0.15); }
   
-  /* Status Dots */
   .status-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
   .dot-online { background: #00e676; box-shadow: 0 0 8px #00e676; }
-  .dot-offline { background: #555; box-shadow: none; }
+  .dot-offline { background: #555; }
   
   .content-area { display: flex; flex: 1; overflow: hidden; }
   .main-pane { flex: 2.5; padding: 20px 30px; overflow-y: auto; }
   .rhs-pane { flex: 1; min-width: 320px; background: rgba(0,0,0,0.3); padding: 20px; border-left: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(15px);}
 
+  /* Visibility: Black text on Light inputs */
   .bigInput, .bigSelect { 
     width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; 
     border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.95); 
     color: #000 !important; font-weight: 600; box-sizing: border-box; 
   }
+  .bigInput::placeholder { color: #444 !important; opacity: 1; }
   
   .score-input { 
     width: 50px; padding: 6px; background: rgba(255,255,255,0.95); 
@@ -65,24 +66,44 @@
   .navBtn.active-nav { background: var(--btn-show); color: #111; }
   .bigBtn { width: 100%; margin: 10px 0; font-size: 16px; padding: 14px; background: var(--btn-show); color: #111; }
   
-  #authScreen { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; z-index: 1000; }
-  .auth-box { background: rgba(15, 32, 39, 0.95); padding: 30px; border-radius: 15px; width: 340px; border: 1px solid var(--glass-border); backdrop-filter: blur(15px); text-align: center; }
+  .game-card { background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); padding: 15px; border-radius: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(5px); }
+  .delete-btn { background: #ff5252; color: white; }
 
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th { text-align: left; font-size: 11px; color: #aaa; padding: 10px; text-transform: uppercase; border-bottom: 1px solid var(--glass-border); }
+  td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .eliminated { opacity: 0.35; background: rgba(255,0,0,0.08); }
+
+  #authScreen { 
+    display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+    z-index: 1000; display: flex; justify-content: center; align-items: center; 
+  }
+  .auth-box { 
+    background: rgba(15, 32, 39, 0.95); padding: 30px; border-radius: 15px; 
+    width: 350px; border: 1px solid var(--glass-border); backdrop-filter: blur(15px); 
+    text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5); 
+  }
+
+  /* Modals */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
-  .modal-content { background: #1a2a3a; width: 90%; max-width: 500px; max-height: 85vh; padding: 20px; border-radius: 15px; border: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(20px); }
+  .modal-content { background: #1a2a3a; width: 90%; max-width: 550px; max-height: 85vh; padding: 25px; border-radius: 15px; border: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(20px); position: relative;}
 
   .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px 0; }
   .stat-box { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
   .stat-val { font-size: 15px; font-weight: bold; color: var(--btn-show); display: block; }
   .stat-lbl { font-size: 8px; color: #aaa; text-transform: uppercase; }
 
+  .viking-avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--btn-show); margin-bottom: 10px; background: #222; }
+
   @media (max-width: 900px) {
-    .app-wrapper { flex-direction: column; overflow-y: auto; }
-    .left-sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--glass-border); padding: 10px; }
+    .app-wrapper { flex-direction: column; overflow-y: auto; height: 100vh; }
+    .left-sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--glass-border); padding: 10px; box-sizing: border-box; display: block; position: relative; }
     .nav-section { display: flex; overflow-x: auto; gap: 5px; }
     .navBtn { width: auto; margin-bottom: 0; font-size: 10px; padding: 6px 10px; }
-    .player-roster-section { display: flex; flex-direction: row; gap: 5px; overflow-x: auto; padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 5px; }
+    .player-roster-section { display: flex; flex-direction: row; gap: 5px; overflow-x: auto; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 5px; }
     .roster-item { padding: 4px 8px; font-size: 10px; flex-shrink: 0; }
+    .logout-bar { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 20; }
+    .main-pane { padding: 10px; }
   }
 </style>
 </head>
@@ -91,9 +112,9 @@
 <!-- PROFILE MODAL -->
 <div id="profileModal" class="modal-overlay">
   <div class="modal-content" style="text-align:center;">
-    <img id="profAvatar" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--btn-show); margin-bottom:10px;" src="">
+    <img id="profAvatar" class="viking-avatar" src="">
     <h2 id="profName" style="color:var(--btn-show); margin:0;">Viking</h2>
-    <p id="profViking" style="color:#aaa; font-size:11px; font-style:italic; margin:5px 0 15px 0;"></p>
+    <p id="profViking" style="color:#aaa; font-size:12px; font-style:italic; margin:5px 0 15px 0;"></p>
     
     <div class="stat-grid">
       <div class="stat-box"><span class="stat-val" id="statPlayed">0</span><span class="stat-lbl">Played</span></div>
@@ -102,10 +123,30 @@
       <div class="stat-box"><span class="stat-val" id="statDrops">0</span><span class="stat-lbl">D (20)</span></div>
       <div class="stat-box"><span class="stat-val" id="statMds">0</span><span class="stat-lbl">MD (40)</span></div>
       <div class="stat-box"><span class="stat-val" id="statFcs">0</span><span class="stat-lbl">FC (80)</span></div>
+      <div class="stat-box"><span class="stat-val" id="statOuts">0</span><span class="stat-lbl">Outs</span></div>
+      <div class="stat-box" style="grid-column: span 2;"><span class="stat-val" id="statPts">0</span><span class="stat-lbl">Career Pts</span></div>
     </div>
     
-    <div id="aiReport" style="background:rgba(0,230,118,0.1); border-left: 4px solid var(--btn-show); padding:12px; margin-top:10px; border-radius:4px; font-size:13px; text-align:left;"></div>
+    <h4 style="text-align:left; margin-bottom:5px;">Recent Glory</h4>
+    <div id="profLog" style="text-align:left; font-size:11px; max-height:100px; overflow-y:auto; color:#ccc; background:rgba(0,0,0,0.2); padding:10px; border-radius:6px;"></div>
+
+    <div id="aiReport" style="background:rgba(0,230,118,0.1); border-left: 4px solid var(--btn-show); padding:15px; margin-top:15px; border-radius:4px; font-size:13px; text-align:left;"></div>
     <button class="bigBtn" onclick="closeModal('profileModal')">Close Profile</button>
+  </div>
+</div>
+
+<!-- NOTES MODAL -->
+<div id="notesModal" class="modal-overlay">
+  <div class="modal-content">
+    <h2 style="color:var(--btn-show); margin-top:0;">Elite Rummy Circle - v32.0</h2>
+    <p style="color:#00e676; font-size:11px; margin-top:-10px;">Updated: May 4, 2026</p>
+    <ul>
+      <li><strong>Realistic Avatars:</strong> Stylized Viking warriors for every player.</li>
+      <li><strong>Deep Profiles:</strong> Fixed career stats tracking (S, D, MD, FC, Outs).</li>
+      <li><strong>Secure Auth:</strong> Password confirmation, show/hide toggle, and Viking name generation.</li>
+      <li><strong>Mobile Fix:</strong> Center-aligned UI with Logout/Profile at the top RHS.</li>
+    </ul>
+    <button class="bigBtn" onclick="closeModal('notesModal')">Close</button>
   </div>
 </div>
 
@@ -134,7 +175,7 @@
       </div>
       <input id="signupEmail" class="bigInput" placeholder="Email Address">
       <div style="position:relative;">
-        <input id="signupPass" class="bigInput" type="password" placeholder="Create Password">
+        <input id="signupPass" class="bigInput" type="password" placeholder="Password">
         <span onclick="togglePass('signupPass')" style="position:absolute; right:12px; top:12px; color:#444; cursor:pointer;">👁️</span>
       </div>
       <input id="signupConfirm" class="bigInput" type="password" placeholder="Confirm Password">
@@ -148,9 +189,9 @@
 <!-- MAIN APP -->
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
-    <div style="display:flex; justify-content:space-between; margin-bottom:15px; gap:5px;">
-        <button class="navBtn" style="background:var(--btn-md); color:#111; margin:0; flex:1; text-align:center; padding:8px;" onclick="viewMyProfile()">Profile</button>
-        <button class="navBtn" style="background:var(--btn-fc); color:white; margin:0; flex:1; text-align:center; padding:8px;" onclick="handleLogout()">Logout</button>
+    <div class="logout-bar">
+        <button class="navBtn" style="background:var(--btn-md); color:#111; margin:0; padding:6px 12px;" onclick="viewMyProfile()">Profile</button>
+        <button class="navBtn" style="background:var(--btn-fc); color:white; margin:0; padding:6px 12px;" onclick="handleLogout()">Logout</button>
     </div>
     <h2 style="color:var(--btn-show); font-size: 18px; margin: 0 0 15px 0;">Elite Rummy</h2>
     
@@ -165,7 +206,7 @@
         <h4 style="font-size:10px; color:#00e676; text-transform:uppercase; letter-spacing:1px; margin:0 0 8px 0;">Players</h4>
         <div id="sidebarRoster"></div>
     </div>
-    <small style="cursor:pointer; text-decoration:underline; color:#777; font-size: 10px;" onclick="openNotes()">v31.0 Notes</small>
+    <small style="cursor:pointer; text-decoration:underline; color:#777; font-size: 10px;" onclick="openModal('notesModal')">v32.0 Notes</small>
   </div>
   
   <div class="content-area">
@@ -209,7 +250,7 @@ auth.onAuthStateChanged(user => {
 
 function setOnlineStatus(uid, status) {
   db.collection('eliteData').doc('playersData').get().then(doc => {
-    let list = doc.data().list;
+    let list = doc.data().list || [];
     let idx = list.findIndex(p => p.id === uid);
     if(idx !== -1) {
         list[idx].isOnline = status;
@@ -219,8 +260,10 @@ function setOnlineStatus(uid, status) {
 }
 
 function handleLogout() {
-  setOnlineStatus(auth.currentUser.uid, false);
-  setTimeout(() => { auth.signOut(); }, 500);
+  if(auth.currentUser) {
+    setOnlineStatus(auth.currentUser.uid, false);
+    setTimeout(() => { auth.signOut(); }, 500);
+  }
 }
 
 function loadData() {
@@ -252,10 +295,11 @@ function login() { auth.signInWithEmailAndPassword(document.getElementById('logi
 function signup() {
   const f = document.getElementById('signupFirst').value, l = document.getElementById('signupLast').value, e = document.getElementById('signupEmail').value, p = document.getElementById('signupPass').value, c = document.getElementById('signupConfirm').value, v = document.getElementById('signupViking').value;
   if(p !== c) return alert("Mismatched passwords!");
+  if(!v) return alert("Generate a Viking name!");
   auth.createUserWithEmailAndPassword(e, p).then(cred => {
     const name = (f + " " + l).toUpperCase();
-    playersDb.push({ id: cred.user.uid, fullName: name, vikingName: v, isOnline: true });
-    db.collection('eliteData').doc('playersData').set({ list: playersDb });
+    let updatedList = [...playersDb, { id: cred.user.uid, fullName: name, vikingName: v, isOnline: true }];
+    db.collection('eliteData').doc('playersData').set({ list: updatedList });
   }).catch(err => alert(err.message));
 }
 
@@ -273,10 +317,10 @@ function renderNewGame() {
   let opts = `<option value="">-- Choose Player --</option>` + playersDb.map(p => `<option value="${p.fullName}">${p.fullName}</option>`).join('');
   document.getElementById('mainPane').innerHTML = `
     <h2 style="font-size:18px;">Start New Game</h2>
-    <div class="game-card" style="display:block; padding:12px; border-radius:0;">
+    <div class="game-card" style="display:block; padding:12px; border-radius:8px;">
         <div style="display:flex; gap:5px; margin-bottom:8px;">
             <input id="gName" class="bigInput" placeholder="Game Name" style="margin-bottom:0; flex:1;">
-            <button class="navBtn" style="background:rgba(255,255,255,0.1); width:auto; padding:5px 10px;" onclick="appendTime('gName')">🕒</button>
+            <button class="navBtn" style="background:rgba(255,255,255,0.1); width:auto; padding:5px 12px;" onclick="appendTime('gName')">🕒</button>
         </div>
         <div id="selArea"><select class="bigSelect p-sel" style="margin-bottom:8px;">${opts}</select></div>
         <div style="display:flex; gap:5px;">
@@ -305,22 +349,24 @@ function startMatch() {
 
 function renderActive() {
   document.getElementById('rhsPane').style.display='block';
-  let html = `<h2 style="font-size:16px; margin:0 0 10px 0;">${state.name}</h2><table><tr><th>Player</th><th>Actions</th><th>Total</th></tr>`;
+  let html = `<h2 style="font-size:16px; margin:0 0 10px 0; color:var(--btn-show);">${state.name}</h2><table><tr><th>Player</th><th>Actions</th><th>Total</th></tr>`;
   state.players.forEach(p => {
     let isOut = state.totals[p] >= 240;
     html += `<tr class="${isOut?'eliminated':''}">
-      <td><b>${p.split(' ')[0]}</b><br><div style="display:flex; gap:2px;"><input type="number" id="manual-${p}" class="score-input" placeholder="0"><button onclick="scoreManual('${p}')">+</button></div></td>
+      <td><b>${p.split(' ')[0]}</b><br><div style="display:flex; gap:2px;"><input type="number" id="manual-${p}" class="score-input" placeholder="0"><button style="background:rgba(255,255,255,0.1); padding:4px;" onclick="scoreManual('${p}')">+</button></div></td>
       <td>
-        <button style="background:var(--btn-show)" onclick="score('${p}',0,'shows')" ${isOut?'disabled':''}>S</button>
-        <button style="background:var(--btn-drop)" onclick="score('${p}',20,'drops')" ${isOut?'disabled':''}>D</button>
-        <button style="background:var(--btn-md)" onclick="score('${p}',40,'mds')" ${isOut?'disabled':''}>MD</button>
-        <button style="background:var(--btn-fc); color:white;" onclick="score('${p}',80,'fcs')" ${isOut?'disabled':''}>F</button>
-        ${(isOut && !state.reentered[p]) ? `<br><button style="background:var(--btn-md); width:100%;" onclick="reenter('${p}')">RE-ENTER</button>` : ''}
+        <div style="display:flex; flex-wrap:wrap; gap:4px;">
+            <button style="background:var(--btn-show)" onclick="score('${p}',0,'shows')" ${isOut?'disabled':''}>S</button>
+            <button style="background:var(--btn-drop)" onclick="score('${p}',20,'drops')" ${isOut?'disabled':''}>D</button>
+            <button style="background:var(--btn-md)" onclick="score('${p}',40,'mds')" ${isOut?'disabled':''}>MD</button>
+            <button style="background:var(--btn-fc); color:white;" onclick="score('${p}',80,'fcs')" ${isOut?'disabled':''}>F</button>
+        </div>
+        ${(isOut && !state.reentered[p]) ? `<button style="background:var(--btn-md); width:100%; margin-top:5px;" onclick="reenter('${p}')">RE-ENTER</button>` : ''}
       </td>
       <td><h3 style="margin:0">${state.totals[p]}</h3></td>
     </tr>`;
   });
-  html += `</table><button class="bigBtn" onclick="nextRound()">Next Round</button>`;
+  html += `</table><button class="bigBtn" onclick="nextRound()">End Round</button>`;
   document.getElementById('mainPane').innerHTML = html;
   renderHistoryPane();
 }
@@ -347,8 +393,8 @@ function nextRound() {
 function viewProfile(name) {
     const pData = playersDb.find(x => x.fullName === name);
     document.getElementById('profName').innerText = name;
-    document.getElementById('profViking').innerText = pData ? pData.vikingName : "Unknown Viking";
-    document.getElementById('profAvatar').src = `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`;
+    document.getElementById('profViking').innerText = pData ? pData.vikingName : "Humble Wanderer";
+    document.getElementById('profAvatar').src = `https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=${name}&beardProbability=100`;
 
     let finished = savedGames.filter(g => g.winner);
     let myGames = finished.filter(g => g.players.includes(name));
@@ -371,37 +417,41 @@ function viewProfile(name) {
     document.getElementById('statMds').innerText = m;
     document.getElementById('statFcs').innerText = f;
     document.getElementById('statOuts').innerText = o;
+    document.getElementById('statPts').innerText = pts;
 
-    let report = "Analyzing the warrior's destiny...";
+    let logHtml = ""; myGames.slice(-5).forEach(g => logHtml += `<div>${g.name}: ${g.winner===name?'WON':'LOST'} (${g.totals[name]} pts)</div>`);
+    document.getElementById('profLog').innerHTML = logHtml || "No glory recorded yet.";
+
+    let report = "Analyzing the path to Valhalla...";
     if(myGames.length > 0) {
-        if(s > (d+m)) report = name + " is a bold fighter, often reaching for the Show. A dangerous adversary when they hold the cards.";
-        else if((d+m) > s) report = name + " is a master of tactical retreats, using Drops to wait for a better moment. A patient survivor.";
-        else report = name + " is a versatile competitor, balancing aggression with caution.";
+        if(s > (d+m)) report = name + " is a bold warrior, often risking all for the Show. A high-risk, high-reward Jarl.";
+        else if((d+m) > s) report = name + " is a cunning strategist, using tactical retreats (Drops) to survive the storm. A master of longevity.";
+        else report = name + " is a balanced fighter, adapting to the winds of fate with equal parts caution and steel.";
     }
-    document.getElementById('aiReport').innerText = "AI INSIGHT: " + report;
+    document.getElementById('aiReport').innerText = "AI WARRIOR INSIGHT: " + report;
     openModal('profileModal');
 }
 
 function viewMyProfile() { const me = playersDb.find(p => p.id === auth.currentUser.uid); if(me) viewProfile(me.fullName); }
-function uiGenerateViking() { const pre = ["Thor", "Bjorn", "Ragnar", "Ivar", "Erik"]; const post = ["Ironside", "Bloodaxe", "Storm", "Wolf", "Red"]; document.getElementById('signupViking').value = pre[Math.floor(Math.random()*pre.length)] + " " + post[Math.floor(Math.random()*post.length)]; }
+function uiGenerateViking() { const pre = ["Thor", "Bjorn", "Ragnar", "Ivar", "Erik", "Olaf", "Sigurd"]; const post = ["Ironside", "Bloodaxe", "Storm", "Wolf", "Red", "Slayer"]; document.getElementById('signupViking').value = pre[Math.floor(Math.random()*pre.length)] + " " + post[Math.floor(Math.random()*post.length)]; }
 
 function renderContinue() {
   let active = savedGames.filter(g => !g.winner);
-  document.getElementById('mainPane').innerHTML = "<h2>Active Games</h2>" + (active.length === 0 ? "<p>No games.</p>" : active.map(g => `<div class="game-card"><div><b>${g.name}</b></div><button style="background:var(--btn-show)" onclick="resume('${g.id}')">Resume</button></div>`).join(''));
+  document.getElementById('mainPane').innerHTML = "<h2>Active Games</h2>" + (active.length === 0 ? "<p>No active games.</p>" : active.map(g => `<div class="game-card"><div><b>${g.name}</b></div><button style="background:var(--btn-show); color:#111" onclick="resume('${g.id}')">Resume</button></div>`).join(''));
 }
 function resume(id) { state = savedGames.find(g => g.id === id); renderActive(); }
 
 function renderHistory() {
   let finished = savedGames.filter(g => g.winner);
-  document.getElementById('mainPane').innerHTML = "<h2>History</h2>" + finished.map(g => `<div class="game-card"><div><b>${g.name}</b><br>Winner: ${g.winner}</div></div>`).join('');
+  document.getElementById('mainPane').innerHTML = "<h2>History</h2>" + finished.map(g => `<div class="game-card"><div><b>${g.name}</b><br>Won by: ${g.winner}</div><button style="background:#444; color:white;" onclick="viewMatchReport('${g.id}')">Report</button></div>`).join('');
 }
 
 function renderReports() {
-  let html = `<h2>Leaderboard</h2><table><tr><th>Player</th><th>Win %</th></tr>`;
+  let html = `<h2>Leaderboard</h2><table><tr><th>Viking</th><th>Played</th><th>Win %</th></tr>`;
   playersDb.forEach(p => {
     let myGames = savedGames.filter(g => g.winner && g.players.includes(p.fullName));
     let wins = savedGames.filter(g => g.winner === p.fullName).length;
-    if(myGames.length > 0) html += `<tr><td>${p.fullName}</td><td>${((wins/myGames.length)*100).toFixed(1)}%</td></tr>`;
+    if(myGames.length > 0) html += `<tr><td><b>${p.fullName}</b></td><td>${myGames.length}</td><td>${((wins/myGames.length)*100).toFixed(1)}%</td></tr>`;
   });
   document.getElementById('mainPane').innerHTML = html + `</table>`;
 }
@@ -412,9 +462,17 @@ function renderHistoryPane() {
   document.getElementById('rhsPane').innerHTML = h;
 }
 
+function viewMatchReport(id) {
+  let g = savedGames.find(x => x.id === id);
+  if(!g) return;
+  let html = `<div style="text-align:center;"><h2>Game Report: ${g.name}</h2><h3>Winner: ${g.winner}</h3></div>
+    <table><tr><th>Player</th><th>Final Score</th></tr>`;
+  g.players.forEach(p => html += `<tr><td>${p}</td><td>${g.totals[p]}</td></tr>`);
+  document.getElementById('mainPane').innerHTML = html + `</table><button class="bigBtn" onclick="showScreen('history')">Back</button>`;
+}
+
 function toggleAuthView(v) { document.getElementById('loginView').style.display = v==='login'?'block':'none'; document.getElementById('signupView').style.display = v==='signup'?'block':'none'; if(v==='signup') uiGenerateViking(); }
 function appendTime(id) { let x = document.getElementById(id); let now = new Date(); x.value = x.value + " (" + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) + ")"; }
-function openNotes() { alert("v31.0 - Presence system updated (Green for online, Gray for offline). Player Roster renamed to 'Players'. Terminology set to 'Game'. Rules Verified."); }
 </script>
 </body>
 </html>
