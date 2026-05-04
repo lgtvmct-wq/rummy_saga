@@ -7,14 +7,11 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v42.2</title>
+<title>Elite Rummy Circle - v43.0</title>
 
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
-<!-- Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
@@ -38,19 +35,16 @@
   }
 
   #mainApp, #authScreen { display: none; }
-
   .app-wrapper { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
   .left-sidebar { width: 260px; background: var(--primary-bg); padding: 25px; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; }
   .main-pane { flex: 3; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-  .rhs-pane { flex: 1.2; min-width: 300px; background: rgba(0,0,0,0.4); padding: 20px; border-left: 1px solid var(--glass-border); overflow-y: auto; }
-
+  
   @media (max-width: 900px) {
     .app-wrapper { flex-direction: column; }
     .left-sidebar { width: 100%; height: auto; padding: 10px; border-right: none; border-bottom: 1px solid var(--glass-border); }
     .nav-section { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scrollbar-width: none; }
     .nav-section::-webkit-scrollbar { display: none; }
     .navBtn { min-width: 110px; margin-bottom: 0 !important; font-size: 11px !important; padding: 10px !important; text-align: center !important; }
-    .rhs-pane { display: none !important; }
     .main-pane { padding: 15px; }
     .sidebar-footer { display: none; }
   }
@@ -58,7 +52,7 @@
   .std-input { width: 100%; height: 50px; padding: 0 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--glass-border); background: #ffffff; color: #333; font-size: 16px; font-weight: 600; box-sizing: border-box; }
   button { padding: 12px 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
   button:active { transform: scale(0.95); }
-  button:disabled { opacity: 0.2; filter: grayscale(1); cursor: not-allowed; }
+  button:disabled { opacity: 0.2; filter: grayscale(1); }
   
   .tactic-btn { border: 2px solid transparent; flex: 1; padding: 8px 5px; font-size: 11px; }
   .tactic-btn.active { border-color: white; box-shadow: 0 0 10px rgba(255,255,255,0.5); filter: brightness(1.3); }
@@ -74,7 +68,7 @@
   td { padding: 8px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
 
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; justify-content: center; align-items: center; padding: 20px; overflow-y: auto; }
-  .modal-card { background: #2c3e50; width: 100%; max-width: 450px; padding: 25px; border-radius: 15px; text-align: center; max-height: 90vh; overflow-y: auto; }
+  .modal-card { background: #2c3e50; width: 100%; max-width: 450px; padding: 25px; border-radius: 15px; text-align: center; max-height: 90vh; overflow-y: auto; border: 1px solid var(--glass-border); }
 
   .avatar-lg { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); margin: 0 auto 15px auto; display: block; background: #1a252f; }
   .avatar-sm { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid var(--accent); vertical-align: middle; margin-right: 5px; }
@@ -84,32 +78,29 @@
   .stat-val { font-size: 16px; font-weight: bold; color: var(--accent); display: block; }
   .stat-lbl { font-size: 9px; color: #aaa; text-transform: uppercase; }
 
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
-  .online { background: #2ecc71; }
-  .offline { background: #95a5a6; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; border: 1px solid rgba(0,0,0,0.2); }
+  .online-dot { background: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+  .offline-dot { background: #95a5a6; }
+  .status-text { font-size: 10px; font-weight: bold; text-transform: uppercase; }
 
   .pause-btn { background: var(--info); color: white; border: 1px solid rgba(255,255,255,0.3); font-size: 11px; padding: 8px 12px; }
-  .pause-btn:hover { background: #2980b9; }
 </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
 <div id="authScreen">
-  <div class="auth-box">
+  <div class="modal-card" style="background:#1a252f; width:100%; max-width:400px;">
     <h1 style="color:var(--accent); margin:0;">Elite Rummy Circle</h1>
-    <span style="font-size: 10px; opacity: 0.6; display: block; margin-bottom: 20px;">VERSION 42.2 (Mobile Optimized Version)</span>
-    
+    <span style="font-size: 10px; opacity: 0.6; display: block; margin-bottom: 20px;">VERSION 43.0 (MOBILE OPTIMIZED VERSION)</span>
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
       <input id="loginPassword" class="std-input" type="password" placeholder="Password">
       <button class="actionBtn" onclick="login()">Log In</button>
       <button class="actionBtn" style="background:#fff; color:#333; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="googleSignIn()">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="18"> Google Login
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="18"> Continue with Google
       </button>
       <p onclick="toggleAuthView('signup')" style="margin-top:20px; cursor:pointer; text-decoration:underline; font-size:13px;">Create Account</p>
     </div>
-
     <div id="signupView" style="display:none">
       <input id="signupFirst" class="std-input" placeholder="First Name">
       <input id="signupLast" class="std-input" placeholder="Last Name">
@@ -122,10 +113,9 @@
   </div>
 </div>
 
-<!-- MODALS -->
 <div id="reentryModal" class="modal-overlay">
     <div class="modal-card">
-        <h2 style="color:var(--warning);">Eliminated!</h2>
+        <h2 style="color:var(--warning);">Player Elimination</h2>
         <p id="reentryText"></p>
         <div style="display:flex; gap:10px;">
             <button class="actionBtn" style="background:#555; flex:1;" id="btnReentryNo">Leave</button>
@@ -134,15 +124,11 @@
     </div>
 </div>
 
-<!-- PROFILE VIEW MODAL -->
 <div id="profileModal" class="modal-overlay">
     <div class="modal-card">
         <img id="pPhoto" class="avatar-lg" src="">
         <h2 id="pName" style="color:var(--accent); margin:0;"></h2>
-        <p id="pGender" style="font-size:11px; opacity:0.6; margin-bottom:10px;"></p>
-        
-        <button id="btnEditProfile" style="background:var(--warning); color:#111; margin-bottom:15px; font-size:12px;" onclick="openEditProfile()">Edit Profile</button>
-        
+        <p id="pID" style="font-size:10px; opacity:0.5; margin-bottom:10px;"></p>
         <div class="stat-grid">
             <div class="stat-item"><span class="stat-val" id="statWins">0</span><span class="stat-lbl">Wins</span></div>
             <div class="stat-item"><span class="stat-val" id="statS">0</span><span class="stat-lbl">Shows</span></div>
@@ -151,40 +137,33 @@
             <div class="stat-item"><span class="stat-val" id="statMD">0</span><span class="stat-lbl">Mid</span></div>
             <div class="stat-item"><span class="stat-val" id="statTotal">0</span><span class="stat-lbl">Matches</span></div>
         </div>
-        <div id="aiAnalysis" style="background:rgba(39, 174, 96, 0.1); border-left: 4px solid var(--accent); padding:10px; text-align:left; font-size:12px; border-radius:4px; margin-bottom:15px;"></div>
+        <div id="aiAnalysis" style="background:rgba(39, 174, 96, 0.1); border-left: 4px solid var(--accent); padding:12px; text-align:left; font-size:12px; border-radius:4px; margin-bottom:15px; line-height:1.5;"></div>
+        <button id="btnEditProfile" style="background:var(--warning); color:#111; margin-bottom:10px; font-size:12px; display:none;" onclick="openEditProfile()">Edit My Profile</button>
         <button class="actionBtn" onclick="document.getElementById('profileModal').style.display='none'">Close</button>
     </div>
 </div>
 
-<!-- PROFILE EDIT MODAL -->
 <div id="editProfileModal" class="modal-overlay">
     <div class="modal-card">
         <h2>Edit Profile</h2>
         <img id="editPhotoPreview" class="avatar-lg" src="">
         <input type="file" id="photoUpload" style="display:none;" onchange="handlePhotoUpload(event)">
-        <button onclick="document.getElementById('photoUpload').click()" style="background:var(--warning); margin-bottom:15px; font-size:12px;">Change Photo</button>
-        <input id="editName" class="std-input" placeholder="Name">
-        <select id="editGender" class="std-input">
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-        </select>
+        <button onclick="document.getElementById('photoUpload').click()" style="background:var(--warning); margin-bottom:15px;">Change Photo</button>
+        <input id="editName" class="std-input" placeholder="Display Name">
         <button class="actionBtn" onclick="saveProfile()">Save Changes</button>
         <button class="actionBtn" style="background:#555; margin-top:10px;" onclick="document.getElementById('editProfileModal').style.display='none'">Cancel</button>
     </div>
 </div>
 
-<!-- MID-GAME ADD PLAYER MODAL -->
-<div id="addPlayerMidGameModal" class="modal-overlay">
+<div id="addMidGameModal" class="modal-overlay">
     <div class="modal-card">
         <h2>Add Player Mid-Game</h2>
-        <p style="font-size:12px; margin-bottom:15px;">Player will enter at [Highest Score + 1]</p>
-        <select id="midGamePlayerSelect" class="std-input"></select>
-        <button class="actionBtn" onclick="confirmAddMidGamePlayer()">Add Player</button>
-        <button class="actionBtn" style="background:#555; margin-top:10px;" onclick="document.getElementById('addPlayerMidGameModal').style.display='none'">Cancel</button>
+        <select id="midGameSelect" class="std-input"></select>
+        <button class="actionBtn" onclick="confirmAddMidGame()">Add Now</button>
+        <button class="actionBtn" style="background:#555; margin-top:10px;" onclick="document.getElementById('addMidGameModal').style.display='none'">Cancel</button>
     </div>
 </div>
 
-<!-- MAIN APP -->
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
     <h2 style="color:var(--accent); margin-bottom:15px; margin-top:0;">Elite Circle</h2>
@@ -194,23 +173,18 @@
       <button id="navPlayers" class="navBtn" onclick="showScreen('players')">Players</button>
       <button id="navHistory" class="navBtn" onclick="showScreen('history')">History</button>
       <button id="navReports" class="navBtn" onclick="showScreen('reports')">Reports</button>
-      <!-- Mobile Exclusive Nav -->
-      <button class="navBtn" style="background:var(--warning); color:#000;" onclick="viewMyProfile()">Profile</button>
+      <button class="navBtn" style="background:var(--warning); color:#000;" onclick="viewMyProfile()">My Stats</button>
       <button class="navBtn" style="background:var(--danger);" onclick="handleLogout()">Logout</button>
     </div>
-    <div style="margin-top:auto;" class="sidebar-footer">
-        <button style="background:var(--warning); color:#111; width:100%; margin-bottom:10px;" onclick="viewMyProfile()">My Profile</button>
-        <button style="background:var(--danger); color:white; width:100%;" onclick="handleLogout()">Logout</button>
-        <div style="font-size: 10px; opacity: 0.4; text-align: center; margin-top: 15px;">Elite IT &copy; 2026</div>
+    <div style="margin-top:auto; text-align:center;" class="sidebar-footer">
+        <div style="font-size: 10px; opacity: 0.4;">Developed by Elite IT &copy; 2026</div>
     </div>
   </div>
-  
   <div class="main-pane" id="mainPane"></div>
-  <div class="rhs-pane" id="rhsPane" style="display:none"></div>
 </div>
 
 <script>
-// --- CORE CONFIG ---
+// --- FIREBASE INIT ---
 const firebaseConfig = {
   apiKey: "AIzaSyCo_G5Vo7OkUsK-tUXVQKCkeTn_IHw9vB0",
   authDomain: "elite-rummy-circle.firebaseapp.com",
@@ -246,14 +220,16 @@ async function signup() {
     const cred = await auth.createUserWithEmailAndPassword(document.getElementById('signupEmail').value, document.getElementById('signupPass').value);
     await db.collection('players').doc(cred.user.uid).set({ 
         fullName: (document.getElementById('signupFirst').value + " " + document.getElementById('signupLast').value).toUpperCase(), 
-        isOnline: true, 
-        gender: "Male",
-        photoURL: "",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+        isOnline: true, photoURL: "", createdAt: firebase.firestore.FieldValue.serverTimestamp() 
     });
 }
 function handleLogout() { if(auth.currentUser) db.collection('players').doc(auth.currentUser.uid).update({ isOnline: false }).then(() => auth.signOut()); }
+function toggleAuthView(v) {
+  document.getElementById('loginView').style.display = v==='login'?'block':'none';
+  document.getElementById('signupView').style.display = v==='signup'?'block':'none';
+}
 
+// --- DATA LISTENER ---
 function loadData() {
   db.collection('players').onSnapshot(snap => { playersDb =[]; snap.forEach(doc => playersDb.push({id: doc.id, ...doc.data()})); });
   db.collection('eliteGames').onSnapshot(snap => {
@@ -265,13 +241,12 @@ function loadData() {
   });
 }
 
-// --- NAV ---
+// --- NAVIGATION ---
 function showScreen(s) {
   currentScreen = s;
   document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active-nav'));
   const btn = document.getElementById('nav' + s.charAt(0).toUpperCase() + s.slice(1));
   if(btn) btn.classList.add('active-nav');
-  document.getElementById('rhsPane').style.display='none';
   if(s==='newGame') renderNewGame();
   if(s==='players') renderPlayers();
   if(s==='continue') renderContinue();
@@ -288,26 +263,23 @@ function renderNewGame() {
         <button onclick="appendDT()" style="background:var(--warning); width:100%; color:#111; margin-bottom:15px;">🕒 Insert Date/Time</button>
         <div id="playerList"></div>
         <button class="navBtn" style="background:rgba(255,255,255,0.1); width:100%; border:1px dashed var(--glass-border);" onclick="addPlayerField()">+ Add Player</button>
-        <button class="actionBtn" onclick="startGame()">Randomize & Start Match</button>
+        <button class="actionBtn" onclick="startGame()">Start Random Match</button>
     </div>`;
 }
 
-function appendDT() {
-    const now = new Date();
-    document.getElementById('gName').value += " " + now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-}
+function appendDT() { document.getElementById('gName').value += " " + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
 
 function addPlayerField() {
   const selected = Array.from(document.querySelectorAll('#playerList select')).map(s => s.value);
   let opts = `<option value="">-- Select Player --</option>` + 
     playersDb.map(p => {
         if(selected.includes(p.fullName)) return '';
-        return `<option value="${p.fullName}" ${p.isOnline?'':'disabled'}>${p.fullName} ${p.isOnline?'':'(OFFLINE)'}</option>`;
+        const name = p.fullName || `Elite-User-${p.id.substring(0,5)}`;
+        return `<option value="${name}" ${p.isOnline?'':'disabled'}>${name} ${p.isOnline?'':'(OFFLINE)'}</option>`;
     }).join('');
   const div = document.createElement('div');
   div.style="display:flex; gap:10px; margin-bottom:10px;";
-  div.innerHTML = `<select class="std-input" style="margin-bottom:0; flex:1;">${opts}</select>
-                   <button onclick="this.parentElement.remove()" style="background:var(--danger); width:50px;">✕</button>`;
+  div.innerHTML = `<select class="std-input" style="margin-bottom:0; flex:1;">${opts}</select><button onclick="this.parentElement.remove()" style="background:var(--danger); width:50px;">✕</button>`;
   document.getElementById('playerList').appendChild(div);
 }
 
@@ -326,46 +298,14 @@ function startGame() {
   renderActive();
 }
 
-function openAddMidGamePlayer() {
-    let avail = playersDb.filter(p => !state.players.includes(p.fullName));
-    document.getElementById('midGamePlayerSelect').innerHTML = `<option value="">-- Select --</option>` + avail.map(p => {
-        let disabled = p.isOnline ? '' : 'disabled';
-        return `<option value="${p.fullName}" ${disabled}>${p.fullName} (${p.isOnline?'ONLINE':'OFFLINE'})</option>`;
-    }).join('');
-    document.getElementById('addPlayerMidGameModal').style.display = 'flex';
-}
-
-async function confirmAddMidGamePlayer() {
-    let name = document.getElementById('midGamePlayerSelect').value;
-    if(!name) return;
-    let activeTotals = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240).map(p => state.totals[p]);
-    let entryScore = (activeTotals.length > 0 ? Math.max(...activeTotals) : 0) + 1;
-    state.players.push(name);
-    state.totals[name] = entryScore;
-    state.roundScores[name] = null;
-    state.actionStats[name] = { shows: 0, fcs: 0, drops: 0, mds: 0 };
-    if (entryScore >= 240) {
-        let re = confirm(`${name} joining at ${entryScore}. Re-enter?`);
-        if (re) { state.reEntries[name] = true; state.totals[name] = entryScore; }
-        else state.eliminated[name] = true;
-    }
-    await db.collection('eliteGames').doc(state.id).set(state);
-    document.getElementById('addPlayerMidGameModal').style.display = 'none';
-}
-
 function renderActive() {
   if(!state) return;
-  
   let dealerIdx = (state.round-1) % state.players.length;
   let dealer = state.players[dealerIdx];
-  let activeCount = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240).length;
-  let curWinner = state.players.find(p => state.roundScores[p] === 'S');
-
-  let btnText = state.winner ? "Match Over: Return Home" : "Pause & Home";
 
   let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
     <h3 style="margin:0;">${state.name}</h3>
-    <button onclick="state=null; showScreen('newGame')" class="pause-btn">${btnText}</button>
+    <button onclick="state=null; showScreen('newGame')" class="pause-btn">${state.winner?'Home':'Pause'}</button>
   </div><table style="table-layout: fixed;">
     <colgroup><col style="width:32%"><col style="width:48%"><col style="width:20%"></colgroup>
     <tr><th>Player</th><th>Tactics</th><th>Total</th></tr>`;
@@ -374,119 +314,48 @@ function renderActive() {
     let rs = state.roundScores[p];
     let isOut = state.eliminated[p] || state.totals[p] >= 240;
     let dLock = state.lastDropRound[p] === (state.round-1);
-    let h2hLock = (activeCount === 2 && curWinner && curWinner !== p);
 
     h += `<tr style="${isOut?'opacity:0.3':''}">
-        <td>${p===dealer?'<span class="dealer-badge">D</span>':''} <b>${p}</b> ${state.reEntries[p]?'<span class="reentry-tag">RE</span>':''}</td>
+        <td>${p===dealer?'<span class="dealer-badge">D</span>':''} <b>${p}</b></td>
         <td>
             <div style="display:flex; gap:3px; flex-wrap:wrap;">
-                <button class="tactic-btn ${rs==='S'?'active':''}" style="background:var(--accent)" onclick="setTactic('${p.replace(/'/g,"\\'")}', 'S')" ${isOut || h2hLock ?'disabled':''}>S</button>
-                <button class="tactic-btn ${rs===20?'active':''}" style="background:var(--warning)" onclick="setTactic('${p.replace(/'/g,"\\'")}', 'D')" ${isOut || dLock || h2hLock ?'disabled':''}>D</button>
-                <button class="tactic-btn ${rs===40?'active':''}" style="background:#8e44ad; color:white;" onclick="setTactic('${p.replace(/'/g,"\\'")}', 'MD')" ${isOut || h2hLock ?'disabled':''}>MD</button>
-                <button class="tactic-btn ${rs===80?'active':''}" style="background:var(--danger); color:white;" onclick="setTactic('${p.replace(/'/g,"\\'")}', 'FC')" ${isOut?'disabled':''}>FC</button>
-                <button style="background:#333; color:white; font-size:10px; flex:none; padding:5px; border-radius:4px; border:none;" onclick="markOut('${p.replace(/'/g,"\\'")}')" ${isOut?'disabled':''}>OUT</button>
+                <button class="tactic-btn ${rs==='S'?'active':''}" style="background:var(--accent)" onclick="setTactic('${p}', 'S')" ${isOut?'disabled':''}>S</button>
+                <button class="tactic-btn ${rs===20?'active':''}" style="background:var(--warning)" onclick="setTactic('${p}', 'D')" ${isOut || dLock?'disabled':''}>D</button>
+                <button class="tactic-btn ${rs===40?'active':''}" style="background:#8e44ad; color:white;" onclick="setTactic('${p}', 'MD')" ${isOut?'disabled':''}>MD</button>
+                <button class="tactic-btn ${rs===80?'active':''}" style="background:var(--danger); color:white;" onclick="setTactic('${p}', 'FC')" ${isOut?'disabled':''}>FC</button>
+                <button style="background:#333; color:white; font-size:10px; border:none; border-radius:4px; padding:5px;" onclick="markOut('${p}')" ${isOut?'disabled':''}>OUT</button>
             </div>
-            <input type="text" class="std-input" style="height:35px; margin:5px 0 0 0; text-align:center; font-size:12px; width:100%;" value="${rs===null?'':rs}" onchange="manualInput('${p.replace(/'/g,"\\'")}', this.value)" ${isOut?'disabled':''}>
+            <input type="text" class="std-input" style="height:35px; margin:5px 0 0 0; text-align:center; font-size:12px; width:100%;" value="${rs===null?'':rs}" onchange="manualInput('${p}', this.value)" ${isOut?'disabled':''}>
         </td>
         <td><b style="color:var(--warning)">${state.totals[p]}</b></td>
     </tr>`;
   });
 
   if(!state.winner) {
-      h += `</table><button id="endBtn" class="actionBtn" onclick="nextRound()">Next Round</button>
-            <button class="actionBtn" style="background:#555; height:45px; font-size:13px;" onclick="openAddMidGamePlayer()">+ Add Player Mid-Game</button>`;
+      h += `</table><button id="endBtn" class="actionBtn" style="margin-top:15px;" onclick="nextRound()">Next Round</button>
+            <button class="actionBtn" style="background:#555; height:45px; font-size:12px;" onclick="openMidGame()">+ Add Player Mid-Game</button>`;
   } else {
       h += `</table><div style="text-align:center; padding:15px;"><h2 style="color:var(--accent); margin:0;">Winner: ${state.winner}</h2></div>`;
   }
   
-  // OVERALL ROUND SCOREBOARD INSERTED DIRECTLY HERE
-  h += `<div style="margin-top: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
-        <h4 style="margin: 0 0 10px 0; font-size:14px; color:var(--accent);">Overall Round Logs (Total Points)</h4>`;
-  
-  if (state.history.length === 0) {
-      h += `<div style="font-size:11px; opacity:0.5; font-style:italic;">No rounds completed yet.</div>`;
-  } else {
+  h += `<div style="margin-top: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border:1px solid var(--glass-border);">
+        <h4 style="margin: 0 0 10px 0; color:var(--accent);">Scoreboard Logs</h4>`;
+  if (state.history.length === 0) h += `<div style="font-size:11px; opacity:0.5;">Waiting for round completion...</div>`;
+  else {
       state.history.slice().reverse().forEach(r => {
-          h += `<div style="font-size:11px; margin-bottom:8px; background:rgba(255,255,255,0.05); padding:8px; border-radius:5px;">
-              <b style="color:var(--accent);">Round ${r.round}</b><br>
-              ${state.players.map(p => {
+          h += `<div style="font-size:11px; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;">
+              <b style="color:var(--accent);">Round ${r.round}</b>: ${state.players.map(p => {
                   let rs = r.scores[p] === undefined ? '-' : r.scores[p];
-                  let tot = r.totals[p] === undefined ? '-' : r.totals[p];
-                  let display = (rs === 240 || state.eliminated[p]) ? '<span style="color:var(--danger)">OUT</span>' : `${rs} (${tot})`;
-                  return `${p}: ${display}`;
+                  return `${p}: ${rs==240||state.eliminated[p]?'OUT':rs+' ('+(r.totals[p]||'0')+')'}`;
               }).join(' | ')}
           </div>`;
       });
   }
   h += `</div>`;
-
   document.getElementById('mainPane').innerHTML = h;
   validateEndBtn();
 }
 
-// --- PROFILE LOGIC ---
-function viewProfile(uid) {
-    const p = playersDb.find(x => x.id === uid); if(!p) return;
-    const name = p.fullName;
-    let matches = savedGames.filter(g => g.winner && g.players.includes(name));
-    let wins = matches.filter(g => g.winner === name).length;
-    let s=0, fc=0, d=0, md=0;
-    matches.forEach(g => { if(g.actionStats[name]){ s+=g.actionStats[name].shows; fc+=g.actionStats[name].fcs; d+=g.actionStats[name].drops; md+=g.actionStats[name].mds; } });
-    
-    document.getElementById('pPhoto').src = p.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=27ae60&color=fff&size=150`;
-    document.getElementById('pName').innerText = name;
-    document.getElementById('pGender').innerText = (p.gender || "MALE").toUpperCase();
-    document.getElementById('statWins').innerText = wins;
-    document.getElementById('statS').innerText = s;
-    document.getElementById('statFC').innerText = fc;
-    document.getElementById('statD').innerText = d;
-    document.getElementById('statMD').innerText = md;
-    document.getElementById('statTotal').innerText = matches.length;
-    document.getElementById('aiAnalysis').innerHTML = `<b>AI ANALYSIS:</b> ${d+md > s+fc ? 'Conservative defensive strategist. Prefers drops over high-risk shows.' : 'Aggressive hunter. Takes risks to end rounds early.'}`;
-    document.getElementById('btnEditProfile').style.display = (auth.currentUser && uid === auth.currentUser.uid) ? 'inline-block' : 'none';
-    document.getElementById('profileModal').style.display='flex';
-}
-
-function viewMyProfile() { if(auth.currentUser) viewProfile(auth.currentUser.uid); }
-
-function openEditProfile() {
-    const p = playersDb.find(x => x.id === auth.currentUser.uid);
-    document.getElementById('editName').value = p.fullName;
-    document.getElementById('editGender').value = p.gender || "Male";
-    document.getElementById('editPhotoPreview').src = p.photoURL || "";
-    document.getElementById('profileModal').style.display = 'none';
-    document.getElementById('editProfileModal').style.display = 'flex';
-}
-
-function handlePhotoUpload(event) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 150;
-            const scale = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scale;
-            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-            document.getElementById('editPhotoPreview').src = canvas.toDataURL('image/jpeg', 0.7);
-        }
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(event.target.files[0]);
-}
-
-async function saveProfile() {
-    await db.collection('players').doc(auth.currentUser.uid).update({
-        fullName: document.getElementById('editName').value.toUpperCase(),
-        gender: document.getElementById('editGender').value,
-        photoURL: document.getElementById('editPhotoPreview').src
-    });
-    document.getElementById('editProfileModal').style.display = 'none';
-    viewMyProfile();
-}
-
-// --- GAME LOGIC ---
 function setTactic(p, type) {
     if(state.winner || state.eliminated[p]) return;
     let v = null;
@@ -505,19 +374,19 @@ function manualInput(p, val) {
     db.collection('eliteGames').doc(state.id).update({ roundScores: state.roundScores });
 }
 
-function markOut(p) {
-    if(confirm(`Eject ${p} immediately? Score will be set to 240.`)) {
-        state.eliminated[p]=true; state.totals[p]=240; state.roundScores[p]=240;
-        db.collection('eliteGames').doc(state.id).set(state);
-    }
-}
-
 function validateEndBtn() {
     let active = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
     let win = active.filter(p => state.roundScores[p]==='S' || state.roundScores[p]===0);
     let fill = active.every(p => state.roundScores[p]!==null && state.roundScores[p]!=='');
     const btn = document.getElementById('endBtn');
     if(btn) { btn.disabled = !(win.length===1 && fill); btn.style.background = btn.disabled?"#555":"var(--accent)"; }
+}
+
+function markOut(p) {
+    if(confirm(`Eject ${p} immediately?`)) {
+        state.eliminated[p]=true; state.totals[p]=240; state.roundScores[p]=240;
+        db.collection('eliteGames').doc(state.id).set(state);
+    }
 }
 
 async function nextRound() {
@@ -543,12 +412,11 @@ async function nextRound() {
             if(state.reEntries[p] || entryScore >= 240) state.eliminated[p]=true;
             else {
                 let re = confirm(`${p} reached ${state.totals[p]}. Re-enter at ${entryScore}?`);
-                if (re) { state.reEntries[p]=true; state.totals[p]=entryScore; } else state.eliminated[p]=true;
+                if(re) { state.reEntries[p]=true; state.totals[p]=entryScore; } else state.eliminated[p]=true;
             }
         }
     }
-    state.round++;
-    state.players.forEach(p => state.roundScores[p]=null);
+    state.round++; state.players.forEach(p => state.roundScores[p]=null);
     let survivors = state.players.filter(p => !state.eliminated[p] && state.totals[p]<240);
     if(survivors.length === 1) { state.winner=survivors[0]; state.endTime=new Date().toLocaleString(); }
     await db.collection('eliteGames').doc(state.id).set(state);
@@ -556,9 +424,99 @@ async function nextRound() {
     renderActive();
 }
 
+// --- PROFILE & AI ANALYSIS ---
+function viewProfile(uid) {
+    const p = playersDb.find(x => x.id === uid); if(!p) return;
+    const name = p.fullName || `Elite-ID: ${p.id.substring(0,8)}`;
+    let matches = savedGames.filter(g => g.winner && g.players.includes(name));
+    let wins = matches.filter(g => g.winner === name).length;
+    let s=0, fc=0, d=0, md=0;
+    matches.forEach(g => { if(g.actionStats[name]){ s+=g.actionStats[name].shows; fc+=g.actionStats[name].fcs; d+=g.actionStats[name].drops; md+=g.actionStats[name].mds; } });
+    
+    document.getElementById('pPhoto').src = p.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=27ae60&color=fff&size=150`;
+    document.getElementById('pName').innerText = name;
+    document.getElementById('pID').innerText = "PLAYER ID: " + p.id;
+    document.getElementById('statWins').innerText = wins;
+    document.getElementById('statS').innerText = s;
+    document.getElementById('statFC').innerText = fc;
+    document.getElementById('statD').innerText = d;
+    document.getElementById('statMD').innerText = md;
+    document.getElementById('statTotal').innerText = matches.length;
+
+    let ai = "Insufficient match history to build a realistic strategic profile (Need 3+ matches).";
+    if(matches.length >= 3) {
+        const dropRatio = (d + md) / matches.length;
+        const showRatio = s / matches.length;
+        const fullRatio = fc / matches.length;
+
+        if (dropRatio > 1.5 && showRatio < 0.5) ai = "<b>Defensive Strategist:</b> Plays with extreme caution. Prioritizes point preservation through calculated drops. Difficult to eliminate but rarely takes the initiative.";
+        else if (showRatio > 1.2) ai = "<b>Aggressive Hunter:</b> High-risk, high-reward player. Hunts for the show early and often. Dominates fast rounds but prone to heavy point hits if caught.";
+        else if (fullRatio > 1.0) ai = "<b>Stubborn Competitor:</b> Tendency to hold cards too long. Relies on big hands rather than tactical drops. Vulnerable to fast players.";
+        else ai = "<b>Balanced Professional:</b> Adapts seamlessly to the table. Knows exactly when to push for a show and when to fold. A highly versatile and unpredictable opponent.";
+    }
+    document.getElementById('aiAnalysis').innerHTML = "<b>AI STRATEGIC PROFILE:</b><br>" + ai;
+    document.getElementById('btnEditProfile').style.display = (auth.currentUser && uid === auth.currentUser.uid) ? 'inline-block' : 'none';
+    document.getElementById('profileModal').style.display='flex';
+}
+
+function viewMyProfile() { if(auth.currentUser) viewProfile(auth.currentUser.uid); }
+
+function openEditProfile() {
+    const p = playersDb.find(x => x.id === auth.currentUser.uid);
+    document.getElementById('editName').value = p.fullName || "";
+    document.getElementById('editPhotoPreview').src = p.photoURL || "";
+    document.getElementById('profileModal').style.display = 'none';
+    document.getElementById('editProfileModal').style.display = 'flex';
+}
+
+async function saveProfile() {
+    await db.collection('players').doc(auth.currentUser.uid).update({ fullName: document.getElementById('editName').value.toUpperCase(), photoURL: document.getElementById('editPhotoPreview').src });
+    document.getElementById('editProfileModal').style.display = 'none';
+    viewMyProfile();
+}
+
+function handlePhotoUpload(event) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 150;
+            const scale = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scale;
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            document.getElementById('editPhotoPreview').src = canvas.toDataURL('image/jpeg', 0.7);
+        }
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+// --- UTILS & SCREENS ---
+function openMidGame() {
+    let avail = playersDb.filter(p => !state.players.includes(p.fullName));
+    document.getElementById('midGameSelect').innerHTML = `<option value="">-- Select --</option>` + avail.map(p => `<option value="${p.fullName}">${p.fullName}</option>`).join('');
+    document.getElementById('addMidGameModal').style.display='flex';
+}
+async function confirmAddMidGame() {
+    let name = document.getElementById('midGameSelect').value; if(!name) return;
+    let act = state.players.filter(p => !state.eliminated[p] && state.totals[p]<240).map(p => state.totals[p]);
+    let es = (act.length > 0 ? Math.max(...act) : 0) + 1;
+    state.players.push(name); state.totals[name]=es; state.roundScores[name]=null; state.actionStats[name]={shows:0,fcs:0,drops:0,mds:0};
+    await db.collection('eliteGames').doc(state.id).set(state);
+    document.getElementById('addMidGameModal').style.display='none';
+}
+
 function renderPlayers() {
-    document.getElementById('mainPane').innerHTML = `<h2>Players</h2><table>` + 
-        playersDb.map(p => `<tr><td><img src="${p.photoURL || 'https://via.placeholder.com/40'}" class="avatar-sm"> ${p.fullName}</td><td><button onclick="viewProfile('${p.id}')">View</button></td></tr>`).join('') + `</table>`;
+    document.getElementById('mainPane').innerHTML = `<h2>Registered Players</h2><table>` + 
+        playersDb.map(p => {
+            const name = p.fullName || "Undefined Player";
+            return `<tr><td>
+                <span class="status-dot ${p.isOnline?'online-dot':'offline-dot'}"></span>
+                <span class="status-text">${p.isOnline?'Online':'Offline'}</span> | <b>${name}</b>
+            </td><td><button onclick="viewProfile('${p.id}')">Profile</button></td></tr>`
+        }).join('') + `</table>`;
 }
 
 function renderContinue() {
@@ -575,22 +533,17 @@ function delMatch(id) { if(confirm("Delete this match?")) db.collection('eliteGa
 
 function renderReports() {
     let fin = savedGames.filter(g => g.winner);
-    document.getElementById('mainPane').innerHTML = `<h2>Reports</h2>` + fin.map(g => `<div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:5px; border-radius:8px; display:flex; justify-content:space-between;"><span>${g.name}</span><button onclick="genPDF('${g.id}')">PDF</button></div>`).join('');
+    document.getElementById('mainPane').innerHTML = `<h2>PDF Reports</h2>` + fin.map(g => `<div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:5px; border-radius:8px; display:flex; justify-content:space-between;"><span>${g.name}</span><button onclick="genPDF('${g.id}')" style="background:var(--info)">PDF</button></div>`).join('');
 }
 
 function genPDF(id) {
     const g = savedGames.find(x => x.id === id);
     const doc = new jspdf.jsPDF();
-    doc.text(`Elite Match: ${g.name}`, 14, 15);
+    doc.text(`Match: ${g.name}`, 14, 15);
     const body = g.history.map(r => [r.round, ...g.players.map(p => r.scores[p] || '-')]);
     body.push(['TOTAL', ...g.players.map(p => g.totals[p])]);
     doc.autoTable({ head:[['Rnd', ...g.players]], body: body, startY: 20 });
     doc.save(`${g.name}.pdf`);
-}
-
-function toggleAuthView(v) {
-  document.getElementById('loginView').style.display = v==='login'?'block':'none';
-  document.getElementById('signupView').style.display = v==='signup'?'block':'none';
 }
 </script>
 </body>
