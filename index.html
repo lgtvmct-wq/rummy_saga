@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elite Rummy Circle - v38.0</title>
+<!-- CACHE CONTROL: Prevents old versions from sticking around -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<title>Elite Rummy Circle - v39.0</title>
+
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -33,7 +39,6 @@
   .main-pane { flex: 3; padding: 30px; overflow-y: auto; }
   .rhs-pane { flex: 1.2; min-width: 320px; background: rgba(0,0,0,0.3); padding: 20px; border-left: 1px solid var(--glass-border); overflow-y: auto; }
 
-  /* Standard Inputs */
   .std-input { 
     width: 100%; height: 55px; padding: 0 15px; margin-bottom: 15px; 
     border-radius: 8px; border: 1px solid var(--glass-border); 
@@ -45,11 +50,9 @@
   .navBtn.active-nav { background: var(--accent); }
   .actionBtn { background: var(--accent); color: white; width: 100%; height: 55px; font-size: 16px; }
 
-  /* Centered Auth */
   #authScreen { display: flex; position: fixed; inset: 0; justify-content: center; align-items: center; background: rgba(0,0,0,0.7); z-index: 2000; }
   .auth-box { background: #1a252f; padding: 40px; border-radius: 20px; width: 90%; max-width: 420px; text-align: center; border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
 
-  /* Profiles & Tables */
   .profile-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; justify-content: center; align-items: center; }
   .profile-card { background: #2c3e50; width: 90%; max-width: 500px; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); }
   
@@ -93,7 +96,7 @@
             <div class="stat-item"><span class="stat-val" id="statTotal">0</span><span class="stat-lbl">Matches</span></div>
         </div>
 
-        <div id="aiAnalysis" style="background:rgba(39, 174, 96, 0.1); border-left: 4px solid var(--accent); padding:15px; text-align:left; font-size:13px; border-radius:4px; margin-bottom:20px;"></div>
+        <div id="aiAnalysis" style="background:rgba(39, 174, 96, 0.1); border-left: 4px solid var(--accent); padding:15px; text-align:left; font-size:13px; border-radius:4px; margin-bottom:20px; line-height:1.4;"></div>
 
         <button class="actionBtn" onclick="document.getElementById('profileModal').style.display='none'">Close Dashboard</button>
     </div>
@@ -102,8 +105,8 @@
 <!-- AUTH SCREEN -->
 <div id="authScreen">
   <div class="auth-box">
-    <h1 style="color:var(--accent); margin-bottom: 5px;">Elite Rummy</h1>
-    <p style="font-size:10px; opacity:0.4; margin-bottom: 25px;">VERSION 38.0</p>
+    <h1 style="color:var(--accent); margin-bottom: 5px;">Elite Rummy Circle</h1>
+    <div style="background: var(--accent); color: white; display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; margin-bottom: 25px;">VERSION 39.0</div>
     
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
@@ -133,7 +136,8 @@
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
     <h2 style="color:var(--accent); margin-bottom: 5px;">Menu</h2>
-    <p style="font-size:10px; opacity:0.4; margin-bottom: 25px;">VERSION 38.0</p>
+    <div style="font-size:10px; opacity:0.4; margin-bottom: 25px; font-weight: bold;">BUILD v39.0</div>
+    
     <div class="nav-section">
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">Start New Game</button>
       <button id="navPlayers" class="navBtn" onclick="showScreen('players')">Players List</button>
@@ -141,6 +145,7 @@
       <button id="navHistory" class="navBtn" onclick="showScreen('history')">Game History</button>
       <button id="navReports" class="navBtn" onclick="showScreen('reports')">Reports</button>
     </div>
+    
     <div style="margin-top:auto; display:flex; gap:10px; padding-top:20px; border-top:1px solid var(--glass-border);">
         <button style="background:var(--warning); flex:1;" onclick="viewMyProfile()">My Profile</button>
         <button style="background:var(--danger); color:white; flex:1;" onclick="handleLogout()">Logout</button>
@@ -179,7 +184,6 @@ auth.onAuthStateChanged(user => {
   }
 });
 
-// COLLECTION-BASED PLAYER STATUS
 async function setOnlineStatus(uid, status) {
   await db.collection('players').doc(uid).update({ isOnline: status }).catch(() => {});
 }
@@ -192,7 +196,6 @@ function handleLogout() {
 }
 
 function loadData() {
-  // Listener for individual player documents
   db.collection('players').onSnapshot(snap => {
     playersDb = [];
     snap.forEach(doc => playersDb.push({id: doc.id, ...doc.data()}));
@@ -226,7 +229,6 @@ async function signup() {
   try {
     const cred = await auth.createUserWithEmailAndPassword(e, p);
     const fullName = (f + " " + l).toUpperCase();
-    // Save to unique player document
     await db.collection('players').doc(cred.user.uid).set({
         fullName, gender: g, isOnline: true, createdAt: new Date()
     });
@@ -252,7 +254,7 @@ function renderPlayers() {
   <table><tr><th>Full Name</th><th>Status</th><th>Profile</th></tr>`;
   
   if(!playersDb.length) {
-      html += `<tr><td colspan="3" class="empty-msg">No players found in database.</td></tr>`;
+      html += `<tr><td colspan="3" class="empty-msg">Fetching players...</td></tr>`;
   } else {
       playersDb.sort((a,b)=>a.fullName.localeCompare(b.fullName)).forEach(p => {
         html += `<tr>
@@ -345,7 +347,7 @@ function renderActive() {
     </tr>`;
   });
 
-  document.getElementById('mainPane').innerHTML = html + `</table><button class="actionBtn" style="margin-top:20px;" onclick="nextRound()">Next Round</button>`;
+  document.getElementById('mainPane').innerHTML = html + `</table><button class="actionBtn" style="margin-top:20px;" onclick="nextRound()">End Round</button>`;
   renderHistoryPane();
 }
 
@@ -377,7 +379,6 @@ function viewProfile(name) {
     const p = playersDb.find(x => x.fullName === name);
     if(!p) return;
     
-    // Aggregating Stats
     let finished = savedGames.filter(g => g.winner && g.players.includes(name));
     let wins = finished.filter(g => g.winner === name).length;
     let s=0, fc=0, d=0, md=0;
@@ -400,7 +401,6 @@ function viewProfile(name) {
     document.getElementById('statMD').innerText = md;
     document.getElementById('statTotal').innerText = finished.length;
 
-    // AI Pattern Analysis
     let analysis = "No match history found for a deep analysis.";
     if(finished.length > 0) {
         if(d + md > s + fc) {
