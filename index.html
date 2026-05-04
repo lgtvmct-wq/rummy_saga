@@ -33,8 +33,6 @@
   .app-wrapper { display: flex; flex-direction: row; height: 100vh; width: 100vw; overflow: hidden; backdrop-filter: blur(8px); }
   
   .left-sidebar { width: 240px; background: var(--sidebar-bg); padding: 20px; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; z-index: 10; overflow-y: hidden;}
-  .nav-section { flex-shrink: 0; margin-bottom: 10px; }
-  
   .player-roster-section { flex-grow: 1; overflow-y: auto; margin-top: 10px; border-top: 1px solid var(--glass-border); padding-top: 15px; }
   .roster-item { display: flex; align-items: center; font-size: 13px; padding: 6px 12px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.2s; }
   .roster-item:hover { background: rgba(0,230,118,0.15); }
@@ -43,67 +41,39 @@
   .dot-online { background: #00e676; box-shadow: 0 0 8px #00e676; }
   .dot-offline { background: #555; }
   
-  .content-area { display: flex; flex: 1; overflow: hidden; }
   .main-pane { flex: 2.5; padding: 20px 30px; overflow-y: auto; }
   .rhs-pane { flex: 1; min-width: 320px; background: rgba(0,0,0,0.3); padding: 20px; border-left: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(15px);}
 
-  /* Visibility: Black text on Light inputs */
-  .bigInput, .bigSelect { 
-    width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; 
-    border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.95); 
-    color: #000 !important; font-weight: 600; box-sizing: border-box; 
-  }
-  .bigInput::placeholder { color: #444 !important; opacity: 1; }
-  
-  .score-input { 
-    width: 50px; padding: 6px; background: rgba(255,255,255,0.95); 
-    border: 1px solid var(--glass-border); color: #000 !important; border-radius: 4px; 
-    text-align: center; font-weight: bold; 
-  }
+  .bigInput, .bigSelect { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.95); color: #000 !important; font-weight: 600; box-sizing: border-box; }
+  .bigInput::placeholder { color: #444 !important; }
+  .score-input { width: 50px; padding: 6px; background: rgba(255,255,255,0.95); color: #000 !important; border-radius: 4px; text-align: center; font-weight: bold; }
   
   button { padding: 8px 12px; margin: 2px; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
   .navBtn { width: 100%; margin-bottom: 8px; background: rgba(255,255,255,0.1); color: white; text-align: left; padding: 12px; }
+  .navBtn:disabled { opacity: 0.3; cursor: not-allowed; }
   .navBtn.active-nav { background: var(--btn-show); color: #111; }
   .bigBtn { width: 100%; margin: 10px 0; font-size: 16px; padding: 14px; background: var(--btn-show); color: #111; }
   
-  .game-card { background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); padding: 15px; border-radius: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(5px); }
-  .delete-btn { background: #ff5252; color: white; }
+  #authScreen { display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; z-index: 1000; }
+  .auth-box { background: rgba(15, 32, 39, 0.95); padding: 25px; border-radius: 15px; width: 350px; border: 1px solid var(--glass-border); backdrop-filter: blur(15px); text-align: center; }
 
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  th { text-align: left; font-size: 11px; color: #aaa; padding: 10px; text-transform: uppercase; border-bottom: 1px solid var(--glass-border); }
-  td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  .eliminated { opacity: 0.35; background: rgba(255,0,0,0.08); }
-
-  #authScreen { 
-    display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-    z-index: 1000; display: flex; justify-content: center; align-items: center; 
-  }
-  .auth-box { 
-    background: rgba(15, 32, 39, 0.95); padding: 30px; border-radius: 15px; 
-    width: 350px; border: 1px solid var(--glass-border); backdrop-filter: blur(15px); 
-    text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5); 
-  }
-
-  /* Modals */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
-  .modal-content { background: #1a2a3a; width: 90%; max-width: 550px; max-height: 85vh; padding: 25px; border-radius: 15px; border: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(20px); position: relative;}
+  .modal-content { background: #1a2a3a; width: 95%; max-width: 500px; max-height: 90vh; padding: 20px; border-radius: 15px; border: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(20px); position: relative;}
 
   .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px 0; }
   .stat-box { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
   .stat-val { font-size: 15px; font-weight: bold; color: var(--btn-show); display: block; }
   .stat-lbl { font-size: 8px; color: #aaa; text-transform: uppercase; }
 
-  .viking-avatar { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--btn-show); margin-bottom: 10px; background: #222; }
+  .prof-avatar-img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--btn-show); background: #fff; margin-bottom: 10px; }
 
   @media (max-width: 900px) {
-    .app-wrapper { flex-direction: column; overflow-y: auto; height: 100vh; }
-    .left-sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--glass-border); padding: 10px; box-sizing: border-box; display: block; position: relative; }
+    .app-wrapper { flex-direction: column; overflow-y: auto; }
+    .left-sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--glass-border); padding: 10px; }
     .nav-section { display: flex; overflow-x: auto; gap: 5px; }
     .navBtn { width: auto; margin-bottom: 0; font-size: 10px; padding: 6px 10px; }
-    .player-roster-section { display: flex; flex-direction: row; gap: 5px; overflow-x: auto; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 5px; }
+    .player-roster-section { display: flex; flex-direction: row; gap: 5px; overflow-x: auto; padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 5px; }
     .roster-item { padding: 4px 8px; font-size: 10px; flex-shrink: 0; }
-    .logout-bar { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 20; }
-    .main-pane { padding: 10px; }
   }
 </style>
 </head>
@@ -112,10 +82,9 @@
 <!-- PROFILE MODAL -->
 <div id="profileModal" class="modal-overlay">
   <div class="modal-content" style="text-align:center;">
-    <img id="profAvatar" class="viking-avatar" src="">
+    <img id="profAvatar" class="prof-avatar-img" src="">
     <h2 id="profName" style="color:var(--btn-show); margin:0;">Viking</h2>
-    <p id="profViking" style="color:#aaa; font-size:12px; font-style:italic; margin:5px 0 15px 0;"></p>
-    
+    <p id="profViking" style="color:#aaa; font-size:12px; font-style:italic; margin:5px 0 10px 0;"></p>
     <div class="stat-grid">
       <div class="stat-box"><span class="stat-val" id="statPlayed">0</span><span class="stat-lbl">Played</span></div>
       <div class="stat-box"><span class="stat-val" id="statWon">0</span><span class="stat-lbl">Won</span></div>
@@ -123,37 +92,17 @@
       <div class="stat-box"><span class="stat-val" id="statDrops">0</span><span class="stat-lbl">D (20)</span></div>
       <div class="stat-box"><span class="stat-val" id="statMds">0</span><span class="stat-lbl">MD (40)</span></div>
       <div class="stat-box"><span class="stat-val" id="statFcs">0</span><span class="stat-lbl">FC (80)</span></div>
-      <div class="stat-box"><span class="stat-val" id="statOuts">0</span><span class="stat-lbl">Outs</span></div>
-      <div class="stat-box" style="grid-column: span 2;"><span class="stat-val" id="statPts">0</span><span class="stat-lbl">Career Pts</span></div>
     </div>
-    
-    <h4 style="text-align:left; margin-bottom:5px;">Recent Glory</h4>
-    <div id="profLog" style="text-align:left; font-size:11px; max-height:100px; overflow-y:auto; color:#ccc; background:rgba(0,0,0,0.2); padding:10px; border-radius:6px;"></div>
-
-    <div id="aiReport" style="background:rgba(0,230,118,0.1); border-left: 4px solid var(--btn-show); padding:15px; margin-top:15px; border-radius:4px; font-size:13px; text-align:left;"></div>
-    <button class="bigBtn" onclick="closeModal('profileModal')">Close Profile</button>
-  </div>
-</div>
-
-<!-- NOTES MODAL -->
-<div id="notesModal" class="modal-overlay">
-  <div class="modal-content">
-    <h2 style="color:var(--btn-show); margin-top:0;">Elite Rummy Circle - v32.0</h2>
-    <p style="color:#00e676; font-size:11px; margin-top:-10px;">Updated: May 4, 2026</p>
-    <ul>
-      <li><strong>Realistic Avatars:</strong> Stylized Viking warriors for every player.</li>
-      <li><strong>Deep Profiles:</strong> Fixed career stats tracking (S, D, MD, FC, Outs).</li>
-      <li><strong>Secure Auth:</strong> Password confirmation, show/hide toggle, and Viking name generation.</li>
-      <li><strong>Mobile Fix:</strong> Center-aligned UI with Logout/Profile at the top RHS.</li>
-    </ul>
-    <button class="bigBtn" onclick="closeModal('notesModal')">Close</button>
+    <div id="aiReport" style="background:rgba(0,230,118,0.1); border-left: 4px solid var(--btn-show); padding:12px; margin-top:10px; border-radius:4px; font-size:13px; text-align:left; color: white;"></div>
+    <button class="bigBtn" onclick="closeModal('profileModal')">Close Glory Profile</button>
   </div>
 </div>
 
 <!-- AUTH SCREEN -->
 <div id="authScreen">
   <div class="auth-box">
-    <h1 style="color:var(--btn-show)">Elite Rummy</h1>
+    <h1 style="color:var(--btn-show); margin-bottom: 20px;">Elite Rummy</h1>
+    
     <div id="loginView">
       <input id="loginEmail" class="bigInput" placeholder="Email Address">
       <div style="position:relative;">
@@ -161,14 +110,18 @@
         <span onclick="togglePass('loginPassword')" style="position:absolute; right:12px; top:12px; color:#444; cursor:pointer;">👁️</span>
       </div>
       <button class="bigBtn" onclick="login()">Log In</button>
-      <a onclick="toggleAuthView('signup')" style="cursor:pointer; font-size:11px; text-decoration:underline;">Create Account</a>
+      <a onclick="toggleAuthView('signup')" style="cursor:pointer; font-size:11px; text-decoration:underline; color:#fff;">New Viking? Sign Up</a>
     </div>
 
     <div id="signupView" style="display:none">
-      <div style="display:flex; gap:8px;">
-        <input id="signupFirst" class="bigInput" placeholder="First Name">
-        <input id="signupLast" class="bigInput" placeholder="Surname">
-      </div>
+      <div style="display:flex; gap:8px;"><input id="signupFirst" class="bigInput" placeholder="First Name"><input id="signupLast" class="bigInput" placeholder="Surname"></div>
+      
+      <!-- Gender Select -->
+      <select id="signupGender" class="bigSelect">
+        <option value="male">Male Warrior</option>
+        <option value="female">Female Shield-Maiden</option>
+      </select>
+
       <div style="display:flex; gap:5px; margin-bottom:10px;">
         <input id="signupViking" class="bigInput" style="margin-bottom:0; background:#eee; color:#111;" readonly>
         <button onclick="uiGenerateViking()" style="background:var(--btn-show); color:#111;">🎲</button>
@@ -179,8 +132,8 @@
         <span onclick="togglePass('signupPass')" style="position:absolute; right:12px; top:12px; color:#444; cursor:pointer;">👁️</span>
       </div>
       <input id="signupConfirm" class="bigInput" type="password" placeholder="Confirm Password">
-      <button class="bigBtn" onclick="signup()">Sign Up</button>
-      <a onclick="toggleAuthView('login')" style="cursor:pointer; font-size:11px; text-decoration:underline;">Back to Login</a>
+      <button class="bigBtn" onclick="signup()">Join the Horde</button>
+      <a onclick="toggleAuthView('login')" style="cursor:pointer; font-size:11px; text-decoration:underline; color:#fff;">Back to Login</a>
     </div>
     <p id="authError" style="color:#ff5252; font-size:11px; margin-top:10px;"></p>
   </div>
@@ -189,26 +142,22 @@
 <!-- MAIN APP -->
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
-    <div class="logout-bar">
-        <button class="navBtn" style="background:var(--btn-md); color:#111; margin:0; padding:6px 12px;" onclick="viewMyProfile()">Profile</button>
-        <button class="navBtn" style="background:var(--btn-fc); color:white; margin:0; padding:6px 12px;" onclick="handleLogout()">Logout</button>
+    <div style="display:flex; justify-content:space-between; margin-bottom:15px; gap:5px;">
+        <button class="navBtn" style="background:var(--btn-md); color:#111; margin:0; flex:1; text-align:center; padding:8px;" onclick="viewMyProfile()">Profile</button>
+        <button class="navBtn" style="background:var(--btn-fc); color:white; margin:0; flex:1; text-align:center; padding:8px;" onclick="handleLogout()">Logout</button>
     </div>
     <h2 style="color:var(--btn-show); font-size: 18px; margin: 0 0 15px 0;">Elite Rummy</h2>
-    
     <div class="nav-section">
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">New Game</button>
       <button id="navContinue" class="navBtn" onclick="showScreen('continue')">Continue</button>
       <button id="navHistory" class="navBtn" onclick="showScreen('history')">History</button>
       <button id="navReports" class="navBtn" onclick="showScreen('reports')">Reports</button>
     </div>
-    
     <div class="player-roster-section">
-        <h4 style="font-size:10px; color:#00e676; text-transform:uppercase; letter-spacing:1px; margin:0 0 8px 0;">Players</h4>
+        <h4 style="font-size:10px; color:#00e676; text-transform:uppercase; letter-spacing:1px; margin:0 0 8px 0;">Live Horde</h4>
         <div id="sidebarRoster"></div>
     </div>
-    <small style="cursor:pointer; text-decoration:underline; color:#777; font-size: 10px;" onclick="openModal('notesModal')">v32.0 Notes</small>
   </div>
-  
   <div class="content-area">
     <div class="main-pane" id="mainPane"></div>
     <div class="rhs-pane" id="rhsPane" style="display:none"></div>
@@ -250,7 +199,7 @@ auth.onAuthStateChanged(user => {
 
 function setOnlineStatus(uid, status) {
   db.collection('eliteData').doc('playersData').get().then(doc => {
-    let list = doc.data().list || [];
+    let list = doc.data().list;
     let idx = list.findIndex(p => p.id === uid);
     if(idx !== -1) {
         list[idx].isOnline = status;
@@ -260,19 +209,15 @@ function setOnlineStatus(uid, status) {
 }
 
 function handleLogout() {
-  if(auth.currentUser) {
-    setOnlineStatus(auth.currentUser.uid, false);
-    setTimeout(() => { auth.signOut(); }, 500);
-  }
+  setOnlineStatus(auth.currentUser.uid, false);
+  setTimeout(() => { auth.signOut(); }, 500);
 }
 
 function loadData() {
-  db.collection('eliteData').doc('playersData').onSnapshot(doc => { 
-    if(doc.exists) { playersDb = doc.data().list || []; renderRoster(); }
-  });
+  db.collection('eliteData').doc('playersData').onSnapshot(doc => { if(doc.exists) { playersDb = doc.data().list || []; renderRoster(); if(currentScreen==='newGame') renderNewGame(); }});
   db.collection('eliteGames').onSnapshot(snap => {
     savedGames = []; snap.forEach(d => savedGames.push(d.data()));
-    if(state) { let s = savedGames.find(g => g.id === state.id); if(s) { state = s; renderActive(); } }
+    if(state) { let s = savedGames.find(g => g.id === state.id); if(s) { state = s; renderActive(); } else { state = null; showScreen('continue'); } }
     if(currentScreen==='continue') renderContinue();
     if(currentScreen==='history') renderHistory();
     if(currentScreen==='reports') renderReports();
@@ -280,26 +225,21 @@ function loadData() {
 }
 
 function renderRoster() {
-  const c = document.getElementById('sidebarRoster'); if(!c) return;
-  c.innerHTML = "";
+  const c = document.getElementById('sidebarRoster'); if(!c) return; c.innerHTML = "";
   playersDb.sort((a,b)=>a.fullName.localeCompare(b.fullName)).forEach(p => {
     const dotClass = p.isOnline ? 'dot-online' : 'dot-offline';
-    c.innerHTML += `<div class="roster-item" onclick="viewProfile('${p.fullName}')">
-        <div class="status-dot ${dotClass}"></div> ${p.fullName}
-    </div>`;
+    c.innerHTML += `<div class="roster-item" onclick="viewProfile('${p.fullName}')"><div class="status-dot ${dotClass}"></div> ${p.fullName}</div>`;
   });
 }
 
-/* AUTH */
 function login() { auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value).catch(e => alert(e.message)); }
 function signup() {
-  const f = document.getElementById('signupFirst').value, l = document.getElementById('signupLast').value, e = document.getElementById('signupEmail').value, p = document.getElementById('signupPass').value, c = document.getElementById('signupConfirm').value, v = document.getElementById('signupViking').value;
-  if(p !== c) return alert("Mismatched passwords!");
-  if(!v) return alert("Generate a Viking name!");
+  const f = document.getElementById('signupFirst').value, l = document.getElementById('signupLast').value, e = document.getElementById('signupEmail').value, p = document.getElementById('signupPass').value, c = document.getElementById('signupConfirm').value, v = document.getElementById('signupViking').value, g = document.getElementById('signupGender').value;
+  if(p !== c) return alert("Passwords do not match!");
   auth.createUserWithEmailAndPassword(e, p).then(cred => {
     const name = (f + " " + l).toUpperCase();
-    let updatedList = [...playersDb, { id: cred.user.uid, fullName: name, vikingName: v, isOnline: true }];
-    db.collection('eliteData').doc('playersData').set({ list: updatedList });
+    playersDb.push({ id: cred.user.uid, fullName: name, vikingName: v, gender: g, isOnline: true });
+    db.collection('eliteData').doc('playersData').set({ list: playersDb });
   }).catch(err => alert(err.message));
 }
 
@@ -313,16 +253,27 @@ function showScreen(s) {
   if(s==='reports') { document.getElementById('navReports').classList.add('active-nav'); renderReports(); }
 }
 
+function getPlayerOptionsHtml(currentSelected) {
+  let opts = `<option value="">-- Choose Player --</option>`;
+  playersDb.forEach(p => {
+    if(!currentSelected.includes(p.fullName)) { opts += `<option value="${p.fullName}">${p.fullName}</option>`; }
+  });
+  return opts;
+}
+
 function renderNewGame() {
-  let opts = `<option value="">-- Choose Player --</option>` + playersDb.map(p => `<option value="${p.fullName}">${p.fullName}</option>`).join('');
+  const gInput = document.getElementById('gName');
+  const isLocked = gInput && gInput.value.includes('(');
   document.getElementById('mainPane').innerHTML = `
-    <h2 style="font-size:18px;">Start New Game</h2>
-    <div class="game-card" style="display:block; padding:12px; border-radius:8px;">
-        <div style="display:flex; gap:5px; margin-bottom:8px;">
-            <input id="gName" class="bigInput" placeholder="Game Name" style="margin-bottom:0; flex:1;">
-            <button class="navBtn" style="background:rgba(255,255,255,0.1); width:auto; padding:5px 12px;" onclick="appendTime('gName')">🕒</button>
+    <h2>Start New Game</h2>
+    <div class="game-card" style="display:block; padding:15px; border-radius:0;">
+        <div style="display:flex; gap:5px; margin-bottom:10px;">
+            <input id="gName" class="bigInput" placeholder="Game Name" style="margin-bottom:0; flex:1;" oninput="refreshDropdowns()">
+            <button id="timeBtn" class="navBtn" style="background:rgba(255,255,255,0.1); width:auto; padding:5px 12px;" onclick="appendDateTime()" ${isLocked?'disabled':''}>🕒</button>
         </div>
-        <div id="selArea"><select class="bigSelect p-sel" style="margin-bottom:8px;">${opts}</select></div>
+        <div id="selArea">
+            <select class="bigSelect p-sel" onchange="refreshDropdowns()">${getPlayerOptionsHtml([])}</select>
+        </div>
         <div style="display:flex; gap:5px;">
             <button class="navBtn" style="background:rgba(0,230,118,0.1); color:#00e676; flex:1;" onclick="addSlot()">+ Add Player</button>
             <button class="bigBtn" style="margin:0; flex:1.5;" onclick="startMatch()">Start</button>
@@ -330,16 +281,37 @@ function renderNewGame() {
     </div>`;
 }
 
+function refreshDropdowns() {
+    const gInput = document.getElementById('gName');
+    const timeBtn = document.getElementById('timeBtn');
+    if (gInput && timeBtn && !gInput.value.includes('(')) { timeBtn.disabled = false; }
+    const selects = Array.from(document.querySelectorAll('.p-sel'));
+    const selected = selects.map(s => s.value).filter(v => v !== "");
+    selects.forEach(s => {
+        const val = s.value;
+        const otherSelected = selected.filter(v => v !== val);
+        s.innerHTML = getPlayerOptionsHtml(otherSelected);
+        s.value = val;
+    });
+}
+
 function addSlot() {
-  let opts = `<option value="">-- Choose Player --</option>` + playersDb.map(p => `<option value="${p.fullName}">${p.fullName}</option>`).join('');
+  const selected = Array.from(document.querySelectorAll('.p-sel')).map(s => s.value);
   const div = document.createElement('div'); div.style="display:flex; gap:5px; margin-bottom:5px;";
-  div.innerHTML = `<select class="bigSelect p-sel" style="margin-bottom:0;">${opts}</select><button onclick="this.parentElement.remove()" style="width:40px; background:#ff5252; color:white; border-radius:6px; border:none;">✕</button>`;
+  div.innerHTML = `<select class="bigSelect p-sel" onchange="refreshDropdowns()">${getPlayerOptionsHtml(selected)}</select><button onclick="this.parentElement.remove(); refreshDropdowns();" style="width:40px; background:#ff5252; color:white; border-radius:6px; border:none;">✕</button>`;
   document.getElementById('selArea').appendChild(div);
+}
+
+function appendDateTime() {
+    const gInput = document.getElementById('gName');
+    const now = new Date();
+    const dt = now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    gInput.value = gInput.value + " (" + dt + ")";
+    document.getElementById('timeBtn').disabled = true;
 }
 
 function startMatch() {
   const players = Array.from(document.querySelectorAll('.p-sel')).map(s => s.value).filter(val => val !== "");
-  if(new Set(players).size !== players.length) return alert("Duplicates not allowed");
   if(players.length < 2) return alert("Min 2 players");
   state = { id: Date.now().toString(), name: document.getElementById('gName').value||"Game", players, totals: {}, round: 1, history: [], eliminated: {}, reentered: {}, winner: null, actionStats: {} };
   players.forEach(p => { state.totals[p]=0; state.eliminated[p]=false; state.reentered[p]=false; state.actionStats[p] = { shows: 0, fcs: 0, drops: 0, mds: 0, outs: 0 }; });
@@ -349,33 +321,27 @@ function startMatch() {
 
 function renderActive() {
   document.getElementById('rhsPane').style.display='block';
-  let html = `<h2 style="font-size:16px; margin:0 0 10px 0; color:var(--btn-show);">${state.name}</h2><table><tr><th>Player</th><th>Actions</th><th>Total</th></tr>`;
+  let html = `<h2 style="font-size:16px; margin:0 0 10px 0;">${state.name}</h2><table><tr><th>Player</th><th>Actions</th><th>Total</th></tr>`;
   state.players.forEach(p => {
     let isOut = state.totals[p] >= 240;
     html += `<tr class="${isOut?'eliminated':''}">
-      <td><b>${p.split(' ')[0]}</b><br><div style="display:flex; gap:2px;"><input type="number" id="manual-${p}" class="score-input" placeholder="0"><button style="background:rgba(255,255,255,0.1); padding:4px;" onclick="scoreManual('${p}')">+</button></div></td>
+      <td><b>${p.split(' ')[0]}</b><br><div style="display:flex; gap:2px;"><input type="number" id="manual-${p}" class="score-input" placeholder="0"><button onclick="scoreManual('${p}')">+</button></div></td>
       <td>
-        <div style="display:flex; flex-wrap:wrap; gap:4px;">
-            <button style="background:var(--btn-show)" onclick="score('${p}',0,'shows')" ${isOut?'disabled':''}>S</button>
-            <button style="background:var(--btn-drop)" onclick="score('${p}',20,'drops')" ${isOut?'disabled':''}>D</button>
-            <button style="background:var(--btn-md)" onclick="score('${p}',40,'mds')" ${isOut?'disabled':''}>MD</button>
-            <button style="background:var(--btn-fc); color:white;" onclick="score('${p}',80,'fcs')" ${isOut?'disabled':''}>F</button>
-        </div>
-        ${(isOut && !state.reentered[p]) ? `<button style="background:var(--btn-md); width:100%; margin-top:5px;" onclick="reenter('${p}')">RE-ENTER</button>` : ''}
+        <button style="background:var(--btn-show)" onclick="score('${p}',0,'shows')" ${isOut?'disabled':''}>S</button>
+        <button style="background:var(--btn-drop)" onclick="score('${p}',20,'drops')" ${isOut?'disabled':''}>D</button>
+        <button style="background:var(--btn-md)" onclick="score('${p}',40,'mds')" ${isOut?'disabled':''}>MD</button>
+        <button style="background:var(--btn-fc); color:white;" onclick="score('${p}',80,'fcs')" ${isOut?'disabled':''}>F</button>
+        ${(isOut && !state.reentered[p]) ? `<br><button style="background:var(--btn-md); width:100%;" onclick="reenter('${p}')">RE-ENTER</button>` : ''}
       </td>
       <td><h3 style="margin:0">${state.totals[p]}</h3></td>
     </tr>`;
   });
-  html += `</table><button class="bigBtn" onclick="nextRound()">End Round</button>`;
+  html += `</table><button class="bigBtn" onclick="nextRound()">Next Round</button>`;
   document.getElementById('mainPane').innerHTML = html;
   renderHistoryPane();
 }
 
-function score(p, val, type) { 
-    state.totals[p] += val; if(type) state.actionStats[p][type]++;
-    if(state.totals[p] >= 240) { state.eliminated[p] = true; state.actionStats[p].outs++; }
-    db.collection('eliteGames').doc(state.id).set(state); 
-}
+function score(p, val, type) { state.totals[p] += val; if(type) state.actionStats[p][type]++; if(state.totals[p] >= 240) { state.eliminated[p] = true; state.actionStats[p].outs++; } db.collection('eliteGames').doc(state.id).set(state); }
 function scoreManual(p) { let val = parseInt(document.getElementById(`manual-${p}`).value) || 0; score(p, val); document.getElementById(`manual-${p}`).value = ""; }
 function reenter(p) {
   let max = 0; state.players.forEach(player => { if(state.totals[player] < 240 && state.totals[player] > max) max = state.totals[player]; });
@@ -393,23 +359,17 @@ function nextRound() {
 function viewProfile(name) {
     const pData = playersDb.find(x => x.fullName === name);
     document.getElementById('profName').innerText = name;
-    document.getElementById('profViking').innerText = pData ? pData.vikingName : "Humble Wanderer";
-    document.getElementById('profAvatar').src = `https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=${name}&beardProbability=100`;
-
+    document.getElementById('profViking').innerText = pData ? pData.vikingName : "Humble Viking";
+    
+    // CUTE AVATAR LOGIC
+    const style = (pData && pData.gender === 'female') ? 'lorelei' : 'lorelei-neutral';
+    document.getElementById('profAvatar').src = `https://api.dicebear.com/7.x/${style}/svg?seed=${name}&mood=happy`;
+    
     let finished = savedGames.filter(g => g.winner);
     let myGames = finished.filter(g => g.players.includes(name));
     let wins = finished.filter(g => g.winner === name).length;
-    let s=0, f=0, d=0, m=0, o=0, pts=0;
-
-    myGames.forEach(g => {
-        if(g.actionStats && g.actionStats[name]) {
-            s += g.actionStats[name].shows || 0; f += g.actionStats[name].fcs || 0;
-            d += g.actionStats[name].drops || 0; m += g.actionStats[name].mds || 0;
-            o += g.actionStats[name].outs || 0;
-        }
-        pts += g.totals[name] || 0;
-    });
-
+    let s=0, f=0, d=0, m=0, o=0;
+    myGames.forEach(g => { if(g.actionStats && g.actionStats[name]) { s += g.actionStats[name].shows || 0; f += g.actionStats[name].fcs || 0; d += g.actionStats[name].drops || 0; m += g.actionStats[name].mds || 0; o += g.actionStats[name].outs || 0; }});
     document.getElementById('statPlayed').innerText = myGames.length;
     document.getElementById('statWon').innerText = wins;
     document.getElementById('statShows').innerText = s;
@@ -417,62 +377,47 @@ function viewProfile(name) {
     document.getElementById('statMds').innerText = m;
     document.getElementById('statFcs').innerText = f;
     document.getElementById('statOuts').innerText = o;
-    document.getElementById('statPts').innerText = pts;
-
-    let logHtml = ""; myGames.slice(-5).forEach(g => logHtml += `<div>${g.name}: ${g.winner===name?'WON':'LOST'} (${g.totals[name]} pts)</div>`);
-    document.getElementById('profLog').innerHTML = logHtml || "No glory recorded yet.";
-
-    let report = "Analyzing the path to Valhalla...";
-    if(myGames.length > 0) {
-        if(s > (d+m)) report = name + " is a bold warrior, often risking all for the Show. A high-risk, high-reward Jarl.";
-        else if((d+m) > s) report = name + " is a cunning strategist, using tactical retreats (Drops) to survive the storm. A master of longevity.";
-        else report = name + " is a balanced fighter, adapting to the winds of fate with equal parts caution and steel.";
-    }
-    document.getElementById('aiReport').innerText = "AI WARRIOR INSIGHT: " + report;
+    let r = "Analyzing destiny...";
+    if(myGames.length > 0) { if(s > (d+m)) r = name + " is a bold fighter, seeking the Show. High-risk, high-reward Jarl."; else if((d+m) > s) r = name + " is a tactical survivor, master of retreats. A patient survivor."; else r = "A versatile warrior, balancing caution and steel."; }
+    document.getElementById('aiReport').innerText = "AI WARRIOR INSIGHT: " + r;
     openModal('profileModal');
 }
 
 function viewMyProfile() { const me = playersDb.find(p => p.id === auth.currentUser.uid); if(me) viewProfile(me.fullName); }
-function uiGenerateViking() { const pre = ["Thor", "Bjorn", "Ragnar", "Ivar", "Erik", "Olaf", "Sigurd"]; const post = ["Ironside", "Bloodaxe", "Storm", "Wolf", "Red", "Slayer"]; document.getElementById('signupViking').value = pre[Math.floor(Math.random()*pre.length)] + " " + post[Math.floor(Math.random()*post.length)]; }
-
-function renderContinue() {
-  let active = savedGames.filter(g => !g.winner);
-  document.getElementById('mainPane').innerHTML = "<h2>Active Games</h2>" + (active.length === 0 ? "<p>No active games.</p>" : active.map(g => `<div class="game-card"><div><b>${g.name}</b></div><button style="background:var(--btn-show); color:#111" onclick="resume('${g.id}')">Resume</button></div>`).join(''));
-}
-function resume(id) { state = savedGames.find(g => g.id === id); renderActive(); }
-
-function renderHistory() {
-  let finished = savedGames.filter(g => g.winner);
-  document.getElementById('mainPane').innerHTML = "<h2>History</h2>" + finished.map(g => `<div class="game-card"><div><b>${g.name}</b><br>Won by: ${g.winner}</div><button style="background:#444; color:white;" onclick="viewMatchReport('${g.id}')">Report</button></div>`).join('');
-}
+function uiGenerateViking() { const pre = ["Thor", "Bjorn", "Ragnar", "Ivar", "Erik"]; const post = ["Ironside", "Bloodaxe", "Storm", "Wolf", "Red"]; document.getElementById('signupViking').value = pre[Math.floor(Math.random()*pre.length)] + " " + post[Math.floor(Math.random()*post.length)]; }
 
 function renderReports() {
-  let html = `<h2>Leaderboard</h2><table><tr><th>Viking</th><th>Played</th><th>Win %</th></tr>`;
+  let html = `<h2>Leaderboard</h2><table><tr><th>Viking</th><th>Win %</th><th>Manage</th></tr>`;
   playersDb.forEach(p => {
     let myGames = savedGames.filter(g => g.winner && g.players.includes(p.fullName));
     let wins = savedGames.filter(g => g.winner === p.fullName).length;
-    if(myGames.length > 0) html += `<tr><td><b>${p.fullName}</b></td><td>${myGames.length}</td><td>${((wins/myGames.length)*100).toFixed(1)}%</td></tr>`;
+    html += `<tr><td><b>${p.fullName}</b></td><td>${myGames.length?((wins/myGames.length)*100).toFixed(1):0}%</td><td><button class="delete-btn" onclick="purgePlayer('${p.id}')">🗑️ Purge</button></td></tr>`;
   });
   document.getElementById('mainPane').innerHTML = html + `</table>`;
 }
 
+function purgePlayer(uid) {
+    if(confirm("Permanently remove this player from the horde list?")) {
+        let newList = playersDb.filter(p => p.id !== uid);
+        db.collection('eliteData').doc('playersData').set({ list: newList });
+    }
+}
+
+function renderContinue() {
+  let active = savedGames.filter(g => !g.winner);
+  document.getElementById('mainPane').innerHTML = "<h2>Active Games</h2>" + active.map(g => `<div class="game-card"><div><b>${g.name}</b></div><button style="background:var(--btn-show)" onclick="resume('${g.id}')">Resume</button></div>`).join('');
+}
+function resume(id) { state = savedGames.find(g => g.id === id); renderActive(); }
+function renderHistory() {
+  let finished = savedGames.filter(g => g.winner);
+  document.getElementById('mainPane').innerHTML = "<h2>History</h2>" + finished.map(g => `<div class="game-card"><div><b>${g.name}</b><br>Winner: ${g.winner}</div></div>`).join('');
+}
 function renderHistoryPane() {
   let h = "<h3>Round Logs</h3>";
   state.history.forEach(r => h += `<div style="font-size:10px; margin-bottom:4px; background:rgba(255,255,255,0.05); padding:4px;">R${r.round}: ${JSON.stringify(r.totals).replace(/[{}"]/g,'')}</div>`);
   document.getElementById('rhsPane').innerHTML = h;
 }
-
-function viewMatchReport(id) {
-  let g = savedGames.find(x => x.id === id);
-  if(!g) return;
-  let html = `<div style="text-align:center;"><h2>Game Report: ${g.name}</h2><h3>Winner: ${g.winner}</h3></div>
-    <table><tr><th>Player</th><th>Final Score</th></tr>`;
-  g.players.forEach(p => html += `<tr><td>${p}</td><td>${g.totals[p]}</td></tr>`);
-  document.getElementById('mainPane').innerHTML = html + `</table><button class="bigBtn" onclick="showScreen('history')">Back</button>`;
-}
-
 function toggleAuthView(v) { document.getElementById('loginView').style.display = v==='login'?'block':'none'; document.getElementById('signupView').style.display = v==='signup'?'block':'none'; if(v==='signup') uiGenerateViking(); }
-function appendTime(id) { let x = document.getElementById(id); let now = new Date(); x.value = x.value + " (" + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) + ")"; }
 </script>
 </body>
 </html>
