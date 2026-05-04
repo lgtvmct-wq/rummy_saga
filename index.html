@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v39.8</title>
+<title>Elite Rummy Circle - v40.0</title>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -134,13 +134,13 @@
 <!-- RELEASE NOTES MODAL -->
 <div id="releaseNotesModal" class="modal-overlay">
     <div class="modal-card" style="text-align: left;">
-        <h2 style="color:var(--accent); margin-top:0;">Release Notes - v39.8</h2>
+        <h2 style="color:var(--accent); margin-top:0;">Release Notes - v40.0</h2>
         <ul style="font-size: 14px; line-height: 1.6; opacity: 0.9; padding-left: 20px;">
-            <li><b>Round vs Total Scores:</b> New rounds start at 0. Totals safely accumulate in the background.</li>
-            <li><b>Review Past Rounds:</b> Click 'View' in the History Logs to inspect locked historical scores.</li>
-            <li><b>Manual OUT Button:</b> A fast way to permanently eject a player from the game without re-entry loops.</li>
-            <li><b>PDF Match Reports:</b> Generate and download full game histories dynamically.</li>
-            <li><b>Next Round Lock:</b> You must press 'S' (Show) to activate the Next Round.</li>
+            <li><b>Strict Scoring Enforcement:</b> The system now checks that all players have a score entered, and someone triggered a Show (S) before allowing the round to end.</li>
+            <li><b>Cleaner Interface:</b> Redundant "+" buttons and UI warnings have been removed. Input boxes intuitively sync and reset to blank every round.</li>
+            <li><b>Isolated Round Scores:</b> The input box now reflects exactly what you scored 'This Round'. Tactics overwrite the box seamlessly.</li>
+            <li><b>Review Past Rounds:</b> Click 'View' in the Game Logs to inspect locked historical scores for that specific round.</li>
+            <li><b>Instant 'OUT' Tactics:</b> Permanently eject a player from the game without triggering re-entry prompts.</li>
         </ul>
         <button class="actionBtn" style="margin-top:15px;" onclick="document.getElementById('releaseNotesModal').style.display='none'">Close</button>
     </div>
@@ -196,7 +196,7 @@
 <div id="authScreen">
   <div class="auth-box">
     <h1 style="color:var(--accent); margin-bottom: 5px;">Elite Rummy Circle</h1>
-    <a class="version-link" onclick="document.getElementById('releaseNotesModal').style.display='flex'">VERSION 39.8</a>
+    <a class="version-link" onclick="document.getElementById('releaseNotesModal').style.display='flex'">VERSION 40.0</a>
     
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
@@ -234,7 +234,7 @@
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
     <h2 style="color:var(--accent); margin-bottom: 5px;">Menu</h2>
-    <a class="version-link" style="margin-bottom: 25px; display:inline-block;" onclick="document.getElementById('releaseNotesModal').style.display='flex'">v39.8 Notes</a>
+    <a class="version-link" style="margin-bottom: 25px; display:inline-block;" onclick="document.getElementById('releaseNotesModal').style.display='flex'">v40.0 Notes</a>
     
     <div class="nav-section">
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">Start New Game</button>
@@ -501,7 +501,7 @@ function startGame() {
     endTime: null,
     players: players,
     totals: {},
-    roundScores: {},   // NEW: tracks the current round score safely starting at 0
+    roundScores: {},   
     actionStats: {},
     reEntries: {},     
     eliminated: {},    
@@ -513,7 +513,7 @@ function startGame() {
 
   players.forEach(p => { 
     state.totals[p] = 0; 
-    state.roundScores[p] = 0;
+    state.roundScores[p] = null; // Blank explicitly forces validation entry
     state.actionStats[p] = { shows: 0, fcs: 0, drops: 0, mds: 0, outs: 0 }; 
   });
 
@@ -527,13 +527,12 @@ function startGame() {
 function renderActive() {
   if (!state) return;
 
-  // Fallbacks for older ongoing games
   state.reEntries = state.reEntries || {};
   state.eliminated = state.eliminated || {};
   if(state.roundHasShow === undefined) state.roundHasShow = true; 
   if(!state.roundScores) {
       state.roundScores = {};
-      state.players.forEach(p => state.roundScores[p] = 0);
+      state.players.forEach(p => state.roundScores[p] = null);
   }
 
   let activeInputs = {};
@@ -563,46 +562,47 @@ function renderActive() {
       </div>`;
   }
 
-  // Refined Column Headers for Round vs Total logic
   html += `<table><tr><th>Player</th><th>Tactics</th><th>This Round</th><th>Total Score</th></tr>`;
 
   state.players.forEach(p => {
     let isElim = state.eliminated[p];
     let hasReEntered = state.reEntries[p];
     let statusTag = isElim ? '<span style="color:var(--danger); font-size:10px; font-weight:bold;">[OUT]</span>' : 
-                    hasReEntered ? '<span style="color:var(--warning); font-size:10px; font-weight:bold;"> [RE-ENTERED]</span>' : '';
+                    hasReEntered ? '<span style="color:var(--warning); font-size:10px; font-weight:bold;">[RE-ENTERED]</span>' : '';
     
-    // UI logic correctly utilizes base total to calculate elimination 
     let isOut = isElim || state.winner || state.totals[p] >= 240; 
     let safeP = p.replace(/'/g, "\\'");
     let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
 
+    let currentRoundDisplay = (state.roundScores[p] !== undefined && state.roundScores[p] !== null) ? state.roundScores[p] : '';
+    let projTotal = state.totals[p] + (currentRoundDisplay === '' ? 0 : currentRoundDisplay);
+
     html += `<tr style="${isElim || state.totals[p]>=240 ? 'opacity:0.4; background:rgba(231,76,60,0.15);':''}">
-      <td><b>${p}</b> ${statusTag}<br>
-        <div style="display:flex; gap:4px; margin-top:5px;">
-          <input type="number" id="${safeId}" style="width:45px;" placeholder="0" ${isOut?'disabled':''}>
-          <button onclick="scoreManual('${safeP}')" ${isOut?'disabled':''}>+</button>
+      <td><b>${p}</b> ${statusTag}</td>
+      <td>
+        <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:5px;">
+          <button style="background:var(--accent); padding:8px 12px; border-radius:6px;" onclick="score('${safeP}',0,'shows')" ${isOut?'disabled':''}>S</button>
+          <button style="background:var(--warning); padding:8px 12px; border-radius:6px;" onclick="score('${safeP}',20,'drops')" ${isOut?'disabled':''}>D</button>
+          <button style="background:#8e44ad; color:white; padding:8px 12px; border-radius:6px;" onclick="score('${safeP}',40,'mds')" ${isOut?'disabled':''}>MD</button>
+          <button style="background:var(--danger); color:white; padding:8px 12px; border-radius:6px;" onclick="score('${safeP}',80,'fcs')" ${isOut?'disabled':''}>FC</button>
+          <button style="background:#333; color:white; padding:8px 12px; border-radius:6px; font-size:10px;" onclick="markOut('${safeP}')" ${isOut?'disabled':''}>OUT</button>
         </div>
       </td>
       <td>
-        <button style="background:var(--accent)" onclick="score('${safeP}',0,'shows')" ${isOut?'disabled':''}>S</button>
-        <button style="background:var(--warning)" onclick="score('${safeP}',20,'drops')" ${isOut?'disabled':''}>D</button>
-        <button style="background:#8e44ad; color:white;" onclick="score('${safeP}',40,'mds')" ${isOut?'disabled':''}>MD</button>
-        <button style="background:var(--danger); color:white;" onclick="score('${safeP}',80,'fcs')" ${isOut?'disabled':''}>FC</button>
-        <button style="background:#333; color:white; font-size:11px;" onclick="markOut('${safeP}')" ${isOut?'disabled':''}>OUT</button>
+        <input type="number" id="${safeId}" class="std-input" style="width:70px; height:42px; margin:0; text-align:center; padding:0; font-size:18px;" 
+            value="${currentRoundDisplay}" 
+            onchange="handleRoundScoreInput('${safeP}', this)" 
+            onkeydown="if(event.key==='Enter') { this.blur(); }" 
+            ${isOut?'disabled':''}>
       </td>
-      <td><h3 style="margin:0">${state.roundScores[p]}</h3></td>
-      <td><h3 style="margin:0; color:var(--warning);">${state.totals[p] + state.roundScores[p]}</h3></td>
+      <td><h3 style="margin:0; color:var(--warning);">${projTotal}</h3></td>
     </tr>`;
   });
 
-  let canEndRound = !!state.roundHasShow;
-  let endBtnStyle = canEndRound ? "background:var(--accent);" : "background:#555; opacity:0.5; cursor:not-allowed;";
-
   if (!state.winner) {
+      // Button is always active, validation is handled upon click natively inside processRoundEnd
       html += `</table>
-      <div style="font-size:11px; margin-top:15px; color:var(--warning); ${canEndRound?'display:none;':''} ">* Note: A player must click Show (S) to unlock the Next Round button.</div>
-      <button id="endRoundBtn" class="actionBtn" style="margin-top:10px; ${endBtnStyle}" onclick="processRoundEnd()" ${canEndRound?'':'disabled'}>Next Round</button>`;
+      <button id="endRoundBtn" class="actionBtn" style="margin-top:10px;" onclick="processRoundEnd()">Next Round</button>`;
   } else {
       html += `</table><button class="actionBtn" style="margin-top:20px;" onclick="showScreen('history')">Go to History</button>`;
   }
@@ -621,30 +621,40 @@ function renderActive() {
   }
 }
 
+// Applies tactics directly to 'This Round' and updates the DB securely
 function score(p, val, type) {
   if (state.totals[p] >= 240 || state.eliminated[p] || state.winner) return;
-  state.roundScores[p] += val; // Apply to the ROUND exclusively
-  if(type) state.actionStats[p][type]++;
-  
+  state.roundScores[p] = val; 
+  if(type) {
+      if(!state.actionStats[p]) state.actionStats[p] = { shows: 0, fcs: 0, drops: 0, mds: 0, outs: 0 };
+      state.actionStats[p][type]++;
+  }
   if(type === 'shows') state.roundHasShow = true;
   db.collection('eliteGames').doc(state.id).set(state);
 }
 
-function scoreManual(p) {
-  if (state.totals[p] >= 240 || state.eliminated[p] || state.winner) return;
-  let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
-  let inputEl = document.getElementById(safeId);
-  let v = parseInt(inputEl.value) || 0;
-  state.roundScores[p] += v;
-  inputEl.value = "";
-  db.collection('eliteGames').doc(state.id).set(state);
+// Allows user to manually type in a score for 'This Round'
+window.handleRoundScoreInput = function(p, el) {
+    if (state.totals[p] >= 240 || state.eliminated[p] || state.winner) return;
+    let val = el.value.trim();
+    let v = val === "" ? null : parseInt(val);
+    if (state.roundScores[p] === v) return; 
+    state.roundScores[p] = v;
+    db.collection('eliteGames').doc(state.id).set(state);
 }
 
+// Permanently eject a player from the game immediately
 window.markOut = function(p) {
     if(confirm(`Are you sure you want to permanently eliminate ${p}? They will NOT be able to re-enter the game.`)) {
         state.eliminated[p] = true;
         if(!state.actionStats[p]) state.actionStats[p] = { shows: 0, fcs: 0, drops: 0, mds: 0, outs: 0 };
         state.actionStats[p].outs = (state.actionStats[p].outs || 0) + 1;
+        
+        let activeRemaining = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]);
+        if(activeRemaining.length <= 1) {
+            state.winner = activeRemaining.length === 1 ? activeRemaining[0] : "No Winner";
+            state.endTime = new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        }
         db.collection('eliteGames').doc(state.id).set(state);
     }
 };
@@ -671,29 +681,58 @@ function askReEntryModal(playerName, nextScore) {
 
 async function processRoundEnd() {
     if(!state) return;
+    
+    // Flush pending inputs seamlessly before performing calculations
+    state.players.forEach(p => {
+        let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
+        let el = document.getElementById(safeId);
+        if(el && !el.disabled) {
+            let val = el.value.trim();
+            if(val === "") {
+                state.roundScores[p] = null;
+            } else {
+                state.roundScores[p] = parseInt(val);
+            }
+        }
+    });
+
+    // Validations: Check missing entries & 'Show' validation
+    let activeRemaining = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p] && p !== state.winner);
+    
+    let missing = activeRemaining.filter(p => state.roundScores[p] === null || state.roundScores[p] === undefined || state.roundScores[p] === "");
+    if(missing.length > 0) {
+        alert("Error: Scores for all active players must be entered before proceeding to the next round.");
+        return;
+    }
+
+    if(!state.roundHasShow) {
+        alert("Error: At least one player must declare a Show (S) before ending the round.");
+        return;
+    }
+
     document.getElementById('endRoundBtn').disabled = true; 
     isPromptingReEntry = true; 
     
     state.reEntries = state.reEntries || {};
     state.eliminated = state.eliminated || {};
 
-    // 1. SAFELY ADD ALL ROUND SCORES TO PERMANENT TOTALS
+    // 1. ADD ROUND'S SCORE TO TOTALS 
     state.players.forEach(p => {
-        if(!state.eliminated[p]) {
+        if(!state.eliminated[p] && state.roundScores[p] !== null) {
             state.totals[p] += state.roundScores[p];
         }
     });
 
-    // 2. PUSH EXACT ROUND DATA TO HISTORY
+    // 2. PUSH EXACT ROUND DATA TO HISTORY LOG
     state.history.push({ round: state.round, roundScores: {...state.roundScores}, totals: {...state.totals} });
 
-    // 3. CHECK FOR RE-ENTRIES NOW THAT TOTALS ARE UPDATED
+    // 3. CHECK FOR RE-ENTRIES 
     let over240 = state.players.filter(p => state.totals[p] >= 240 && !state.eliminated[p]);
 
     let validScores = state.players.map(p => state.totals[p]).filter(s => s < 240);
     let highestActive = validScores.length > 0 ? Math.max(...validScores) : 0;
     
-    // Smart Backtracking if EVERYONE bombs out
+    // Backtracking if EVERYONE gets wiped 
     if (validScores.length === 0 && state.history.length > 1) {
         let prevScores = state.players.map(p => state.history[state.history.length-2].totals[p]).filter(s => s < 240);
         highestActive = prevScores.length > 0 ? Math.max(...prevScores) : 0;
@@ -703,7 +742,7 @@ async function processRoundEnd() {
 
     for (let p of over240) {
         if (state.reEntries[p]) {
-            state.eliminated[p] = true; // 2nd offense. Instant elimination.
+            state.eliminated[p] = true; 
         } else {
             if (entryScore >= 240) {
                 alert(`${p} cannot re-enter because the calculated score would be ${entryScore}. They are eliminated.`);
@@ -720,17 +759,17 @@ async function processRoundEnd() {
         }
     }
 
-    // 4. RESET ROUND SCORES TO ZERO FOR THE NEXT ROUND
-    state.players.forEach(p => state.roundScores[p] = 0);
+    // 4. RESET "THIS ROUND" TO NULL FOR NEW ROUND
+    state.players.forEach(p => state.roundScores[p] = null);
 
     state.round++;
     state.roundHasShow = false; 
 
-    // 5. DETERMINE GAME WINNER
-    let activeRemaining = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]);
-    if(activeRemaining.length <= 1) {
-        if(activeRemaining.length === 1) {
-            state.winner = activeRemaining[0];
+    // 5. CHECK IF GAME ENDED
+    let finalRemaining = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]);
+    if(finalRemaining.length <= 1) {
+        if(finalRemaining.length === 1) {
+            state.winner = finalRemaining[0];
         } else {
             let lowestScorePlayer = state.players.reduce((min, p) => state.totals[p] < state.totals[min] ? p : min, state.players[0]);
             state.winner = lowestScorePlayer;
@@ -775,7 +814,7 @@ function confirmAddMidGamePlayer() {
     
     state.players.push(newP);
     state.totals[newP] = highestActive;
-    state.roundScores[newP] = 0;
+    state.roundScores[newP] = null;
     state.actionStats[newP] = { shows: 0, fcs: 0, drops: 0, mds: 0, outs: 0 };
     
     db.collection('eliteGames').doc(state.id).set(state);
@@ -980,24 +1019,21 @@ window.generatePDF = function(gameId) {
     const head = [['Round', ...players]];
     const body =[];
 
-    // Extract exactly what they got per round (+20, +40, etc)
     g.history.forEach(r => {
-        let row = [`Round ${r.round}`];
+        let row =[`Round ${r.round}`];
         players.forEach(p => {
-            let val = r.roundScores ? r.roundScores[p] : r.totals[p]; // fallback for legacy games
-            row.push(val !== undefined ? `+${val}` : '-');
+            let val = r.roundScores && r.roundScores[p] !== null && r.roundScores[p] !== undefined ? r.roundScores[p] : r.totals[p]; 
+            row.push(val !== undefined ? `${val}` : '-');
         });
         body.push(row);
     });
 
-    // Extract their Total Match Scores
     let finalRow = ['FINAL TOTAL'];
     players.forEach(p => {
         finalRow.push(g.totals[p] !== undefined ? g.totals[p].toString() : '-');
     });
     body.push(finalRow);
 
-    // Render Table securely
     doc.autoTable({
         startY: 60,
         head: head,
@@ -1039,14 +1075,14 @@ window.viewPastRound = function(roundNum) {
     const r = state.history.find(x => x.round === roundNum);
     if(!r) return;
     
-    let html = `<tr><th style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.2);">Player</th><th style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.2);">This Round</th><th style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.2);">Total After Round</th></tr>`;
+    let html = `<tr><th style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.2);">Player</th><th style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.2);">Round Score</th><th style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.2);">Total After Round</th></tr>`;
     
     state.players.forEach(p => {
-        let rs = r.roundScores ? r.roundScores[p] : '-';
-        let tot = r.totals[p];
+        let rs = (r.roundScores && r.roundScores[p] !== null && r.roundScores[p] !== undefined) ? r.roundScores[p] : '-';
+        let tot = r.totals[p] !== undefined ? r.totals[p] : '-';
         html += `<tr>
             <td style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);"><b>${p}</b></td>
-            <td style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.05); color:var(--accent);">+${rs}</td>
+            <td style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.05); color:var(--accent);">${rs}</td>
             <td style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">${tot}</td>
         </tr>`;
     });
@@ -1060,7 +1096,11 @@ function renderHistoryPane() {
   let h = "<h3>Game Logs</h3>";
   if(!state.history.length) h += `<div style="font-size:11px; opacity:0.5;">Waiting for first round...</div>`;
   state.history.slice().reverse().forEach(r => {
-      let scoresStr = Object.entries(r.roundScores || r.totals).map(([p, s]) => `${p}: +${s}`).join(' | ');
+      let scoresStr = state.players.map(p => {
+          let s = (r.roundScores && r.roundScores[p] !== null && r.roundScores[p] !== undefined) ? r.roundScores[p] : r.totals[p];
+          return `${p}: ${s !== undefined ? s : '-'}`;
+      }).join(' | ');
+      
       h += `<div style="font-size:11px; margin-bottom:8px; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
           <b style="color:var(--accent);">Round ${r.round}</b>
