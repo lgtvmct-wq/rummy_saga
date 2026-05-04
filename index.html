@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v40.0</title>
+<title>Elite Rummy Circle - v40.1</title>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -107,7 +107,7 @@
     </div>
 </div>
 
-<!-- PAST ROUND MODAL (LOCKED CELLS) -->
+<!-- PAST ROUND MODAL -->
 <div id="pastRoundModal" class="modal-overlay" style="z-index: 3500;">
     <div class="modal-card">
         <h2 id="pastRoundTitle" style="color:var(--accent); margin-top:0;">Round Summary</h2>
@@ -134,12 +134,12 @@
 <!-- RELEASE NOTES MODAL -->
 <div id="releaseNotesModal" class="modal-overlay">
     <div class="modal-card" style="text-align: left;">
-        <h2 style="color:var(--accent); margin-top:0;">Release Notes - v40.0</h2>
+        <h2 style="color:var(--accent); margin-top:0;">Release Notes - v40.1</h2>
         <ul style="font-size: 14px; line-height: 1.6; opacity: 0.9; padding-left: 20px;">
-            <li><b>Strict Scoring Enforcement:</b> The system now checks that all players have a score entered, and someone triggered a Show (S) before allowing the round to end.</li>
-            <li><b>Cleaner Interface:</b> Redundant "+" buttons and UI warnings have been removed. Input boxes intuitively sync and reset to blank every round.</li>
-            <li><b>Isolated Round Scores:</b> The input box now reflects exactly what you scored 'This Round'. Tactics overwrite the box seamlessly.</li>
-            <li><b>Review Past Rounds:</b> Click 'View' in the Game Logs to inspect locked historical scores for that specific round.</li>
+            <li><b>Auto-Fill Scoring:</b> Clicking Tactics buttons instantly populates the score box dynamically.</li>
+            <li><b>Dynamic Round Locks:</b> Next Round button gracefully enables itself only when all active scores are entered and someone triggered a Show. Pop-up errors removed.</li>
+            <li><b>Clean Slate Rounds:</b> New rounds start with completely blank score boxes to prevent accidental data carryover.</li>
+            <li><b>Cleaner Interface:</b> Redundant "+" buttons and UI warnings have been removed.</li>
             <li><b>Instant 'OUT' Tactics:</b> Permanently eject a player from the game without triggering re-entry prompts.</li>
         </ul>
         <button class="actionBtn" style="margin-top:15px;" onclick="document.getElementById('releaseNotesModal').style.display='none'">Close</button>
@@ -196,7 +196,7 @@
 <div id="authScreen">
   <div class="auth-box">
     <h1 style="color:var(--accent); margin-bottom: 5px;">Elite Rummy Circle</h1>
-    <a class="version-link" onclick="document.getElementById('releaseNotesModal').style.display='flex'">VERSION 40.0</a>
+    <a class="version-link" onclick="document.getElementById('releaseNotesModal').style.display='flex'">VERSION 40.1</a>
     
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
@@ -234,7 +234,7 @@
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
     <h2 style="color:var(--accent); margin-bottom: 5px;">Menu</h2>
-    <a class="version-link" style="margin-bottom: 25px; display:inline-block;" onclick="document.getElementById('releaseNotesModal').style.display='flex'">v40.0 Notes</a>
+    <a class="version-link" style="margin-bottom: 25px; display:inline-block;" onclick="document.getElementById('releaseNotesModal').style.display='flex'">v40.1 Notes</a>
     
     <div class="nav-section">
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">Start New Game</button>
@@ -506,7 +506,6 @@ function startGame() {
     reEntries: {},     
     eliminated: {},    
     round: 1,
-    roundHasShow: false, 
     history:[],
     winner: null
   };
@@ -524,12 +523,52 @@ function startGame() {
   renderActive();
 }
 
+// Dynamically validates inputs and locks/unlocks the Next Round button natively
+window.validateNextRound = function() {
+    if (!state || state.winner) return;
+    let activeRem = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]);
+    
+    let allFilled = true;
+    let hasShow = false;
+
+    activeRem.forEach(p => {
+        let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
+        let el = document.getElementById(safeId);
+        if (el) {
+            let val = el.value.trim();
+            if (val === "") {
+                allFilled = false;
+            } else if (parseInt(val) === 0) {
+                hasShow = true;
+            }
+        }
+    });
+
+    let btn = document.getElementById('endRoundBtn');
+    let note = document.getElementById('nextRoundNote');
+    
+    if(btn) {
+        if (allFilled && hasShow) {
+            btn.disabled = false;
+            btn.style.background = "var(--accent)";
+            btn.style.opacity = "1";
+            btn.style.cursor = "pointer";
+            if(note) note.style.display = 'none';
+        } else {
+            btn.disabled = true;
+            btn.style.background = "#555";
+            btn.style.opacity = "0.5";
+            btn.style.cursor = "not-allowed";
+            if(note) note.style.display = 'block';
+        }
+    }
+};
+
 function renderActive() {
   if (!state) return;
 
   state.reEntries = state.reEntries || {};
   state.eliminated = state.eliminated || {};
-  if(state.roundHasShow === undefined) state.roundHasShow = true; 
   if(!state.roundScores) {
       state.roundScores = {};
       state.players.forEach(p => state.roundScores[p] = null);
@@ -591,6 +630,7 @@ function renderActive() {
       <td>
         <input type="number" id="${safeId}" class="std-input" style="width:70px; height:42px; margin:0; text-align:center; padding:0; font-size:18px;" 
             value="${currentRoundDisplay}" 
+            oninput="validateNextRound()"
             onchange="handleRoundScoreInput('${safeP}', this)" 
             onkeydown="if(event.key==='Enter') { this.blur(); }" 
             ${isOut?'disabled':''}>
@@ -600,9 +640,9 @@ function renderActive() {
   });
 
   if (!state.winner) {
-      // Button is always active, validation is handled upon click natively inside processRoundEnd
       html += `</table>
-      <button id="endRoundBtn" class="actionBtn" style="margin-top:10px;" onclick="processRoundEnd()">Next Round</button>`;
+      <div id="nextRoundNote" style="font-size:11px; margin-top:15px; color:var(--warning); display:none;">* Note: Please ensure all active players have a score, and at least one player has a Show (0).</div>
+      <button id="endRoundBtn" class="actionBtn" style="margin-top:10px; background:#555; opacity:0.5; cursor:not-allowed;" onclick="processRoundEnd()" disabled>Next Round</button>`;
   } else {
       html += `</table><button class="actionBtn" style="margin-top:20px;" onclick="showScreen('history')">Go to History</button>`;
   }
@@ -619,9 +659,12 @@ function renderActive() {
      let focusedEl = document.getElementById(activeInputs.focusId);
      if(focusedEl) focusedEl.focus();
   }
+
+  // Force button unlock evaluation dynamically immediately after rendering 
+  validateNextRound();
 }
 
-// Applies tactics directly to 'This Round' and updates the DB securely
+// Applies tactics directly to 'This Round' and automatically populates the text box
 function score(p, val, type) {
   if (state.totals[p] >= 240 || state.eliminated[p] || state.winner) return;
   state.roundScores[p] = val; 
@@ -629,7 +672,6 @@ function score(p, val, type) {
       if(!state.actionStats[p]) state.actionStats[p] = { shows: 0, fcs: 0, drops: 0, mds: 0, outs: 0 };
       state.actionStats[p][type]++;
   }
-  if(type === 'shows') state.roundHasShow = true;
   db.collection('eliteGames').doc(state.id).set(state);
 }
 
@@ -647,6 +689,7 @@ window.handleRoundScoreInput = function(p, el) {
 window.markOut = function(p) {
     if(confirm(`Are you sure you want to permanently eliminate ${p}? They will NOT be able to re-enter the game.`)) {
         state.eliminated[p] = true;
+        state.roundScores[p] = null; // Clear their score box instantly
         if(!state.actionStats[p]) state.actionStats[p] = { shows: 0, fcs: 0, drops: 0, mds: 0, outs: 0 };
         state.actionStats[p].outs = (state.actionStats[p].outs || 0) + 1;
         
@@ -682,32 +725,13 @@ function askReEntryModal(playerName, nextScore) {
 async function processRoundEnd() {
     if(!state) return;
     
-    // Flush pending inputs seamlessly before performing calculations
-    state.players.forEach(p => {
-        let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
-        let el = document.getElementById(safeId);
-        if(el && !el.disabled) {
-            let val = el.value.trim();
-            if(val === "") {
-                state.roundScores[p] = null;
-            } else {
-                state.roundScores[p] = parseInt(val);
-            }
-        }
-    });
-
-    // Validations: Check missing entries & 'Show' validation
+    // Fail-safe validation check
     let activeRemaining = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p] && p !== state.winner);
-    
     let missing = activeRemaining.filter(p => state.roundScores[p] === null || state.roundScores[p] === undefined || state.roundScores[p] === "");
-    if(missing.length > 0) {
-        alert("Error: Scores for all active players must be entered before proceeding to the next round.");
-        return;
-    }
+    let hasShow = activeRemaining.some(p => state.roundScores[p] === 0);
 
-    if(!state.roundHasShow) {
-        alert("Error: At least one player must declare a Show (S) before ending the round.");
-        return;
+    if (missing.length > 0 || !hasShow) {
+        return; // Button is structurally disabled so this will only trigger on raw manipulation
     }
 
     document.getElementById('endRoundBtn').disabled = true; 
@@ -763,7 +787,6 @@ async function processRoundEnd() {
     state.players.forEach(p => state.roundScores[p] = null);
 
     state.round++;
-    state.roundHasShow = false; 
 
     // 5. CHECK IF GAME ENDED
     let finalRemaining = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]);
