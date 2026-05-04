@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v40.8</title>
+<title>Elite Rummy Circle - v41.0</title>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -91,11 +91,11 @@
 </head>
 <body>
 
-<!-- AUTH -->
+<!-- AUTH SCREEN -->
 <div id="authScreen">
   <div class="auth-box">
     <h1 style="color:var(--accent); margin-bottom: 5px;">Elite Rummy Circle</h1>
-    <a class="version-link">VERSION 40.8</a>
+    <a class="version-link">VERSION 41.0</a>
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
       <input id="loginPassword" class="std-input" type="password" placeholder="Password">
@@ -148,7 +148,7 @@
     </div>
 </div>
 
-<!-- APP -->
+<!-- APP WRAPPER -->
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
     <h2 style="color:var(--accent)">Elite Circle</h2>
@@ -186,7 +186,7 @@ const auth = firebase.auth();
 let playersDb =[], savedGames =[], state = null, currentScreen = '';
 let isPromptingReEntry = false;
 
-// AUTH
+// AUTH logic
 auth.onAuthStateChanged(user => {
   if(user) {
     document.getElementById('authScreen').style.display='none';
@@ -236,9 +236,13 @@ function loadData() {
   });
   db.collection('eliteGames').onSnapshot(snap => {
     savedGames =[]; snap.forEach(d => savedGames.push(d.data()));
+    if(currentScreen === 'continue') renderContinue();
+    if(currentScreen === 'history') renderHistory();
+    if(currentScreen === 'reports') renderReports();
     if(currentScreen === 'activeGame' && state && !isPromptingReEntry) {
         let s = savedGames.find(g => g.id === state.id);
         if(s) { state = s; renderActive(); }
+        else { state = null; showScreen('newGame'); }
     }
   });
 }
@@ -247,16 +251,13 @@ function loadData() {
 function applyTactic(p, type) {
     if (state.winner || state.eliminated[p]) return;
     let newVal = null;
-    
     if (type === 'S') {
-        // Clear winner from others
         state.players.forEach(pl => { if(state.roundScores[pl] === 'S') state.roundScores[pl] = null; });
         newVal = (state.roundScores[p] === 'S') ? null : 'S';
     } 
     else if (type === 'D') newVal = (state.roundScores[p] === 20) ? null : 20;
     else if (type === 'MD') newVal = (state.roundScores[p] === 40) ? null : 40;
     else if (type === 'FC') newVal = (state.roundScores[p] === 80) ? null : 80;
-
     state.roundScores[p] = newVal;
     db.collection('eliteGames').doc(state.id).update({ roundScores: state.roundScores });
 }
@@ -264,10 +265,7 @@ function applyTactic(p, type) {
 function manualInput(p, val) {
     if (state.winner || state.eliminated[p]) return;
     let v = val.toUpperCase() === 'S' ? 'S' : (val === '' ? null : parseInt(val));
-    
-    if(v === 'S') {
-        state.players.forEach(pl => { if(state.roundScores[pl] === 'S') state.roundScores[pl] = null; });
-    }
+    if(v === 'S') state.players.forEach(pl => { if(state.roundScores[pl] === 'S') state.roundScores[pl] = null; });
     state.roundScores[p] = v;
     db.collection('eliteGames').doc(state.id).update({ roundScores: state.roundScores });
 }
@@ -281,7 +279,7 @@ function markOutInstant(p) {
     }
 }
 
-// NAVIGATION
+// NAVIGATION logic
 function showScreen(s) {
   currentScreen = s;
   document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active-nav'));
@@ -319,7 +317,6 @@ function addPlayerField() {
         let disabled = p.isOnline ? '' : 'disabled';
         return `<option value="${p.fullName}" ${disabled}>${p.fullName} (${p.isOnline?'ONLINE':'OFFLINE'})</option>`;
     }).join('');
-
   const div = document.createElement('div');
   div.style="display:flex; gap:10px; margin-bottom:10px;";
   div.innerHTML = `<select class="std-input" onchange="refreshSelections()">${opts}</select><button onclick="this.parentElement.remove(); refreshSelections();" style="background:var(--danger)">✕</button>`;
@@ -345,51 +342,45 @@ function refreshSelections() {
 function startGame() {
   let pList = Array.from(document.querySelectorAll('#dynamicPlayers select')).map(s => s.value).filter(v => v !== "");
   if(pList.length < 2) return alert("Select at least 2 players");
-
-  // SHUFFLE (Seat Cut)
   for (let i = pList.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pList[i], pList[j]] = [pList[j], pList[i]];
   }
-
   state = {
     id: Date.now().toString(),
     name: document.getElementById('gName').value || "Match",
     startTime: new Date().toLocaleString(),
     players: pList,
-    totals: {},
-    roundScores: {},
-    lastDropRound: {},
-    eliminated: {},
-    reEntries: {},
-    actionStats: {},
-    round: 1, history: [], winner: null
+    totals: {}, roundScores: {}, lastDropRound: {}, eliminated: {}, reEntries: {}, actionStats: {}, round: 1, history: [], winner: null
   };
   pList.forEach(p => { 
     state.totals[p] = 0; state.roundScores[p] = null; 
-    state.lastDropRound[p] = -1;
-    state.actionStats[p] = { shows: 0, fcs: 0, drops: 0, mds: 0 };
+    state.lastDropRound[p] = -1; state.actionStats[p] = { shows: 0, fcs: 0, drops: 0, mds: 0 };
   });
   db.collection('eliteGames').doc(state.id).set(state);
   currentScreen = 'activeGame';
   renderActive();
 }
 
-// ACTIVE GAME RENDER
+function pauseGame() {
+    state = null;
+    showScreen('newGame');
+}
+
 function renderActive() {
   if (!state) return;
   document.getElementById('rhsPane').style.display='block';
-  
   let dealerIdx = (state.round - 1) % state.players.length;
   let dealerName = state.players[dealerIdx];
-
-  let h = `<h2>${state.name} (R${state.round})</h2><table>`;
+  let h = `<div style="display:flex; justify-content:space-between; align-items:center;">
+    <h2>${state.name} (R${state.round})</h2>
+    <button onclick="pauseGame()" style="background:#555; padding:8px 15px; font-size:12px;">Pause & Return Home</button>
+  </div><table>`;
   state.players.forEach(p => {
     let score = state.roundScores[p];
     let isOut = state.eliminated[p] || state.totals[p] >= 240;
     let dLocked = (state.lastDropRound[p] === (state.round - 1));
     let hasRe = state.reEntries[p];
-
     h += `<tr style="${isOut?'opacity:0.4':''}">
         <td>${p === dealerName ? '<span class="dealer-badge">🃏 DEALER</span>':''} <b>${p}</b> ${hasRe?'<span class="reentry-tag">RE-ENTERED</span>':''}</td>
         <td>
@@ -405,12 +396,8 @@ function renderActive() {
         <td><b style="color:var(--warning)">${state.totals[p]}</b></td>
     </tr>`;
   });
-
-  if(!state.winner) {
-      h += `</table><button id="endBtn" class="actionBtn" style="margin-top:20px;" onclick="processRoundEnd()">Next Round</button>`;
-  } else {
-      h += `</table><h2 style="color:var(--accent); text-align:center;">Winner: ${state.winner}</h2>`;
-  }
+  if(!state.winner) h += `</table><button id="endBtn" class="actionBtn" style="margin-top:20px;" onclick="processRoundEnd()">Next Round</button>`;
+  else h += `</table><h2 style="color:var(--accent); text-align:center;">Winner: ${state.winner}</h2>`;
   document.getElementById('mainPane').innerHTML = h;
   renderHistoryPane();
   validateBtn();
@@ -418,11 +405,8 @@ function renderActive() {
 
 function validateBtn() {
     let active = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
-    // MUST have exactly one Winner 'S'
     let winners = active.filter(p => state.roundScores[p] === 'S' || state.roundScores[p] === 0);
-    // MUST have all players filled (not null)
     let filled = active.every(p => state.roundScores[p] !== null && state.roundScores[p] !== '');
-    
     const btn = document.getElementById('endBtn');
     if(btn) {
         btn.disabled = !(winners.length === 1 && filled);
@@ -434,7 +418,6 @@ async function processRoundEnd() {
     isPromptingReEntry = true;
     let scores = {...state.roundScores};
     let histEntry = { round: state.round, scores: scores, totals: {} };
-
     state.players.forEach(p => {
         if (!state.eliminated[p]) {
             let num = scores[p] === 'S' ? 0 : (parseInt(scores[p]) || 0);
@@ -446,13 +429,9 @@ async function processRoundEnd() {
         }
         histEntry.totals[p] = state.totals[p];
     });
-
     state.history.push(histEntry);
-    
-    // RE-ENTRY
     let active = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]).map(p => state.totals[p]);
     let entryScore = (active.length > 0 ? Math.max(...active) : 0) + 1;
-
     for (let p of state.players) {
         if (state.totals[p] >= 240 && !state.eliminated[p]) {
             if (state.reEntries[p] || entryScore >= 240) state.eliminated[p] = true;
@@ -463,13 +442,10 @@ async function processRoundEnd() {
             }
         }
     }
-
     state.round++;
-    state.players.forEach(p => state.roundScores[p] = null); // RESET TO NULL
-    
+    state.players.forEach(p => state.roundScores[p] = null);
     let survivors = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
     if(survivors.length === 1) { state.winner = survivors[0]; state.endTime = new Date().toLocaleString(); }
-
     await db.collection('eliteGames').doc(state.id).set(state);
     isPromptingReEntry = false;
     renderActive();
@@ -486,7 +462,7 @@ function renderHistoryPane() {
     document.getElementById('rhsPane').innerHTML = h;
 }
 
-// MANAGEMENT SCREENS
+// MANAGEMENT logic
 function renderPlayers() {
     let h = `<h2>Players List</h2><table>`;
     playersDb.forEach(p => h += `<tr><td><span class="status-dot ${p.isOnline?'online':'offline'}"></span> ${p.fullName}</td><td><button onclick="viewProfile('${p.id}')">View Profile</button></td></tr>`);
@@ -496,6 +472,7 @@ function renderPlayers() {
 function renderContinue() {
     let act = savedGames.filter(g => !g.winner);
     let h = `<h2>Active Games</h2>`;
+    if(!act.length) h += `<p class="empty-msg">No active games.</p>`;
     act.forEach(g => h += `
         <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
             <div><b>${g.name}</b><br><small>Round ${g.round} | Started: ${g.startTime}</small></div>
@@ -510,6 +487,7 @@ function renderContinue() {
 function renderHistory() {
     let fin = savedGames.filter(g => g.winner);
     let h = `<h2>Match History</h2>`;
+    if(!fin.length) h += `<p class="empty-msg">No history records.</p>`;
     fin.forEach(g => h += `
         <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
             <div><b>${g.name}</b><br><small>Winner: ${g.winner} | Date: ${g.endTime}</small></div>
@@ -523,8 +501,8 @@ function resume(id) { state = savedGames.find(g => g.id === id); currentScreen =
 
 function renderReports() {
     let fin = savedGames.filter(g => g.winner);
-    let h = `<h2>PDF Reports</h2><table><tr><th>Match</th><th>Action</th></tr>`;
-    fin.forEach(g => h += `<tr><td>${g.name}</td><td><button onclick="genPDF('${g.id}')">Download</button></td></tr>`);
+    let h = `<h2>Reports</h2><table><tr><th>Match</th><th>Download</th></tr>`;
+    fin.forEach(g => h += `<tr><td>${g.name}</td><td><button onclick="genPDF('${g.id}')">PDF</button></td></tr>`);
     document.getElementById('mainPane').innerHTML = h + `</table>`;
 }
 
@@ -541,30 +519,18 @@ function viewProfile(uid) {
     const p = playersDb.find(x => x.id === uid);
     if(!p) return;
     const name = p.fullName;
-    
     let matches = savedGames.filter(g => g.winner && g.players.includes(name));
     let wins = matches.filter(g => g.winner === name).length;
     let s=0, fc=0, d=0, md=0;
-
-    matches.forEach(g => {
-        if(g.actionStats && g.actionStats[name]) {
-            s += g.actionStats[name].shows || 0;
-            fc += g.actionStats[name].fcs || 0;
-            d += g.actionStats[name].drops || 0;
-            md += g.actionStats[name].mds || 0;
-        }
-    });
-
+    matches.forEach(g => { if(g.actionStats && g.actionStats[name]) { s+=g.actionStats[name].shows||0; fc+=g.actionStats[name].fcs||0; d+=g.actionStats[name].drops||0; md+=g.actionStats[name].mds||0; } });
     document.getElementById('pName').innerText = name;
     document.getElementById('pPhoto').src = p.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=27ae60&color=fff&size=150`;
-    
     document.getElementById('statWins').innerText = wins;
     document.getElementById('statS').innerText = s;
     document.getElementById('statFC').innerText = fc;
     document.getElementById('statD').innerText = d;
     document.getElementById('statMD').innerText = md;
     document.getElementById('statTotal').innerText = matches.length;
-
     let ai = "Strategic data pending...";
     if(matches.length > 0) {
         if(d + md > s + fc) ai = "<b>Defensive Strategist:</b> Prefers minimizing losses via tactical drops.";
@@ -574,7 +540,6 @@ function viewProfile(uid) {
     document.getElementById('aiAnalysis').innerHTML = "<b>AI ANALYSIS:</b><br>" + ai;
     document.getElementById('profileModal').style.display = 'flex';
 }
-
 function viewMyProfile() { if(auth.currentUser) viewProfile(auth.currentUser.uid); }
 </script>
 </body>
