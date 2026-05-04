@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v39.1</title>
+<title>Elite Rummy Circle - v39.2</title>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -66,9 +66,11 @@
   th { text-align: left; padding: 12px; color: var(--accent); font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--glass-border); }
   td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
 
-  .status-tag { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
-  .online { background: var(--accent); color: white; }
-  .offline { background: #555; color: white; }
+  /* New Status Indicator UI */
+  .player-row { display: flex; align-items: center; gap: 10px; }
+  .status-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; transition: 0.3s; }
+  .status-dot.online { background: #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.8); }
+  .status-dot.offline { background: #7f8c8d; }
 
   .empty-msg { text-align: center; padding: 40px; opacity: 0.5; font-style: italic; }
 
@@ -107,7 +109,7 @@
 <div id="authScreen">
   <div class="auth-box">
     <h1 style="color:var(--accent); margin-bottom: 5px;">Elite Rummy Circle</h1>
-    <div style="background: var(--accent); color: white; display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; margin-bottom: 25px;">VERSION 39.1</div>
+    <div style="background: var(--accent); color: white; display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; margin-bottom: 25px;">VERSION 39.2</div>
     
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
@@ -137,7 +139,7 @@
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
     <h2 style="color:var(--accent); margin-bottom: 5px;">Menu</h2>
-    <div style="font-size:10px; opacity:0.4; margin-bottom: 25px; font-weight: bold;">BUILD v39.1</div>
+    <div style="font-size:10px; opacity:0.4; margin-bottom: 25px; font-weight: bold;">BUILD v39.2</div>
     
     <div class="nav-section">
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">Start New Game</button>
@@ -194,7 +196,8 @@ window.addEventListener('beforeunload', () => {
 });
 
 async function setOnlineStatus(uid, status) {
-  await db.collection('players').doc(uid).update({ isOnline: status }).catch(() => {});
+  // Use merge:true to ensure if doc doesn't exist yet, we create it gracefully without failing
+  await db.collection('players').doc(uid).set({ isOnline: status }, { merge: true }).catch(() => {});
 }
 
 function handleLogout() {
@@ -218,7 +221,6 @@ function loadData() {
     savedGames =[]; 
     snap.forEach(d => savedGames.push(d.data()));
     
-    // Only re-render screen-specific content if the user is ACTUALLY on that screen
     if(currentScreen === 'activeGame' && state) { 
         let s = savedGames.find(g => g.id === state.id); 
         if(s) { state = s; renderActive(); } 
@@ -241,16 +243,22 @@ async function signup() {
   if(p !== c) return alert("Passwords do not match!");
   try {
     const cred = await auth.createUserWithEmailAndPassword(e, p);
-    const fullName = (f + " " + l).toUpperCase();
+    const fullName = ((f || '') + " " + (l || '')).trim().toUpperCase();
+    
+    // Setting profile data. Merge:true prevents overwriting in case AuthStateChanged fired too fast
     await db.collection('players').doc(cred.user.uid).set({
-        fullName, gender: g, isOnline: true, createdAt: new Date()
-    });
+        fullName: fullName || 'UNKNOWN PLAYER', 
+        gender: g, 
+        isOnline: true, 
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
   } catch (err) { alert(err.message); }
 }
 
 function showScreen(s) {
   currentScreen = s;
-  if (s !== 'activeGame') state = null; // Important: Clear background game state when not playing 
+  if (s !== 'activeGame') state = null;
   document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active-nav'));
   document.getElementById('rhsPane').style.display='none';
   if(s==='newGame') { document.getElementById('navNewGame').classList.add('active-nav'); renderNewGame(); }
@@ -265,16 +273,29 @@ function renderPlayers() {
     <h2>Registered Players</h2>
     <button onclick="showScreen('newGame')" style="background:var(--accent)">← Back</button>
   </div>
-  <table><tr><th>Full Name</th><th>Status</th><th>Profile</th></tr>`;
+  <table><tr><th>Player</th><th>Status</th><th>Profile</th></tr>`;
   
   if(!playersDb.length) {
       html += `<tr><td colspan="3" class="empty-msg">Fetching players...</td></tr>`;
   } else {
-      playersDb.sort((a,b)=>a.fullName.localeCompare(b.fullName)).forEach(p => {
+      // Sorting: Online players float to top, followed by alphabetical. 
+      // Safe fallback (a.fullName || "") prevents Javascript errors if names are missing.
+      playersDb.sort((a,b) => {
+          if (a.isOnline === b.isOnline) {
+              return (a.fullName || "").localeCompare(b.fullName || "");
+          }
+          return a.isOnline ? -1 : 1; 
+      }).forEach(p => {
+        let name = p.fullName || "Unknown Player";
         html += `<tr>
-          <td><b>${p.fullName}</b></td>
-          <td><span class="status-tag ${p.isOnline?'online':'offline'}">${p.isOnline?'ONLINE':'OFFLINE'}</span></td>
-          <td><button onclick="viewProfile('${p.fullName.replace(/'/g, "\\'")}')">View Stats</button></td>
+          <td>
+             <div class="player-row">
+                 <span class="status-dot ${p.isOnline ? 'online' : 'offline'}" title="${p.isOnline ? 'Online' : 'Offline'}"></span>
+                 <b>${name}</b>
+             </div>
+          </td>
+          <td><span style="font-size:11px; opacity:0.7; font-weight:bold;">${p.isOnline ? 'ONLINE' : 'OFFLINE'}</span></td>
+          <td><button onclick="viewProfile('${p.id}')">View Stats</button></td>
         </tr>`;
       });
   }
@@ -299,7 +320,10 @@ function addPlayerField() {
   if(!onlineOnes.length) return alert("No players are currently online.");
   
   let opts = `<option value="">-- Choose Online Player --</option>` + 
-             onlineOnes.map(p => `<option value="${p.fullName.replace(/"/g, '&quot;')}">${p.fullName}</option>`).join('');
+             onlineOnes.map(p => {
+                 let name = p.fullName || "Unknown Player";
+                 return `<option value="${name.replace(/"/g, '&quot;')}">${name}</option>`;
+             }).join('');
              
   const div = document.createElement('div');
   div.style="display:flex; gap:10px; margin-bottom:10px;";
@@ -345,7 +369,6 @@ function startGame() {
 function renderActive() {
   if (!state) return;
 
-  // Preserve manual input values + focus to prevent wiping when Firebase pushes an update
   let activeInputs = {};
   state.players.forEach(p => {
     let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
@@ -374,7 +397,7 @@ function renderActive() {
     let isEliminated = state.totals[p] >= 240;
     let isOut = isEliminated || state.winner; 
     let safeP = p.replace(/'/g, "\\'");
-    let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_'); // Fixes ID logic breaking for users with spaces in names
+    let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
 
     html += `<tr style="${isEliminated?'opacity:0.4; background:rgba(231,76,60,0.15);':''}">
       <td><b>${p}</b><br><div style="display:flex; gap:4px; margin-top:5px;">
@@ -400,7 +423,6 @@ function renderActive() {
   document.getElementById('mainPane').innerHTML = html;
   renderHistoryPane();
 
-  // Restore preserved text values & input focus
   state.players.forEach(p => {
     let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
     let el = document.getElementById(safeId);
@@ -413,7 +435,7 @@ function renderActive() {
 }
 
 function score(p, val, type) {
-  if (state.totals[p] >= 240 || state.winner) return; // Halt logic if already out or Game Over
+  if (state.totals[p] >= 240 || state.winner) return;
   state.totals[p] += val;
   if(type) state.actionStats[p][type]++;
   db.collection('eliteGames').doc(state.id).set(state);
@@ -437,7 +459,6 @@ function nextRound() {
     if(active.length === 1) {
         state.winner = active[0];
     } else {
-        // Tie-breaker fallback if everyone exceeds 240 limit: Lower score wins.
         let lowestScorePlayer = state.players.reduce((min, p) => state.totals[p] < state.totals[min] ? p : min, state.players[0]);
         state.winner = lowestScorePlayer;
     }
@@ -448,25 +469,30 @@ function nextRound() {
   db.collection('eliteGames').doc(state.id).set(state);
 }
 
-function viewProfile(name) {
-    const p = playersDb.find(x => x.fullName === name);
-    if(!p) return;
+// Uses Account UID instead of display string to securely lookup matches.
+function viewProfile(uid) {
+    const p = playersDb.find(x => x.id === uid);
+    if(!p) {
+        alert("Profile data could not be found.");
+        return;
+    }
     
-    let finished = savedGames.filter(g => g.winner && g.players.includes(name));
-    let wins = finished.filter(g => g.winner === name).length;
+    let pName = p.fullName || "Unknown Player";
+    let finished = savedGames.filter(g => g.winner && g.players.includes(pName));
+    let wins = finished.filter(g => g.winner === pName).length;
     let s=0, fc=0, d=0, md=0;
     
     finished.forEach(g => {
-        if(g.actionStats && g.actionStats[name]) {
-            s += g.actionStats[name].shows || 0;
-            fc += g.actionStats[name].fcs || 0;
-            d += g.actionStats[name].drops || 0;
-            md += g.actionStats[name].mds || 0;
+        if(g.actionStats && g.actionStats[pName]) {
+            s += g.actionStats[pName].shows || 0;
+            fc += g.actionStats[pName].fcs || 0;
+            d += g.actionStats[pName].drops || 0;
+            md += g.actionStats[pName].mds || 0;
         }
     });
 
-    document.getElementById('pName').innerText = p.fullName;
-    document.getElementById('pGender').innerText = "GENDER: " + (p.gender || "Not Specified");
+    document.getElementById('pName').innerText = pName;
+    document.getElementById('pGender').innerText = "GENDER: " + (p.gender || "Not Specified").toUpperCase();
     document.getElementById('statWins').innerText = wins;
     document.getElementById('statS').innerText = s;
     document.getElementById('statFC').innerText = fc;
@@ -477,11 +503,11 @@ function viewProfile(name) {
     let analysis = "No match history found for a deep analysis.";
     if(finished.length > 0) {
         if(d + md > s + fc) {
-            analysis = `<b>Conservative Strategist:</b> ${p.fullName} prefers calculated safety. High frequency of Drops (${d}) and Mid-Drops (${md}) suggests a tactical player who knows when to retreat to minimize damage.`;
+            analysis = `<b>Conservative Strategist:</b> ${pName} prefers calculated safety. High frequency of Drops (${d}) and Mid-Drops (${md}) suggests a tactical player who knows when to retreat.`;
         } else if (s > fc) {
-            analysis = `<b>Aggressive High-Roller:</b> ${p.fullName} is a risk-taker. With a high Show (${s}) count, they hunt for victory early and rarely settle for a Full Score loss.`;
+            analysis = `<b>Aggressive High-Roller:</b> ${pName} is a risk-taker. With a high Show (${s}) count, they hunt for victory early and rarely settle for a Full Score loss.`;
         } else {
-            analysis = `<b>Balanced Competitor:</b> ${p.fullName} adapts well to the hand they are dealt. They show a mix of patience and aggression across their history.`;
+            analysis = `<b>Balanced Competitor:</b> ${pName} adapts well to the hand they are dealt. They show a mix of patience and aggression across their history.`;
         }
     }
     document.getElementById('aiAnalysis').innerHTML = "<b>AI ANALYSIS:</b><br>" + analysis;
@@ -490,8 +516,7 @@ function viewProfile(name) {
 
 function viewMyProfile() {
     if(!auth.currentUser) return;
-    const me = playersDb.find(p => p.id === auth.currentUser.uid);
-    if(me) viewProfile(me.fullName);
+    viewProfile(auth.currentUser.uid); // Pass unique UID instead of Full Name
 }
 
 function renderContinue() {
@@ -564,7 +589,6 @@ function renderReports() {
 function renderHistoryPane() {
   let h = "<h3>Game Logs</h3>";
   if(!state.history.length) h += `<div style="font-size:11px; opacity:0.5;">Waiting for first round...</div>`;
-  // Reverse applied so newly finalized rounds stay at the top of the feed instead of getting buried
   state.history.slice().reverse().forEach(r => h += `<div style="font-size:11px; margin-bottom:8px; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
     <b>Round ${r.round}:</b><br>${Object.entries(r.totals).map(([p, s]) => p + ": " + s).join(' | ')}
   </div>`);
