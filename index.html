@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v42.0</title>
+<title>Elite Rummy Circle - v42.1</title>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -39,70 +39,51 @@
 
   #mainApp, #authScreen { display: none; }
 
-  /* NAVIGATION RESPONSIVENESS */
   .app-wrapper { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
-  
-  .left-sidebar { 
-    width: 260px; background: var(--primary-bg); padding: 25px; 
-    border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; 
-  }
-
+  .left-sidebar { width: 260px; background: var(--primary-bg); padding: 25px; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; }
   .main-pane { flex: 3; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   .rhs-pane { flex: 1.2; min-width: 300px; background: rgba(0,0,0,0.4); padding: 20px; border-left: 1px solid var(--glass-border); overflow-y: auto; }
 
-  /* MOBILE ADJUSTMENTS */
   @media (max-width: 900px) {
     .app-wrapper { flex-direction: column; }
-    .left-sidebar { 
-        width: 100%; height: auto; padding: 10px; border-right: none; 
-        border-bottom: 1px solid var(--glass-border);
-    }
-    .nav-section { 
-        display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px;
-        scrollbar-width: none; /* Firefox */
-    }
-    .nav-section::-webkit-scrollbar { display: none; } /* Chrome/Safari */
-    .navBtn { 
-        min-width: 120px; margin-bottom: 0 !important; font-size: 12px !important; 
-        padding: 10px !important; text-align: center !important;
-    }
-    .rhs-pane { border-left: none; border-top: 1px solid var(--glass-border); width: 100%; flex: none; }
+    .left-sidebar { width: 100%; height: auto; padding: 10px; border-right: none; border-bottom: 1px solid var(--glass-border); }
+    .nav-section { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scrollbar-width: none; }
+    .nav-section::-webkit-scrollbar { display: none; }
+    .navBtn { min-width: 110px; margin-bottom: 0 !important; font-size: 11px !important; padding: 10px !important; text-align: center !important; }
+    .rhs-pane { border-left: none; border-top: 1px solid var(--glass-border); width: 100%; flex: none; display: none !important; }
     .main-pane { padding: 15px; }
     .sidebar-footer { display: none; }
-    h2 { font-size: 1.2rem; }
+    .mobile-footer-nav { display: flex !important; }
   }
 
-  .std-input { 
-    width: 100%; height: 50px; padding: 0 15px; margin-bottom: 15px; 
-    border-radius: 8px; border: 1px solid var(--glass-border); 
-    background: #ffffff; color: #333; font-size: 16px; font-weight: 600; box-sizing: border-box; 
-  }
-
+  .std-input { width: 100%; height: 50px; padding: 0 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--glass-border); background: #ffffff; color: #333; font-size: 16px; font-weight: 600; box-sizing: border-box; }
   button { padding: 12px 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
   button:active { transform: scale(0.95); }
-  button:disabled { opacity: 0.2; filter: grayscale(1); cursor: not-allowed; }
+  button:disabled { opacity: 0.2; filter: grayscale(1); }
   
-  .tactic-btn { border: 2px solid transparent; flex: 1; padding: 8px 5px; font-size: 12px; }
+  .tactic-btn { border: 2px solid transparent; flex: 1; padding: 8px 5px; font-size: 11px; }
   .tactic-btn.active { border-color: white; box-shadow: 0 0 10px rgba(255,255,255,0.5); filter: brightness(1.3); }
 
   .navBtn { width: 100%; margin-bottom: 10px; background: rgba(255,255,255,0.08); color: white; text-align: left; }
   .navBtn.active-nav { background: var(--accent); }
-  .actionBtn { background: var(--accent); color: white; width: 100%; height: 55px; font-size: 16px; margin-top: 10px; }
+  .actionBtn { background: var(--accent); color: white; width: 100%; height: 50px; font-size: 16px; margin-top: 5px; }
 
-  .dealer-badge { background: var(--warning); color: #000; padding: 2px 5px; border-radius: 4px; font-size: 9px; font-weight: bold; vertical-align: middle; }
-  .reentry-tag { color: var(--warning); font-size: 9px; font-weight: bold; border: 1px solid var(--warning); padding: 1px 3px; border-radius: 3px; margin-left: 3px; }
-
+  .dealer-badge { background: var(--warning); color: #000; padding: 2px 5px; border-radius: 4px; font-size: 9px; font-weight: bold; }
+  
   table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  th { text-align: left; padding: 10px 5px; color: var(--accent); font-size: 10px; text-transform: uppercase; border-bottom: 2px solid var(--glass-border); }
-  td { padding: 10px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+  th { text-align: left; padding: 8px 5px; color: var(--accent); font-size: 10px; text-transform: uppercase; border-bottom: 2px solid var(--glass-border); }
+  td { padding: 8px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
 
-  .pause-btn { background: var(--info); color: white; border: 1px solid rgba(255,255,255,0.3); font-size: 11px; padding: 8px 12px; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; justify-content: center; align-items: center; padding: 20px; overflow-y: auto; }
+  .modal-card { background: #2c3e50; width: 100%; max-width: 450px; padding: 25px; border-radius: 15px; text-align: center; max-height: 90vh; overflow-y: auto; }
 
-  #authScreen { display: flex; position: fixed; inset: 0; justify-content: center; align-items: center; background: rgba(0,0,0,0.85); z-index: 2000; padding: 20px; overflow-y: auto; }
-  .auth-box { background: #1a252f; padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; border: 1px solid var(--glass-border); }
-
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; justify-content: center; align-items: center; padding: 20px; }
-  .modal-card { background: #2c3e50; width: 100%; max-width: 450px; padding: 20px; border-radius: 15px; text-align: center; }
+  .avatar-lg { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); margin: 0 auto 15px auto; display: block; background: #1a252f; }
+  .avatar-sm { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid var(--accent); vertical-align: middle; margin-right: 5px; }
+  
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px 0; }
+  .stat-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+  .stat-val { font-size: 16px; font-weight: bold; color: var(--accent); display: block; }
+  .stat-lbl { font-size: 9px; color: #aaa; text-transform: uppercase; }
 
   .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
   .online { background: #2ecc71; }
@@ -115,24 +96,21 @@
 <div id="authScreen">
   <div class="auth-box">
     <h1 style="color:var(--accent); margin:0;">Elite Rummy</h1>
-    <span style="font-size: 10px; opacity: 0.6; display: block; margin-bottom: 20px;">VERSION 42.0 (MOBILE OPTIMIZED)</span>
+    <span style="font-size: 10px; opacity: 0.6; display: block; margin-bottom: 20px;">VERSION 42.1 (PAUSE & PROFILE RESTORED)</span>
     
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
       <input id="loginPassword" class="std-input" type="password" placeholder="Password">
       <button class="actionBtn" onclick="login()">Log In</button>
-      <div style="margin: 15px 0; font-size: 11px; opacity: 0.4;">OR</div>
-      <button class="actionBtn" style="background:#fff; color:#333; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="googleSignIn()">
+      <button class="actionBtn" style="background:#fff; color:#333; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="googleSignIn()">
           <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="18"> Google Login
       </button>
       <p onclick="toggleAuthView('signup')" style="margin-top:20px; cursor:pointer; text-decoration:underline; font-size:13px;">Create Account</p>
     </div>
 
     <div id="signupView" style="display:none">
-      <div style="display:flex; gap:10px;">
-        <input id="signupFirst" class="std-input" placeholder="First Name">
-        <input id="signupLast" class="std-input" placeholder="Last Name">
-      </div>
+      <input id="signupFirst" class="std-input" placeholder="First Name">
+      <input id="signupLast" class="std-input" placeholder="Last Name">
       <input id="signupEmail" class="std-input" placeholder="Email Address">
       <input id="signupPass" class="std-input" type="password" placeholder="Password">
       <button class="actionBtn" style="background:var(--warning); color:#111;" onclick="signup()">Register</button>
@@ -147,26 +125,49 @@
     <div class="modal-card">
         <h2 style="color:var(--warning);">Eliminated!</h2>
         <p id="reentryText"></p>
-        <div style="display:flex; gap:10px; margin-top: 15px;">
+        <div style="display:flex; gap:10px;">
             <button class="actionBtn" style="background:#555; flex:1;" id="btnReentryNo">Leave</button>
             <button class="actionBtn" style="background:var(--accent); flex:1;" id="btnReentryYes">Re-enter</button>
         </div>
     </div>
 </div>
 
-<div id="midGameModal" class="modal-overlay">
+<!-- PROFILE VIEW MODAL -->
+<div id="profileModal" class="modal-overlay">
     <div class="modal-card">
-        <h3>Add Player</h3>
-        <select id="midGameSelect" class="std-input"></select>
-        <button class="actionBtn" onclick="confirmAddMidGame()">Add Now</button>
-        <button class="actionBtn" style="background:#555; margin-top:10px;" onclick="closeModal('midGameModal')">Cancel</button>
+        <img id="pPhoto" class="avatar-lg" src="">
+        <h2 id="pName" style="color:var(--accent); margin:0;"></h2>
+        <p id="pGender" style="font-size:11px; opacity:0.6; margin-bottom:10px;"></p>
+        
+        <button id="btnEditProfile" style="background:var(--warning); color:#111; margin-bottom:15px; font-size:12px;" onclick="openEditProfile()">Edit Profile</button>
+        
+        <div class="stat-grid">
+            <div class="stat-item"><span class="stat-val" id="statWins">0</span><span class="stat-lbl">Wins</span></div>
+            <div class="stat-item"><span class="stat-val" id="statS">0</span><span class="stat-lbl">Shows</span></div>
+            <div class="stat-item"><span class="stat-val" id="statFC">0</span><span class="stat-lbl">Full</span></div>
+            <div class="stat-item"><span class="stat-val" id="statD">0</span><span class="stat-lbl">Drops</span></div>
+            <div class="stat-item"><span class="stat-val" id="statMD">0</span><span class="stat-lbl">Mid</span></div>
+            <div class="stat-item"><span class="stat-val" id="statTotal">0</span><span class="stat-lbl">Matches</span></div>
+        </div>
+        <div id="aiAnalysis" style="background:rgba(39, 174, 96, 0.1); border-left: 4px solid var(--accent); padding:10px; text-align:left; font-size:12px; border-radius:4px; margin-bottom:15px;"></div>
+        <button class="actionBtn" onclick="document.getElementById('profileModal').style.display='none'">Close</button>
     </div>
 </div>
 
-<div id="profileModal" class="modal-overlay">
+<!-- PROFILE EDIT MODAL -->
+<div id="editProfileModal" class="modal-overlay">
     <div class="modal-card">
-        <div id="profileContent"></div>
-        <button class="actionBtn" onclick="closeModal('profileModal')">Close</button>
+        <h2>Edit Profile</h2>
+        <img id="editPhotoPreview" class="avatar-lg" src="">
+        <input type="file" id="photoUpload" style="display:none;" onchange="handlePhotoUpload(event)">
+        <button onclick="document.getElementById('photoUpload').click()" style="background:var(--warning); margin-bottom:15px; font-size:12px;">Change Photo</button>
+        <input id="editName" class="std-input" placeholder="Name">
+        <select id="editGender" class="std-input">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+        <button class="actionBtn" onclick="saveProfile()">Save Changes</button>
+        <button class="actionBtn" style="background:#555; margin-top:10px;" onclick="document.getElementById('editProfileModal').style.display='none'">Cancel</button>
     </div>
 </div>
 
@@ -180,6 +181,9 @@
       <button id="navPlayers" class="navBtn" onclick="showScreen('players')">Players</button>
       <button id="navHistory" class="navBtn" onclick="showScreen('history')">History</button>
       <button id="navReports" class="navBtn" onclick="showScreen('reports')">Reports</button>
+      <!-- Mobile Exclusive Nav -->
+      <button class="navBtn" style="background:var(--warning); color:#000;" onclick="viewMyProfile()">Profile</button>
+      <button class="navBtn" style="background:var(--danger);" onclick="handleLogout()">Logout</button>
     </div>
     <div style="margin-top:auto;" class="sidebar-footer">
         <button style="background:var(--warning); color:#111; width:100%; margin-bottom:10px;" onclick="viewMyProfile()">My Profile</button>
@@ -226,17 +230,17 @@ auth.onAuthStateChanged(user => {
 function login() { auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); }
 async function googleSignIn() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 async function signup() {
-    const name = document.getElementById('signupFirst').value + " " + document.getElementById('signupLast').value;
     const cred = await auth.createUserWithEmailAndPassword(document.getElementById('signupEmail').value, document.getElementById('signupPass').value);
-    await db.collection('players').doc(cred.user.uid).set({ fullName: name.toUpperCase(), isOnline: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection('players').doc(cred.user.uid).set({ 
+        fullName: (document.getElementById('signupFirst').value + " " + document.getElementById('signupLast').value).toUpperCase(), 
+        isOnline: true, 
+        gender: "Male",
+        photoURL: "",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+    });
 }
 function handleLogout() { if(auth.currentUser) db.collection('players').doc(auth.currentUser.uid).update({ isOnline: false }).then(() => auth.signOut()); }
-function toggleAuthView(v) {
-  document.getElementById('loginView').style.display = v==='login'?'block':'none';
-  document.getElementById('signupView').style.display = v==='signup'?'block':'none';
-}
 
-// --- DATA ---
 function loadData() {
   db.collection('players').onSnapshot(snap => { playersDb =[]; snap.forEach(doc => playersDb.push({id: doc.id, ...doc.data()})); });
   db.collection('eliteGames').onSnapshot(snap => {
@@ -245,17 +249,15 @@ function loadData() {
         let s = savedGames.find(g => g.id === state.id);
         if(s) { state = s; renderActive(); } else { state = null; showScreen('newGame'); }
     }
-    if(['continue', 'history', 'reports'].includes(currentScreen)) showScreen(currentScreen);
   });
 }
 
-// --- NAVIGATION ---
+// --- NAV ---
 function showScreen(s) {
   currentScreen = s;
   document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active-nav'));
   const btn = document.getElementById('nav' + s.charAt(0).toUpperCase() + s.slice(1));
   if(btn) btn.classList.add('active-nav');
-  
   document.getElementById('rhsPane').style.display='none';
   if(s==='newGame') renderNewGame();
   if(s==='players') renderPlayers();
@@ -267,13 +269,13 @@ function showScreen(s) {
 // --- VIEWS ---
 function renderNewGame() {
   document.getElementById('mainPane').innerHTML = `
-    <h2>New Match</h2>
+    <h2>New Match Setup</h2>
     <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px;">
-        <input id="gName" class="std-input" placeholder="Match Title">
-        <button onclick="appendDT()" style="background:var(--warning); width:100%; color:#111; margin-bottom:15px;">🕒 Insert Date & Time</button>
+        <input id="gName" class="std-input" placeholder="Enter Match Name">
+        <button onclick="appendDT()" style="background:var(--warning); width:100%; color:#111; margin-bottom:15px;">🕒 Insert Date/Time</button>
         <div id="playerList"></div>
         <button class="navBtn" style="background:rgba(255,255,255,0.1); width:100%; border:1px dashed var(--glass-border);" onclick="addPlayerField()">+ Add Player</button>
-        <button class="actionBtn" onclick="startGame()">Start (Seat Cut)</button>
+        <button class="actionBtn" onclick="startGame()">Randomize & Start Match</button>
     </div>`;
 }
 
@@ -291,17 +293,15 @@ function addPlayerField() {
     }).join('');
   const div = document.createElement('div');
   div.style="display:flex; gap:10px; margin-bottom:10px;";
-  div.innerHTML = `<select class="std-input" style="margin-bottom:0;">${opts}</select>
+  div.innerHTML = `<select class="std-input" style="margin-bottom:0; flex:1;">${opts}</select>
                    <button onclick="this.parentElement.remove()" style="background:var(--danger); width:50px;">✕</button>`;
   document.getElementById('playerList').appendChild(div);
 }
 
 function startGame() {
   let pList = Array.from(document.querySelectorAll('#playerList select')).map(s => s.value).filter(v => v !== "");
-  if(pList.length < 2) return alert("Min 2 players required.");
-  // Seat Cut
+  if(pList.length < 2) return alert("Select at least 2 players");
   for(let i=pList.length-1; i>0; i--){ let j=Math.floor(Math.random()*(i+1)); [pList[i],pList[j]]=[pList[j],pList[i]]; }
-  
   state = {
     id: Date.now().toString(), name: document.getElementById('gName').value || "Match",
     startTime: new Date().toLocaleString(), players: pList, totals: {}, roundScores: {}, lastDropRound: {},
@@ -319,50 +319,109 @@ function renderActive() {
   let dealerIdx = (state.round-1) % state.players.length;
   let dealer = state.players[dealerIdx];
   let activeCount = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240).length;
-  let currentWinner = state.players.find(p => state.roundScores[p] === 'S');
+  let curWinner = state.players.find(p => state.roundScores[p] === 'S');
 
   let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-    <h3 style="margin:0;">${state.name} <span style="opacity:0.6;">(R${state.round})</span></h3>
-    <button onclick="state=null; showScreen('newGame')" class="pause-btn">${state.winner?'Exit to Home':'Pause & Home'}</button>
+    <h3 style="margin:0;">${state.name}</h3>
+    <button onclick="state=null; showScreen('newGame')" class="pause-btn">${state.winner?'Return Home':'Pause Game'}</button>
   </div><table style="table-layout: fixed;">
-    <colgroup><col style="width:30%"><col style="width:45%"><col style="width:15%"><col style="width:10%"></colgroup>
-    <tr><th>Player</th><th>Tactics</th><th>Rnd</th><th>Tot</th></tr>`;
+    <colgroup><col style="width:32%"><col style="width:48%"><col style="width:20%"></colgroup>
+    <tr><th>Player</th><th>Tactics</th><th>Total</th></tr>`;
 
   state.players.forEach(p => {
     let rs = state.roundScores[p];
     let isOut = state.eliminated[p] || state.totals[p] >= 240;
     let dLock = state.lastDropRound[p] === (state.round-1);
-    let h2hLock = (activeCount === 2 && currentWinner && currentWinner !== p);
+    let h2hLock = (activeCount === 2 && curWinner && curWinner !== p);
 
     h += `<tr style="${isOut?'opacity:0.3':''}">
-        <td style="overflow:hidden; text-overflow:ellipsis;">
-            ${p===dealer?'<span class="dealer-badge">D</span>':''} <b>${p}</b> ${state.reEntries[p]?'<span class="reentry-tag">RE</span>':''}
-        </td>
+        <td>${p===dealer?'<span class="dealer-badge">D</span>':''} <b>${p}</b></td>
         <td>
             <div style="display:flex; gap:3px; flex-wrap:wrap;">
-                <button class="tactic-btn ${rs==='S'?'active':''}" style="background:var(--accent)" onclick="setTactic('${p.replace(/'/g,"\\'")}', 'S')" ${isOut || h2hLock ?'disabled':''}>S</button>
-                <button class="tactic-btn ${rs===20?'active':''}" style="background:var(--warning)" onclick="setTactic('${p.replace(/'/g,"\\'")}', 'D')" ${isOut || dLock || h2hLock ?'disabled':''}>D</button>
-                <button class="tactic-btn ${rs===40?'active':''}" style="background:#8e44ad; color:white;" onclick="setTactic('${p.replace(/'/g,"\\'")}', 'MD')" ${isOut || h2hLock ?'disabled':''}>MD</button>
-                <button class="tactic-btn ${rs===80?'active':''}" style="background:var(--danger); color:white;" onclick="setTactic('${p.replace(/'/g,"\\'")}', 'FC')" ${isOut?'disabled':''}>FC</button>
-                <button style="background:#333; color:white; font-size:8px; flex:none; padding:5px;" onclick="markOut('${p.replace(/'/g,"\\'")}')" ${isOut?'disabled':''}>OUT</button>
+                <button class="tactic-btn ${rs==='S'?'active':''}" style="background:var(--accent)" onclick="setTactic('${p}', 'S')" ${isOut || h2hLock ?'disabled':''}>S</button>
+                <button class="tactic-btn ${rs===20?'active':''}" style="background:var(--warning)" onclick="setTactic('${p}', 'D')" ${isOut || dLock || h2hLock ?'disabled':''}>D</button>
+                <button class="tactic-btn ${rs===40?'active':''}" style="background:#8e44ad; color:white;" onclick="setTactic('${p}', 'MD')" ${isOut || h2hLock ?'disabled':''}>MD</button>
+                <button class="tactic-btn ${rs===80?'active':''}" style="background:var(--danger); color:white;" onclick="setTactic('${p}', 'FC')" ${isOut?'disabled':''}>FC</button>
             </div>
+            <input type="text" class="std-input" style="height:35px; margin:5px 0 0 0; text-align:center; font-size:12px; width:100%;" value="${rs===null?'':rs}" onchange="manualInput('${p}', this.value)" ${isOut?'disabled':''}>
         </td>
-        <td><input type="text" class="std-input" style="height:35px; margin:0; text-align:center; padding:0; font-size:14px;" value="${rs===null?'':rs}" onchange="manualInput('${p.replace(/'/g,"\\'")}', this.value)" ${isOut?'disabled':''}></td>
-        <td><b style="color:var(--warning); font-size:12px;">${state.totals[p]}</b></td>
+        <td><b style="color:var(--warning)">${state.totals[p]}</b></td>
     </tr>`;
   });
 
   if(!state.winner) {
-      h += `</table><button id="endBtn" class="actionBtn" onclick="nextRound()">Next Round</button>
-            <button class="actionBtn" style="background:#555; height:45px; font-size:13px;" onclick="openMidGame()">+ Add Player Mid-Game</button>`;
+      h += `</table><button id="endBtn" class="actionBtn" onclick="nextRound()">Next Round</button>`;
   } else {
-      h += `</table><div style="text-align:center; padding:20px;"><h2 style="color:var(--accent); margin:0;">Winner: ${state.winner}</h2></div>`;
+      h += `</table><div style="text-align:center; padding:15px;"><h2 style="color:var(--accent); margin:0;">Winner: ${state.winner}</h2></div>`;
   }
   document.getElementById('mainPane').innerHTML = h;
   renderHistoryPane();
   validateEndBtn();
 }
 
+// --- PROFILE LOGIC ---
+function viewProfile(uid) {
+    const p = playersDb.find(x => x.id === uid); if(!p) return;
+    const name = p.fullName;
+    let matches = savedGames.filter(g => g.winner && g.players.includes(name));
+    let wins = matches.filter(g => g.winner === name).length;
+    let s=0, fc=0, d=0, md=0;
+    matches.forEach(g => { if(g.actionStats[name]){ s+=g.actionStats[name].shows; fc+=g.actionStats[name].fcs; d+=g.actionStats[name].drops; md+=g.actionStats[name].mds; } });
+    
+    document.getElementById('pPhoto').src = p.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=27ae60&color=fff&size=150`;
+    document.getElementById('pName').innerText = name;
+    document.getElementById('pGender').innerText = (p.gender || "MALE").toUpperCase();
+    document.getElementById('statWins').innerText = wins;
+    document.getElementById('statS').innerText = s;
+    document.getElementById('statFC').innerText = fc;
+    document.getElementById('statD').innerText = d;
+    document.getElementById('statMD').innerText = md;
+    document.getElementById('statTotal').innerText = matches.length;
+    document.getElementById('aiAnalysis').innerHTML = `<b>AI ANALYSIS:</b> ${d+md > s+fc ? 'Conservative defensive strategist. Prefers drops over high-risk shows.' : 'Aggressive hunter. Takes risks to end rounds early.'}`;
+    document.getElementById('btnEditProfile').style.display = (auth.currentUser && uid === auth.currentUser.uid) ? 'inline-block' : 'none';
+    document.getElementById('profileModal').style.display='flex';
+}
+
+function viewMyProfile() { if(auth.currentUser) viewProfile(auth.currentUser.uid); }
+
+function openEditProfile() {
+    const p = playersDb.find(x => x.id === auth.currentUser.uid);
+    document.getElementById('editName').value = p.fullName;
+    document.getElementById('editGender').value = p.gender || "Male";
+    document.getElementById('editPhotoPreview').src = p.photoURL || "";
+    document.getElementById('profileModal').style.display = 'none';
+    document.getElementById('editProfileModal').style.display = 'flex';
+}
+
+function handlePhotoUpload(event) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 150;
+            const scale = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scale;
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            document.getElementById('editPhotoPreview').src = canvas.toDataURL('image/jpeg', 0.7);
+        }
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+async function saveProfile() {
+    await db.collection('players').doc(auth.currentUser.uid).update({
+        fullName: document.getElementById('editName').value.toUpperCase(),
+        gender: document.getElementById('editGender').value,
+        photoURL: document.getElementById('editPhotoPreview').src
+    });
+    document.getElementById('editProfileModal').style.display = 'none';
+    viewMyProfile();
+}
+
+// --- GAME LOGIC ---
 function setTactic(p, type) {
     if(state.winner || state.eliminated[p]) return;
     let v = null;
@@ -381,13 +440,6 @@ function manualInput(p, val) {
     db.collection('eliteGames').doc(state.id).update({ roundScores: state.roundScores });
 }
 
-function markOut(p) {
-    if(confirm(`Eject ${p} immediately?`)) {
-        state.eliminated[p]=true; state.totals[p]=240; state.roundScores[p]=240;
-        db.collection('eliteGames').doc(state.id).set(state);
-    }
-}
-
 function validateEndBtn() {
     let active = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
     let win = active.filter(p => state.roundScores[p]==='S' || state.roundScores[p]===0);
@@ -400,7 +452,6 @@ async function nextRound() {
     isPromptingReEntry = true;
     let scores = {...state.roundScores};
     let entry = { round: state.round, scores: scores, totals: {} };
-
     state.players.forEach(p => {
         if(!state.eliminated[p]) {
             let n = (scores[p]==='S')?0: (parseInt(scores[p])||0);
@@ -413,16 +464,14 @@ async function nextRound() {
         entry.totals[p] = state.totals[p];
     });
     state.history.push(entry);
-
     let active = state.players.filter(p => state.totals[p]<240 && !state.eliminated[p]).map(p => state.totals[p]);
     let entryScore = (active.length > 0 ? Math.max(...active) : 0) + 1;
-
     for(let p of state.players) {
         if(state.totals[p]>=240 && !state.eliminated[p]) {
             if(state.reEntries[p] || entryScore >= 240) state.eliminated[p]=true;
             else {
                 let re = confirm(`${p} reached ${state.totals[p]}. Re-enter at ${entryScore}?`);
-                if(re) { state.reEntries[p]=true; state.totals[p]=entryScore; } else state.eliminated[p]=true;
+                if (re) { state.reEntries[p]=true; state.totals[p]=entryScore; } else state.eliminated[p]=true;
             }
         }
     }
@@ -436,102 +485,51 @@ async function nextRound() {
 }
 
 function renderHistoryPane() {
-    let h = `<h4>Round Logs (pts)</h4>`;
+    let h = `<h4>Round History</h4>`;
     state.history.slice().reverse().forEach(r => {
         h += `<div style="font-size:11px; margin-bottom:8px; background:rgba(255,255,255,0.05); padding:8px; border-radius:5px;">
-            <b>R${r.round}</b>: ${state.players.map(p => {
-                let s = r.scores[p]===undefined?'-':r.scores[p];
-                let t = r.totals[p]===undefined?'-':r.totals[p];
-                return `${p}: ${s==240||state.eliminated[p]?'OUT':s+' ('+t+')'}`;
-            }).join(' | ')}
+            <b>R${r.round}</b>: ${state.players.map(p => `${p}: ${r.scores[p]===240||state.eliminated[p]?'OUT':r.scores[p]+' ('+r.totals[p]+')'}`).join(' | ')}
         </div>`;
     });
     document.getElementById('rhsPane').innerHTML = h;
 }
 
-// --- UTILS ---
-function openMidGame() {
-    let avail = playersDb.filter(p => !state.players.includes(p.fullName));
-    document.getElementById('midGameSelect').innerHTML = `<option value="">-- Select --</option>` + avail.map(p => `<option value="${p.fullName}">${p.fullName}</option>`).join('');
-    document.getElementById('midGameModal').style.display='flex';
+function renderPlayers() {
+    document.getElementById('mainPane').innerHTML = `<h2>Players</h2><table>` + 
+        playersDb.map(p => `<tr><td><img src="${p.photoURL || 'https://via.placeholder.com/40'}" class="avatar-sm"> ${p.fullName}</td><td><button onclick="viewProfile('${p.id}')">View</button></td></tr>`).join('') + `</table>`;
 }
-async function confirmAddMidGame() {
-    let name = document.getElementById('midGameSelect').value;
-    if(!name) return;
-    let act = state.players.filter(p => !state.eliminated[p] && state.totals[p]<240).map(p => state.totals[p]);
-    let es = (act.length > 0 ? Math.max(...act) : 0) + 1;
-    state.players.push(name); state.totals[name]=es; state.roundScores[name]=null; state.actionStats[name]={shows:0,fcs:0,drops:0,mds:0};
-    await db.collection('eliteGames').doc(state.id).set(state);
-    closeModal('midGameModal');
-}
-function closeModal(id) { document.getElementById(id).style.display='none'; }
 
 function renderContinue() {
     let act = savedGames.filter(g => !g.winner);
-    document.getElementById('mainPane').innerHTML = `<h2>Active Games</h2>` + 
-        act.map(g => `<div style="background:rgba(255,255,255,0.05); padding:12px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-            <div><b>${g.name}</b><br><small>R${g.round} | ${g.startTime}</small></div>
-            <div style="display:flex; gap:5px;"><button onclick="resume('${g.id}')" style="background:var(--accent)">Resume</button><button onclick="delMatch('${g.id}')" style="background:var(--danger)">✕</button></div>
-        </div>`).join('') || `<p>No active games.</p>`;
+    document.getElementById('mainPane').innerHTML = `<h2>Active Games</h2>` + act.map(g => `<div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;"><div><b>${g.name}</b></div><button onclick="resume('${g.id}')">Resume</button></div>`).join('') || `<p>No active games.</p>`;
 }
 function resume(id) { state=savedGames.find(g => g.id === id); currentScreen='activeGame'; renderActive(); }
-function delMatch(id) { if(confirm("Delete this match?")) db.collection('eliteGames').doc(id).delete(); }
 
 function renderHistory() {
     let fin = savedGames.filter(g => g.winner);
-    document.getElementById('mainPane').innerHTML = `<h2>Match History</h2>` + 
-        fin.map(g => `<div style="background:rgba(255,255,255,0.05); padding:12px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-            <div><b>${g.name}</b><br><small>Winner: ${g.winner} | ${g.endTime}</small></div>
-            <button onclick="delMatch('${g.id}')" style="background:var(--danger)">Delete</button>
-        </div>`).join('') || `<p>No history.</p>`;
+    document.getElementById('mainPane').innerHTML = `<h2>Match History</h2>` + fin.map(g => `<div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;"><div><b>${g.name}</b><br><small>Winner: ${g.winner}</small></div><button onclick="delMatch('${g.id}')" style="background:var(--danger)">Del</button></div>`).join('');
 }
+function delMatch(id) { if(confirm("Delete this match?")) db.collection('eliteGames').doc(id).delete(); }
 
 function renderReports() {
     let fin = savedGames.filter(g => g.winner);
-    document.getElementById('mainPane').innerHTML = `<h2>Reports</h2>` + 
-        fin.map(g => `<div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:5px; border-radius:8px; display:flex; justify-content:space-between;">
-            <span>${g.name}</span><button onclick="genPDF('${g.id}')" style="background:var(--info)">PDF</button></div>`).join('');
+    document.getElementById('mainPane').innerHTML = `<h2>Reports</h2>` + fin.map(g => `<div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:5px; border-radius:8px; display:flex; justify-content:space-between;"><span>${g.name}</span><button onclick="genPDF('${g.id}')">PDF</button></div>`).join('');
 }
 
 function genPDF(id) {
     const g = savedGames.find(x => x.id === id);
     const doc = new jspdf.jsPDF();
-    doc.text(`Match: ${g.name}`, 14, 15);
+    doc.text(`Elite Match: ${g.name}`, 14, 15);
     const body = g.history.map(r => [r.round, ...g.players.map(p => r.scores[p] || '-')]);
     body.push(['TOTAL', ...g.players.map(p => g.totals[p])]);
     doc.autoTable({ head:[['Rnd', ...g.players]], body: body, startY: 20 });
     doc.save(`${g.name}.pdf`);
 }
 
-function renderPlayers() {
-    document.getElementById('mainPane').innerHTML = `<h2>Players</h2><table>` + 
-        playersDb.map(p => `<tr><td><span class="status-dot ${p.isOnline?'online':'offline'}"></span>${p.fullName}</td><td><button onclick="viewProfile('${p.id}')">Stats</button></td></tr>`).join('') + `</table>`;
+function toggleAuthView(v) {
+  document.getElementById('loginView').style.display = v==='login'?'block':'none';
+  document.getElementById('signupView').style.display = v==='signup'?'block':'none';
 }
-
-function viewProfile(uid) {
-    const p = playersDb.find(x => x.id === uid); if(!p) return;
-    const name = p.fullName;
-    let matches = savedGames.filter(g => g.winner && g.players.includes(name));
-    let wins = matches.filter(g => g.winner === name).length;
-    let s=0, fc=0, d=0, md=0;
-    matches.forEach(g => { if(g.actionStats[name]){ s+=g.actionStats[name].shows; fc+=g.actionStats[name].fcs; d+=g.actionStats[name].drops; md+=g.actionStats[name].mds; } });
-    
-    document.getElementById('profileContent').innerHTML = `
-        <h2 style="color:var(--accent); margin:0;">${name}</h2>
-        <div class="stat-grid">
-            <div class="stat-item"><span class="stat-val">${wins}</span><span class="stat-lbl">Wins</span></div>
-            <div class="stat-item"><span class="stat-val">${s}</span><span class="stat-lbl">Shows</span></div>
-            <div class="stat-item"><span class="stat-val">${fc}</span><span class="stat-lbl">Full</span></div>
-            <div class="stat-item"><span class="stat-val">${d}</span><span class="stat-lbl">Drops</span></div>
-            <div class="stat-item"><span class="stat-val">${md}</span><span class="stat-lbl">Mid</span></div>
-            <div class="stat-item"><span class="stat-val">${matches.length}</span><span class="stat-lbl">Total</span></div>
-        </div>
-        <div style="font-size:12px; background:rgba(39, 174, 96, 0.1); border-left:3px solid var(--accent); padding:10px; text-align:left;">
-            <b>AI Analysis:</b> ${d+md > s+fc ? 'Defensive Strategist' : 'Aggressive High-Roller'}
-        </div>`;
-    document.getElementById('profileModal').style.display='flex';
-}
-function viewMyProfile() { if(auth.currentUser) viewProfile(auth.currentUser.uid); }
 </script>
 </body>
 </html>
