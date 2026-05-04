@@ -13,10 +13,10 @@
   :root {
     --panel-bg: rgba(255, 255, 255, 0.12);
     --sidebar-bg: rgba(15, 32, 39, 0.98);
-    --btn-show: #00e676; /* Viking Green */
-    --btn-fc: #ff5252;   /* Viking Red */
-    --btn-drop: #ff9800; /* Viking Orange */
-    --btn-md: #ffc107;   /* Viking Yellow */
+    --btn-show: #00e676; 
+    --btn-fc: #d32f2f;   /* Viking Red */
+    --btn-drop: #ff9800; 
+    --btn-md: #ffc107;   
     --text-light: #ffffff;
     --glass-border: rgba(255, 255, 255, 0.2);
   }
@@ -31,50 +31,62 @@
   #mainApp, #authScreen { display: none; }
   .app-wrapper { display: flex; flex-direction: row; height: 100vh; width: 100vw; overflow: hidden; backdrop-filter: blur(8px); }
   
+  /* Sidebar Fixes */
   .left-sidebar { width: 240px; background: var(--sidebar-bg); padding: 20px; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; z-index: 10; overflow-y: hidden;}
   .player-roster-section { flex-grow: 1; overflow-y: auto; margin-top: 10px; border-top: 1px solid var(--glass-border); padding-top: 15px; }
-  .roster-item { display: flex; align-items: center; font-size: 13px; padding: 6px 12px; margin-bottom: 5px; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.2s; }
-  .roster-item:hover { background: rgba(255,255,255,0.15); }
+  .roster-item { display: flex; align-items: center; font-size: 13px; padding: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.2s; position: relative; z-index: 5;}
+  .roster-item:hover { background: rgba(0,230,118,0.2); border-color: var(--btn-show); }
   
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
-  .dot-online { background: #00e676; box-shadow: 0 0 8px #00e676; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
+  .dot-online { background: #00e676; box-shadow: 0 0 10px #00e676; }
   .dot-offline { background: #555; }
   
   .main-pane { flex: 2.5; padding: 20px 30px; overflow-y: auto; }
   .rhs-pane { flex: 1; min-width: 320px; background: rgba(0,0,0,0.3); padding: 20px; border-left: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(15px);}
 
-  .bigInput, .bigSelect { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.95); color: #000 !important; font-weight: 600; box-sizing: border-box; }
-  
-  /* Increased Game Name Input Size */
-  .game-name-input { padding: 18px 12px !important; font-size: 18px !important; border: 2px solid var(--btn-show) !important; }
+  /* Inputs */
+  .bigInput, .bigSelect { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.95); color: #000 !important; font-weight: 600; box-sizing: border-box; }
+  .game-name-box { padding: 22px 15px !important; font-size: 22px !important; border: 2px solid var(--btn-show) !important; height: 75px; }
 
-  .bigInput::placeholder { color: #444 !important; }
-  .score-input { width: 50px; padding: 6px; background: rgba(255,255,255,0.95); color: #000 !important; border-radius: 4px; text-align: center; font-weight: bold; }
+  .bigInput::placeholder { color: #666 !important; }
+  .score-input { width: 55px; padding: 8px; background: rgba(255,255,255,0.95); color: #000 !important; border-radius: 4px; text-align: center; font-weight: bold; }
   
-  button { padding: 8px 12px; margin: 2px; border: none; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-  .navBtn { width: 100%; margin-bottom: 8px; background: rgba(255,255,255,0.1); color: white; text-align: left; padding: 12px; }
-  .navBtn:disabled { opacity: 0.3; cursor: not-allowed; }
+  button { padding: 10px 15px; margin: 2px; border: none; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+  .navBtn { width: 100%; margin-bottom: 8px; background: rgba(255,255,255,0.1); color: white; text-align: left; padding: 15px; }
   .navBtn.active-nav { background: var(--btn-show); color: #111; }
-  .bigBtn { width: 100%; margin: 10px 0; font-size: 16px; padding: 14px; background: var(--btn-show); color: #111; }
   
-  /* Signup Button Color */
+  /* AUTH CENTERING FIX */
+  #authScreen { 
+    display: flex; position: fixed; inset: 0; 
+    width: 100vw; height: 100vh; z-index: 1000; 
+    justify-content: center; align-items: center; 
+    background: rgba(0,0,0,0.4);
+  }
+  .auth-box { 
+    background: rgba(15, 32, 39, 0.95); padding: 35px; border-radius: 20px; 
+    width: 90%; max-width: 380px; border: 1px solid var(--glass-border); 
+    backdrop-filter: blur(15px); text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  .authBtn { width: 100%; margin: 10px 0; font-size: 16px; padding: 16px; border-radius: 12px; }
+  .loginBtn { background: var(--btn-show); color: #111; }
   .signupBtn { background: var(--btn-fc); color: white; }
 
-  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
-  .modal-content { background: #1a2a3a; width: 95%; max-width: 500px; max-height: 90vh; padding: 25px; border-radius: 15px; border: 1px solid var(--glass-border); overflow-y: auto; backdrop-filter: blur(20px); position: relative;}
+  /* Modals */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
+  .modal-content { background: #1a2a3a; width: 95%; max-width: 520px; padding: 30px; border-radius: 20px; border: 1px solid var(--glass-border); text-align: center; }
 
-  .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px 0; }
-  .stat-box { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-  .stat-val { font-size: 15px; font-weight: bold; color: var(--btn-show); display: block; }
-  .stat-lbl { font-size: 8px; color: #aaa; text-transform: uppercase; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
+  .stat-box { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
+  .stat-val { font-size: 18px; font-weight: bold; color: var(--btn-show); display: block; }
+  .stat-lbl { font-size: 10px; color: #aaa; text-transform: uppercase; }
 
   @media (max-width: 900px) {
     .app-wrapper { flex-direction: column; overflow-y: auto; }
-    .left-sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--glass-border); padding: 10px; box-sizing: border-box; display: block; position: relative; }
-    .nav-section { display: flex; overflow-x: auto; gap: 5px; }
-    .navBtn { width: auto; margin-bottom: 0; font-size: 10px; padding: 6px 10px; }
-    .player-roster-section { display: flex; flex-direction: row; gap: 5px; overflow-x: auto; padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 5px; }
-    .roster-item { padding: 4px 8px; font-size: 10px; flex-shrink: 0; }
+    .left-sidebar { width: 100%; height: auto; border-right: none; padding: 10px; box-sizing: border-box; }
+    .nav-section { display: flex; overflow-x: auto; gap: 8px; }
+    .navBtn { width: auto; font-size: 11px; padding: 10px 14px; margin: 0; }
+    .player-roster-section { display: flex; flex-direction: row; gap: 10px; overflow-x: auto; padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.1); }
+    .roster-item { padding: 8px 14px; font-size: 12px; flex-shrink: 0; margin-bottom: 0; }
   }
 </style>
 </head>
@@ -82,10 +94,10 @@
 
 <!-- PROFILE MODAL -->
 <div id="profileModal" class="modal-overlay">
-  <div class="modal-content" style="text-align:center;">
-    <img id="profAvatar" style="width:100px; height:100px; border-radius:50%; border:3px solid var(--btn-show); background:#fff; margin-bottom:10px;" src="">
-    <h2 id="profName" style="color:var(--btn-show); margin:0;">Viking</h2>
-    <p id="profViking" style="color:#aaa; font-size:12px; font-style:italic; margin:5px 0 15px 0;"></p>
+  <div class="modal-content">
+    <img id="profAvatar" style="width:120px; height:120px; border-radius:50%; border:4px solid var(--btn-show); background:#fff; margin-bottom:15px;" src="">
+    <h2 id="profName" style="color:var(--btn-show); margin:0; font-size: 26px;">Warrior</h2>
+    <p id="profViking" style="color:#aaa; font-size:14px; font-style:italic; margin:8px 0 20px 0;"></p>
     <div class="stat-grid">
       <div class="stat-box"><span class="stat-val" id="statPlayed">0</span><span class="stat-lbl">Played</span></div>
       <div class="stat-box"><span class="stat-val" id="statWon">0</span><span class="stat-lbl">Won</span></div>
@@ -94,60 +106,60 @@
       <div class="stat-box"><span class="stat-val" id="statMds">0</span><span class="stat-lbl">MD (40)</span></div>
       <div class="stat-box"><span class="stat-val" id="statFcs">0</span><span class="stat-lbl">FC (80)</span></div>
     </div>
-    <div id="aiReport" style="background:rgba(0,230,118,0.1); border-left: 4px solid var(--btn-show); padding:12px; margin-top:10px; border-radius:4px; font-size:13px; text-align:left; color:white;"></div>
-    <button class="bigBtn" onclick="closeModal('profileModal')">Close Profile</button>
+    <div id="aiReport" style="background:rgba(0,230,118,0.1); border-left: 4px solid var(--btn-show); padding:15px; margin-top:10px; border-radius:10px; font-size:14px; text-align:left; color:white; line-height: 1.5;"></div>
+    <button class="authBtn loginBtn" style="margin-top:25px;" onclick="closeModal('profileModal')">Close Profile</button>
   </div>
 </div>
 
 <!-- AUTH SCREEN -->
 <div id="authScreen">
   <div class="auth-box">
-    <h1 style="color:var(--btn-show)">Elite Rummy</h1>
+    <h1 style="color:var(--btn-show); font-size: 34px; margin-bottom: 30px;">Elite Rummy</h1>
+    
     <div id="loginView">
       <input id="loginEmail" class="bigInput" placeholder="Email Address">
       <div style="position:relative;">
         <input id="loginPassword" class="bigInput" type="password" placeholder="Password">
-        <span onclick="togglePass('loginPassword')" style="position:absolute; right:12px; top:12px; color:#444; cursor:pointer;">👁️</span>
+        <span onclick="togglePass('loginPassword')" style="position:absolute; right:15px; top:15px; color:#444; cursor:pointer; font-size: 20px;">👁️</span>
       </div>
-      <button class="bigBtn" onclick="login()">Log In</button>
-      <a onclick="toggleAuthView('signup')" style="cursor:pointer; font-size:11px; text-decoration:underline; color:#fff;">Join the Horde</a>
+      <button class="authBtn loginBtn" onclick="login()">Log In</button>
+      <a onclick="toggleAuthView('signup')" style="cursor:pointer; font-size:12px; text-decoration:underline; color:#fff; display:block; margin-top:15px;">New Viking? Join the Horde</a>
     </div>
 
     <div id="signupView" style="display:none">
-      <div style="display:flex; gap:8px;"><input id="signupFirst" class="bigInput" placeholder="First Name"><input id="signupLast" class="bigInput" placeholder="Surname"></div>
+      <div style="display:flex; gap:10px;"><input id="signupFirst" class="bigInput" placeholder="First Name"><input id="signupLast" class="bigInput" placeholder="Surname"></div>
       
-      <!-- Gender Tagged -->
-      <div style="text-align:left; font-size:11px; color:var(--btn-show); margin-bottom:4px; padding-left:4px;">GENDER</div>
+      <div style="text-align:left; font-size:11px; color:var(--btn-show); font-weight:bold; margin: 5px 0 5px 5px;">GENDER</div>
       <select id="signupGender" class="bigSelect">
         <option value="male">Warrior (Male)</option>
         <option value="female">Shield-Maiden (Female)</option>
       </select>
 
-      <div style="display:flex; gap:5px; margin-bottom:10px;">
+      <div style="display:flex; gap:10px; margin-bottom:12px;">
         <input id="signupViking" class="bigInput" style="margin-bottom:0; background:#eee; color:#111;" readonly>
-        <button onclick="uiGenerateViking()" style="background:var(--btn-show); color:#111;">🎲</button>
+        <button onclick="uiGenerateViking()" style="background:var(--btn-show); color:#111; padding:0 20px; border-radius:10px;">🎲</button>
       </div>
       <input id="signupEmail" class="bigInput" placeholder="Email Address">
       <div style="position:relative;">
         <input id="signupPass" class="bigInput" type="password" placeholder="Password">
-        <span onclick="togglePass('signupPass')" style="position:absolute; right:12px; top:12px; color:#444; cursor:pointer;">👁️</span>
+        <span onclick="togglePass('signupPass')" style="position:absolute; right:15px; top:15px; color:#444; cursor:pointer;">👁️</span>
       </div>
       <input id="signupConfirm" class="bigInput" type="password" placeholder="Confirm Password">
-      <button class="bigBtn signupBtn" onclick="signup()">Sign Up</button>
-      <a onclick="toggleAuthView('login')" style="cursor:pointer; font-size:11px; text-decoration:underline; color:#fff;">Back to Login</a>
+      <button class="authBtn signupBtn" onclick="signup()">Sign Up</button>
+      <a onclick="toggleAuthView('login')" style="cursor:pointer; font-size:12px; text-decoration:underline; color:#fff; display:block; margin-top:15px;">Back to Login</a>
     </div>
-    <p id="authError" style="color:#ff5252; font-size:11px; margin-top:10px;"></p>
+    <p id="authError" style="color:#ff5252; font-size:12px; margin-top:15px; font-weight:bold;"></p>
   </div>
 </div>
 
 <!-- MAIN APP -->
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
-    <div style="display:flex; justify-content:space-between; margin-bottom:15px; gap:5px;">
-        <button class="navBtn" style="background:var(--btn-md); color:#111; margin:0; flex:1; text-align:center; padding:8px;" onclick="viewMyProfile()">Profile</button>
-        <button class="navBtn" style="background:var(--btn-fc); color:white; margin:0; flex:1; text-align:center; padding:8px;" onclick="handleLogout()">Logout</button>
+    <div style="display:flex; justify-content:space-between; margin-bottom:25px; gap:10px;">
+        <button class="navBtn" style="background:var(--btn-md); color:#111; margin:0; flex:1; text-align:center; padding:12px;" onclick="viewMyProfile()">Profile</button>
+        <button class="navBtn" style="background:var(--btn-fc); color:white; margin:0; flex:1; text-align:center; padding:12px;" onclick="handleLogout()">Logout</button>
     </div>
-    <h2 style="color:var(--btn-show); font-size: 18px; margin: 0 0 15px 0;">Elite Rummy</h2>
+    <h2 style="color:var(--btn-show); font-size: 22px; margin: 0 0 20px 0;">Elite Rummy</h2>
     <div class="nav-section">
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">New Game</button>
       <button id="navContinue" class="navBtn" onclick="showScreen('continue')">Continue</button>
@@ -155,7 +167,7 @@
       <button id="navReports" class="navBtn" onclick="showScreen('reports')">Reports</button>
     </div>
     <div class="player-roster-section">
-        <h4 style="font-size:10px; color:#00e676; text-transform:uppercase; letter-spacing:1px; margin:0 0 8px 0;">Horde Roster</h4>
+        <h4 style="font-size:11px; color:#00e676; text-transform:uppercase; letter-spacing:1px; margin:0 0 12px 0;">Viking Horde</h4>
         <div id="sidebarRoster"></div>
     </div>
   </div>
@@ -200,7 +212,7 @@ auth.onAuthStateChanged(user => {
 
 function setOnlineStatus(uid, status) {
   db.collection('eliteData').doc('playersData').get().then(doc => {
-    let list = doc.data().list;
+    let list = doc.data().list || [];
     let idx = list.findIndex(p => p.id === uid);
     if(idx !== -1) {
         list[idx].isOnline = status;
@@ -213,10 +225,7 @@ function handleLogout() {
   const user = auth.currentUser;
   if(user) {
     setOnlineStatus(user.uid, false);
-    setTimeout(() => { 
-        auth.signOut();
-        // Redirect logic handled by onAuthStateChanged
-    }, 500);
+    setTimeout(() => { auth.signOut(); }, 300);
   }
 }
 
@@ -235,7 +244,9 @@ function renderRoster() {
   const c = document.getElementById('sidebarRoster'); if(!c) return; c.innerHTML = "";
   playersDb.sort((a,b)=>a.fullName.localeCompare(b.fullName)).forEach(p => {
     const dotClass = p.isOnline ? 'dot-online' : 'dot-offline';
-    c.innerHTML += `<div class="roster-item" onclick="viewProfile('${p.fullName}')"><div class="status-dot ${dotClass}"></div> ${p.fullName}</div>`;
+    c.innerHTML += `<div class="roster-item" onclick="viewProfile('${p.fullName.replace(/'/g, "\\'")}')">
+        <div class="status-dot ${dotClass}"></div> ${p.fullName}
+    </div>`;
   });
 }
 
@@ -261,10 +272,8 @@ function showScreen(s) {
 }
 
 function getPlayerOptionsHtml(currentSelected) {
-  let opts = `<option value="">-- Choose Player --</option>`;
-  playersDb.forEach(p => {
-    if(!currentSelected.includes(p.fullName)) { opts += `<option value="${p.fullName}">${p.fullName}</option>`; }
-  });
+  let opts = `<option value="">-- Choose Warrior --</option>`;
+  playersDb.forEach(p => { if(!currentSelected.includes(p.fullName)) { opts += `<option value="${p.fullName}">${p.fullName}</option>`; } });
   return opts;
 }
 
@@ -272,18 +281,18 @@ function renderNewGame() {
   const gInput = document.getElementById('gName');
   const isLocked = gInput && gInput.value.includes('(');
   document.getElementById('mainPane').innerHTML = `
-    <h2>Start New Game</h2>
-    <div class="game-card" style="display:block; padding:15px; border-radius:0;">
-        <div style="display:flex; gap:5px; margin-bottom:10px;">
-            <input id="gName" class="bigInput game-name-input" placeholder="Enter Game Name" style="margin-bottom:0; flex:1;" oninput="refreshDropdowns()">
-            <button id="timeBtn" class="navBtn" style="background:rgba(255,255,255,0.1); width:auto; padding:5px 12px;" onclick="appendDateTime()" ${isLocked?'disabled':''}>🕒</button>
+    <h2>Commence Raid</h2>
+    <div class="game-card" style="display:block; padding:25px; border-radius:15px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);">
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <input id="gName" class="bigInput game-name-box" placeholder="War Name (e.g. Muscat Clash)" style="margin-bottom:0; flex:1;" oninput="refreshDropdowns()">
+            <button id="timeBtn" class="navBtn" style="background:rgba(255,255,255,0.1); width:auto; padding:0 20px; border-radius:10px;" onclick="appendDateTime()" ${isLocked?'disabled':''}>🕒</button>
         </div>
         <div id="selArea">
             <select class="bigSelect p-sel" onchange="refreshDropdowns()">${getPlayerOptionsHtml([])}</select>
         </div>
-        <div style="display:flex; gap:5px;">
-            <button class="navBtn" style="background:rgba(0,230,118,0.1); color:#00e676; flex:1;" onclick="addSlot()">+ Add Player</button>
-            <button class="bigBtn" style="margin:0; flex:1.5;" onclick="startMatch()">Start</button>
+        <div style="display:flex; gap:10px;">
+            <button class="navBtn" style="background:rgba(0,230,118,0.1); color:#00e676; flex:1; text-align:center;" onclick="addSlot()">+ Add Player</button>
+            <button class="authBtn loginBtn" style="margin:0; flex:1.5;" onclick="startMatch()">Begin Raid</button>
         </div>
     </div>`;
 }
@@ -304,8 +313,8 @@ function refreshDropdowns() {
 
 function addSlot() {
   const selected = Array.from(document.querySelectorAll('.p-sel')).map(s => s.value);
-  const div = document.createElement('div'); div.style="display:flex; gap:5px; margin-bottom:5px;";
-  div.innerHTML = `<select class="bigSelect p-sel" onchange="refreshDropdowns()">${getPlayerOptionsHtml(selected)}</select><button onclick="this.parentElement.remove(); refreshDropdowns();" style="width:40px; background:#ff5252; color:white; border-radius:6px; border:none;">✕</button>`;
+  const div = document.createElement('div'); div.style="display:flex; gap:8px; margin-bottom:10px;";
+  div.innerHTML = `<select class="bigSelect p-sel" style="margin-bottom:0;" onchange="refreshDropdowns()">${getPlayerOptionsHtml(selected)}</select><button onclick="this.parentElement.remove(); refreshDropdowns();" style="width:50px; background:var(--btn-fc); color:white; border-radius:10px;">✕</button>`;
   document.getElementById('selArea').appendChild(div);
 }
 
@@ -318,9 +327,9 @@ function appendDateTime() {
 }
 
 function startMatch() {
-  const players = Array.from(document.querySelectorAll('.p-sel')).map(s => s.value).filter(val => val !== "");
-  if(players.length < 2) return alert("Min 2 players required to raid.");
-  state = { id: Date.now().toString(), name: document.getElementById('gName').value||"Unlisted Game", players, totals: {}, round: 1, history: [], eliminated: {}, reentered: {}, winner: null, actionStats: {} };
+  const players = Array.from(document.querySelectorAll('.p-sel')).map(s => s.value).filter(val => v => v !== "");
+  if(players.length < 2) return alert("A raid requires at least 2 warriors.");
+  state = { id: Date.now().toString(), name: document.getElementById('gName').value||"Ancient Battle", players, totals: {}, round: 1, history: [], eliminated: {}, reentered: {}, winner: null, actionStats: {} };
   players.forEach(p => { state.totals[p]=0; state.eliminated[p]=false; state.reentered[p]=false; state.actionStats[p] = { shows: 0, fcs: 0, drops: 0, mds: 0, outs: 0 }; });
   db.collection('eliteGames').doc(state.id).set(state);
   renderActive();
@@ -328,22 +337,24 @@ function startMatch() {
 
 function renderActive() {
   document.getElementById('rhsPane').style.display='block';
-  let html = `<h2 style="font-size:18px; margin:0 0 10px 0; color:var(--btn-show);">${state.name}</h2><table><tr><th>Warrior</th><th>Tactics</th><th>Score</th></tr>`;
+  let html = `<h2 style="font-size:20px; margin:0 0 15px 0; color:var(--btn-show);">${state.name}</h2><table><tr><th>Warrior</th><th>Tactics</th><th>Pts</th></tr>`;
   state.players.forEach(p => {
     let isOut = state.totals[p] >= 240;
     html += `<tr class="${isOut?'eliminated':''}">
-      <td><b>${p.split(' ')[0]}</b><br><div style="display:flex; gap:2px;"><input type="number" id="manual-${p}" class="score-input" placeholder="0"><button onclick="scoreManual('${p}')">+</button></div></td>
+      <td><b>${p.split(' ')[0]}</b><br><div style="display:flex; gap:5px; margin-top:8px;"><input type="number" id="manual-${p}" class="score-input" placeholder="0"><button style="background:rgba(255,255,255,0.1); padding:5px 12px;" onclick="scoreManual('${p}')">+</button></div></td>
       <td>
-        <button style="background:var(--btn-show)" onclick="score('${p}',0,'shows')" ${isOut?'disabled':''}>S</button>
-        <button style="background:var(--btn-drop)" onclick="score('${p}',20,'drops')" ${isOut?'disabled':''}>D</button>
-        <button style="background:var(--btn-md)" onclick="score('${p}',40,'mds')" ${isOut?'disabled':''}>MD</button>
-        <button style="background:var(--btn-fc); color:white;" onclick="score('${p}',80,'fcs')" ${isOut?'disabled':''}>F</button>
-        ${(isOut && !state.reentered[p]) ? `<br><button style="background:var(--btn-md); width:100%; margin-top:5px;" onclick="reenter('${p}')">RE-ENTER</button>` : ''}
+        <div style="display:flex; flex-wrap:wrap; gap:4px;">
+            <button style="background:var(--btn-show)" onclick="score('${p}',0,'shows')" ${isOut?'disabled':''}>S</button>
+            <button style="background:var(--btn-drop)" onclick="score('${p}',20,'drops')" ${isOut?'disabled':''}>D</button>
+            <button style="background:var(--btn-md)" onclick="score('${p}',40,'mds')" ${isOut?'disabled':''}>MD</button>
+            <button style="background:var(--btn-fc); color:white;" onclick="score('${p}',80,'fcs')" ${isOut?'disabled':''}>F</button>
+        </div>
+        ${(isOut && !state.reentered[p]) ? `<button style="background:var(--btn-md); width:100%; margin-top:8px; padding:10px;" onclick="reenter('${p}')">RE-ENTER</button>` : ''}
       </td>
       <td><h3 style="margin:0">${state.totals[p]}</h3></td>
     </tr>`;
   });
-  html += `</table><button class="bigBtn" onclick="nextRound()">End Round</button>`;
+  html += `</table><button class="bigBtn" style="margin-top:20px;" onclick="nextRound()">End Round</button>`;
   document.getElementById('mainPane').innerHTML = html;
   renderHistoryPane();
 }
@@ -369,11 +380,10 @@ function nextRound() {
 
 function viewProfile(name) {
     const pData = playersDb.find(x => x.fullName === name);
+    if(!pData) return;
     document.getElementById('profName').innerText = name;
-    document.getElementById('profViking').innerText = pData ? pData.vikingName : "Drifting Soul";
-    
-    // Lorelei cute avatars
-    const style = (pData && pData.gender === 'female') ? 'lorelei' : 'lorelei-neutral';
+    document.getElementById('profViking').innerText = pData.vikingName || "Ancient Warrior";
+    const style = (pData.gender === 'female') ? 'lorelei' : 'lorelei-neutral';
     document.getElementById('profAvatar').src = `https://api.dicebear.com/7.x/${style}/svg?seed=${name}&mood=happy`;
     
     let finished = savedGames.filter(g => g.winner);
@@ -388,35 +398,30 @@ function viewProfile(name) {
     document.getElementById('statMds').innerText = m;
     document.getElementById('statFcs').innerText = f;
     document.getElementById('statOuts').innerText = o;
-    let r = "Fate is still unwritten...";
-    if(myGames.length > 0) { if(s > (d+m)) r = name + " is a bold Jarl who trusts in the Show. Valhalla awaits their victory."; else if((d+m) > s) r = name + " is a master of the calculated drop. Cunning as Loki."; else r = "A balanced warrior of the realm."; }
-    document.getElementById('aiReport').innerText = "WARRIOR REPORT: " + r;
+    let r = "Fate is unfolding...";
+    if(myGames.length > 0) { if(s > (d+m)) r = name + " is a bold fighter who thrives on the Show. Valhalla welcomes their spirit."; else if((d+m) > s) r = name + " is a master of tactical drops. Patience of a wolf on the hunt."; else r = "A balanced warrior across the nine realms."; }
+    document.getElementById('aiReport').innerText = "AI WARRIOR INSIGHT: " + r;
     openModal('profileModal');
 }
 
-function viewMyProfile() { const me = playersDb.find(p => p.id === auth.currentUser.uid); if(me) viewProfile(me.fullName); }
+function viewMyProfile() { if(auth.currentUser) { const me = playersDb.find(p => p.id === auth.currentUser.uid); if(me) viewProfile(me.fullName); } }
 function uiGenerateViking() { const pre = ["Thor", "Bjorn", "Ragnar", "Ivar", "Erik"]; const post = ["Ironside", "Bloodaxe", "Storm", "Wolf", "Red"]; document.getElementById('signupViking').value = pre[Math.floor(Math.random()*pre.length)] + " " + post[Math.floor(Math.random()*post.length)]; }
 
 function renderReports() {
-  let html = `<h2>Leaderboard</h2><table><tr><th>Warrior</th><th>Win %</th><th>Manage</th></tr>`;
+  let html = `<h2>Glory Leaderboard</h2><table><tr><th>Warrior</th><th>Win %</th><th>Purge</th></tr>`;
   playersDb.forEach(p => {
     let myGames = savedGames.filter(g => g.winner && g.players.includes(p.fullName));
     let wins = savedGames.filter(g => g.winner === p.fullName).length;
-    html += `<tr><td><b>${p.fullName}</b></td><td>${myGames.length?((wins/myGames.length)*100).toFixed(1):0}%</td><td><button class="delete-btn" onclick="purgePlayer('${p.id}')">🗑️ Purge</button></td></tr>`;
+    html += `<tr><td><b>${p.fullName}</b></td><td>${myGames.length?((wins/myGames.length)*100).toFixed(1):0}%</td><td><button style="background:var(--btn-fc); color:white; padding:5px 10px;" onclick="purgePlayer('${p.id}')">🗑️</button></td></tr>`;
   });
   document.getElementById('mainPane').innerHTML = html + `</table>`;
 }
 
-function purgePlayer(uid) {
-    if(confirm("Expel this soul from the horde list?")) {
-        let newList = playersDb.filter(p => p.id !== uid);
-        db.collection('eliteData').doc('playersData').set({ list: newList });
-    }
-}
+function purgePlayer(uid) { if(confirm("Expel this soul from the horde list?")) { let newList = playersDb.filter(p => p.id !== uid); db.collection('eliteData').doc('playersData').set({ list: newList }); } }
 
 function renderContinue() {
   let active = savedGames.filter(g => !g.winner);
-  document.getElementById('mainPane').innerHTML = "<h2>Active Raids</h2>" + active.map(g => `<div class="game-card"><div><b>${g.name}</b></div><button style="background:var(--btn-show); color:#111" onclick="resume('${g.id}')">Resume</button></div>`).join('');
+  document.getElementById('mainPane').innerHTML = "<h2>Active Raids</h2>" + active.map(g => `<div class="game-card"><div><b>${g.name}</b></div><button class="navBtn active-nav" style="width:auto;" onclick="resume('${g.id}')">Resume Raid</button></div>`).join('');
 }
 function resume(id) { state = savedGames.find(g => g.id === id); renderActive(); }
 function renderHistory() {
@@ -424,8 +429,8 @@ function renderHistory() {
   document.getElementById('mainPane').innerHTML = "<h2>Hall of Fame</h2>" + finished.map(g => `<div class="game-card"><div><b>${g.name}</b><br>Victor: ${g.winner}</div></div>`).join('');
 }
 function renderHistoryPane() {
-  let h = "<h3>Chronicles</h3>";
-  state.history.forEach(r => h += `<div style="font-size:10px; margin-bottom:4px; background:rgba(255,255,255,0.05); padding:4px;">R${r.round}: ${JSON.stringify(r.totals).replace(/[{}"]/g,'')}</div>`);
+  let h = "<h3>Battle Chronicles</h3>";
+  state.history.forEach(r => h += `<div style="font-size:11px; margin-bottom:5px; background:rgba(255,255,255,0.05); padding:8px; border-radius:6px;">R${r.round}: ${JSON.stringify(r.totals).replace(/[{}"]/g,'')}</div>`);
   document.getElementById('rhsPane').innerHTML = h;
 }
 function toggleAuthView(v) { document.getElementById('loginView').style.display = v==='login'?'block':'none'; document.getElementById('signupView').style.display = v==='signup'?'block':'none'; if(v==='signup') uiGenerateViking(); }
