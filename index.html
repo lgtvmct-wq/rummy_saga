@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v41.0</title>
+<title>Elite Rummy Circle - v41.2</title>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -24,6 +24,7 @@
     --accent: #27ae60;
     --danger: #e74c3c;
     --warning: #f39c12;
+    --info: #3498db;
     --text-light: #ffffff;
     --glass-border: rgba(255, 255, 255, 0.15);
   }
@@ -62,6 +63,9 @@
   .navBtn.active-nav { background: var(--accent); }
   .actionBtn { background: var(--accent); color: white; width: 100%; height: 55px; font-size: 16px; }
 
+  .pause-btn { background: var(--info); color: white; border: 1px solid rgba(255,255,255,0.3); }
+  .pause-btn:hover { background: #2980b9; }
+
   .version-link { background: var(--accent); color: white; display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: bold; margin-bottom: 25px; cursor: pointer; text-decoration: none; }
 
   #authScreen { display: flex; position: fixed; inset: 0; justify-content: center; align-items: center; background: rgba(0,0,0,0.8); z-index: 2000; padding: 20px; }
@@ -70,7 +74,6 @@
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 4000; justify-content: center; align-items: center; padding: 20px; }
   .modal-card { background: #2c3e50; width: 100%; max-width: 500px; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); overflow-y: auto; max-height: 90vh; }
   
-  .avatar-sm { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid var(--accent); background: #1a252f; }
   .avatar-lg { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); margin-bottom: 15px; }
 
   .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 20px 0; }
@@ -91,11 +94,10 @@
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
 <div id="authScreen">
   <div class="auth-box">
     <h1 style="color:var(--accent); margin-bottom: 5px;">Elite Rummy Circle</h1>
-    <a class="version-link">VERSION 41.0</a>
+    <a class="version-link">VERSION 41.2</a>
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
       <input id="loginPassword" class="std-input" type="password" placeholder="Password">
@@ -114,7 +116,6 @@
       <button class="actionBtn" style="background:var(--warning); color:#111;" onclick="signup()">Create Account</button>
       <p onclick="toggleAuthView('login')" style="margin-top:20px; cursor:pointer; text-decoration:underline; font-size:13px;">Back to Login</p>
     </div>
-    <p id="authError" style="color:var(--danger); font-size:12px; margin-top:15px;"></p>
     <div class="elite-footer">Developed by Elite IT &copy; 2026</div>
   </div>
 </div>
@@ -122,12 +123,22 @@
 <!-- MODALS -->
 <div id="reentryModal" class="modal-overlay" style="z-index: 5000;">
     <div class="modal-card">
-        <h2 style="color:var(--warning);">Eliminated!</h2>
+        <h2 style="color:var(--warning);">Player Elimination</h2>
         <p id="reentryText"></p>
         <div style="display:flex; gap:10px; margin-top: 20px; padding:0 20px;">
-            <button class="actionBtn" style="background:#555; flex:1;" id="btnReentryNo">Leave</button>
+            <button class="actionBtn" style="background:#555; flex:1;" id="btnReentryNo">Leave Match</button>
             <button class="actionBtn" style="background:var(--accent); flex:1;" id="btnReentryYes">Re-enter</button>
         </div>
+    </div>
+</div>
+
+<div id="addPlayerMidGameModal" class="modal-overlay">
+    <div class="modal-card">
+        <h2>Add Player Mid-Game</h2>
+        <p style="font-size:12px; margin-bottom:15px;">Player will enter at [Highest Score + 1]</p>
+        <select id="midGamePlayerSelect" class="std-input"></select>
+        <button class="actionBtn" onclick="confirmAddMidGamePlayer()">Add Player</button>
+        <button class="actionBtn" style="background:#555; margin-top:10px;" onclick="document.getElementById('addPlayerMidGameModal').style.display='none'">Cancel</button>
     </div>
 </div>
 
@@ -144,11 +155,10 @@
             <div class="stat-item"><span class="stat-val" id="statTotal">0</span><span class="stat-lbl">Total</span></div>
         </div>
         <div id="aiAnalysis" style="background:rgba(39, 174, 96, 0.1); border-left: 4px solid var(--accent); padding:15px; text-align:left; font-size:13px; border-radius:4px; margin-bottom:20px;"></div>
-        <button class="actionBtn" onclick="document.getElementById('profileModal').style.display='none'">Close</button>
+        <button class="actionBtn" onclick="document.getElementById('profileModal').style.display='none'">Close Dashboard</button>
     </div>
 </div>
 
-<!-- APP WRAPPER -->
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
     <h2 style="color:var(--accent)">Elite Circle</h2>
@@ -170,7 +180,6 @@
 </div>
 
 <script>
-// INITIALIZATION
 const firebaseConfig = {
   apiKey: "AIzaSyCo_G5Vo7OkUsK-tUXVQKCkeTn_IHw9vB0",
   authDomain: "elite-rummy-circle.firebaseapp.com",
@@ -186,7 +195,6 @@ const auth = firebase.auth();
 let playersDb =[], savedGames =[], state = null, currentScreen = '';
 let isPromptingReEntry = false;
 
-// AUTH logic
 auth.onAuthStateChanged(user => {
   if(user) {
     document.getElementById('authScreen').style.display='none';
@@ -205,40 +213,22 @@ function toggleAuthView(v) {
   document.getElementById('signupView').style.display = v==='signup'?'block':'none';
 }
 
-function login() {
-  auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value)
-  .catch(e => document.getElementById('authError').innerText = e.message);
-}
-
-async function googleSignIn() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(e => document.getElementById('authError').innerText = e.message);
-}
-
+function login() { auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); }
+async function googleSignIn() { const provider = new firebase.auth.GoogleAuthProvider(); auth.signInWithPopup(provider); }
 async function signup() {
     const f = document.getElementById('signupFirst').value;
     const l = document.getElementById('signupLast').value;
     const e = document.getElementById('signupEmail').value;
     const p = document.getElementById('signupPass').value;
-    try {
-        const cred = await auth.createUserWithEmailAndPassword(e, p);
-        await db.collection('players').doc(cred.user.uid).set({ fullName: (f+" "+l).toUpperCase(), isOnline: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    } catch(err) { document.getElementById('authError').innerText = err.message; }
+    const cred = await auth.createUserWithEmailAndPassword(e, p);
+    await db.collection('players').doc(cred.user.uid).set({ fullName: (f+" "+l).toUpperCase(), isOnline: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
 }
-
-function handleLogout() {
-  if(auth.currentUser) db.collection('players').doc(auth.currentUser.uid).update({ isOnline: false }).then(() => auth.signOut());
-}
+function handleLogout() { if(auth.currentUser) db.collection('players').doc(auth.currentUser.uid).update({ isOnline: false }).then(() => auth.signOut()); }
 
 function loadData() {
-  db.collection('players').onSnapshot(snap => {
-    playersDb =[]; snap.forEach(doc => playersDb.push({id: doc.id, ...doc.data()}));
-  });
+  db.collection('players').onSnapshot(snap => { playersDb =[]; snap.forEach(doc => playersDb.push({id: doc.id, ...doc.data()})); });
   db.collection('eliteGames').onSnapshot(snap => {
     savedGames =[]; snap.forEach(d => savedGames.push(d.data()));
-    if(currentScreen === 'continue') renderContinue();
-    if(currentScreen === 'history') renderHistory();
-    if(currentScreen === 'reports') renderReports();
     if(currentScreen === 'activeGame' && state && !isPromptingReEntry) {
         let s = savedGames.find(g => g.id === state.id);
         if(s) { state = s; renderActive(); }
@@ -247,7 +237,6 @@ function loadData() {
   });
 }
 
-// SCORING RULES
 function applyTactic(p, type) {
     if (state.winner || state.eliminated[p]) return;
     let newVal = null;
@@ -279,7 +268,6 @@ function markOutInstant(p) {
     }
 }
 
-// NAVIGATION logic
 function showScreen(s) {
   currentScreen = s;
   document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active-nav'));
@@ -362,9 +350,31 @@ function startGame() {
   renderActive();
 }
 
-function pauseGame() {
-    state = null;
-    showScreen('newGame');
+function openAddMidGamePlayer() {
+    let avail = playersDb.filter(p => !state.players.includes(p.fullName));
+    document.getElementById('midGamePlayerSelect').innerHTML = `<option value="">-- Select --</option>` + avail.map(p => {
+        let disabled = p.isOnline ? '' : 'disabled';
+        return `<option value="${p.fullName}" ${disabled}>${p.fullName} (${p.isOnline?'ONLINE':'OFFLINE'})</option>`;
+    }).join('');
+    document.getElementById('addPlayerMidGameModal').style.display = 'flex';
+}
+
+async function confirmAddMidGamePlayer() {
+    let name = document.getElementById('midGamePlayerSelect').value;
+    if(!name) return;
+    let activeTotals = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240).map(p => state.totals[p]);
+    let entryScore = (activeTotals.length > 0 ? Math.max(...activeTotals) : 0) + 1;
+    state.players.push(name);
+    state.totals[name] = entryScore;
+    state.roundScores[name] = null;
+    state.actionStats[name] = { shows: 0, fcs: 0, drops: 0, mds: 0 };
+    if (entryScore >= 240) {
+        let re = confirm(`${name} joining at ${entryScore}. Re-enter?`);
+        if (re) { state.reEntries[name] = true; state.totals[name] = entryScore; }
+        else state.eliminated[name] = true;
+    }
+    await db.collection('eliteGames').doc(state.id).set(state);
+    document.getElementById('addPlayerMidGameModal').style.display = 'none';
 }
 
 function renderActive() {
@@ -372,10 +382,14 @@ function renderActive() {
   document.getElementById('rhsPane').style.display='block';
   let dealerIdx = (state.round - 1) % state.players.length;
   let dealerName = state.players[dealerIdx];
+  
+  let btnText = state.winner ? "Match Over: Return Home" : "Pause & Home";
+
   let h = `<div style="display:flex; justify-content:space-between; align-items:center;">
     <h2>${state.name} (R${state.round})</h2>
-    <button onclick="pauseGame()" style="background:#555; padding:8px 15px; font-size:12px;">Pause & Return Home</button>
+    <button onclick="state=null; showScreen('newGame')" class="pause-btn">${btnText}</button>
   </div><table>`;
+  
   state.players.forEach(p => {
     let score = state.roundScores[p];
     let isOut = state.eliminated[p] || state.totals[p] >= 240;
@@ -396,8 +410,12 @@ function renderActive() {
         <td><b style="color:var(--warning)">${state.totals[p]}</b></td>
     </tr>`;
   });
-  if(!state.winner) h += `</table><button id="endBtn" class="actionBtn" style="margin-top:20px;" onclick="processRoundEnd()">Next Round</button>`;
-  else h += `</table><h2 style="color:var(--accent); text-align:center;">Winner: ${state.winner}</h2>`;
+  if(!state.winner) {
+      h += `</table><button id="endBtn" class="actionBtn" style="margin-top:20px;" onclick="processRoundEnd()">Next Round</button>`;
+      h += `<button class="actionBtn" style="background:#555; margin-top:10px;" onclick="openAddMidGamePlayer()">+ Add Player Mid-Game</button>`;
+  } else {
+      h += `</table><h2 style="color:var(--accent); text-align:center;">Winner: ${state.winner}</h2>`;
+  }
   document.getElementById('mainPane').innerHTML = h;
   renderHistoryPane();
   validateBtn();
@@ -452,48 +470,42 @@ async function processRoundEnd() {
 }
 
 function renderHistoryPane() {
-    let h = `<h3>Round History</h3>`;
+    let h = `<h3>Round Logs (Total pts)</h3>`;
     state.history.slice().reverse().forEach(r => {
         h += `<div style="font-size:11px; margin-bottom:10px; background:rgba(255,255,255,0.05); padding:8px; border-radius:5px;">
             <b style="color:var(--accent);">Round ${r.round}</b><br>
-            ${state.players.map(p => `${p}: ${r.scores[p] === 240 || state.eliminated[p] ? '<span style="color:var(--danger)">OUT</span>' : r.scores[p]}`).join(' | ')}
+            ${state.players.map(p => {
+                let rs = r.scores[p] === undefined ? '-' : r.scores[p];
+                let tot = r.totals[p] === undefined ? '-' : r.totals[p];
+                let display = (rs === 240 || state.eliminated[p]) ? '<span style="color:var(--danger)">OUT</span>' : `${rs} (${tot})`;
+                return `${p}: ${display}`;
+            }).join(' | ')}
         </div>`;
     });
     document.getElementById('rhsPane').innerHTML = h;
 }
 
-// MANAGEMENT logic
-function renderPlayers() {
-    let h = `<h2>Players List</h2><table>`;
-    playersDb.forEach(p => h += `<tr><td><span class="status-dot ${p.isOnline?'online':'offline'}"></span> ${p.fullName}</td><td><button onclick="viewProfile('${p.id}')">View Profile</button></td></tr>`);
-    document.getElementById('mainPane').innerHTML = h + `</table>`;
-}
-
 function renderContinue() {
     let act = savedGames.filter(g => !g.winner);
     let h = `<h2>Active Games</h2>`;
-    if(!act.length) h += `<p class="empty-msg">No active games.</p>`;
-    act.forEach(g => h += `
-        <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-            <div><b>${g.name}</b><br><small>Round ${g.round} | Started: ${g.startTime}</small></div>
-            <div style="display:flex; gap:10px;">
-                <button onclick="resume('${g.id}')" style="background:var(--accent)">Resume</button>
-                <button onclick="deleteMatch('${g.id}')" style="background:var(--danger)">Cancel</button>
-            </div>
-        </div>`);
-    document.getElementById('mainPane').innerHTML = h;
+    act.forEach(g => h += `<div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+        <div><b>${g.name}</b><br><small>R${g.round} | Started: ${g.startTime}</small></div>
+        <div style="display:flex; gap:10px;">
+            <button onclick="resume('${g.id}')" style="background:var(--accent)">Resume</button>
+            <button onclick="deleteMatch('${g.id}')" style="background:var(--danger)">Cancel</button>
+        </div>
+    </div>`);
+    document.getElementById('mainPane').innerHTML = h || `<p>No games.</p>`;
 }
 
 function renderHistory() {
     let fin = savedGames.filter(g => g.winner);
     let h = `<h2>Match History</h2>`;
-    if(!fin.length) h += `<p class="empty-msg">No history records.</p>`;
-    fin.forEach(g => h += `
-        <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-            <div><b>${g.name}</b><br><small>Winner: ${g.winner} | Date: ${g.endTime}</small></div>
-            <button onclick="deleteMatch('${g.id}')" style="background:var(--danger)">Delete</button>
-        </div>`);
-    document.getElementById('mainPane').innerHTML = h;
+    fin.forEach(g => h += `<div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+        <div><b>${g.name}</b><br><small>Winner: ${g.winner} | Date: ${g.endTime}</small></div>
+        <button onclick="deleteMatch('${g.id}')" style="background:var(--danger)">Delete</button>
+    </div>`);
+    document.getElementById('mainPane').innerHTML = h || `<p>No history.</p>`;
 }
 
 function deleteMatch(id) { if(confirm("Permanently delete this match data?")) db.collection('eliteGames').doc(id).delete(); }
@@ -502,7 +514,7 @@ function resume(id) { state = savedGames.find(g => g.id === id); currentScreen =
 function renderReports() {
     let fin = savedGames.filter(g => g.winner);
     let h = `<h2>Reports</h2><table><tr><th>Match</th><th>Download</th></tr>`;
-    fin.forEach(g => h += `<tr><td>${g.name}</td><td><button onclick="genPDF('${g.id}')">PDF</button></td></tr>`);
+    fin.forEach(g => h += `<tr><td>${g.name}</td><td><button onclick="genPDF('${g.id}')">PDF Report</button></td></tr>`);
     document.getElementById('mainPane').innerHTML = h + `</table>`;
 }
 
@@ -511,7 +523,10 @@ function genPDF(id) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     doc.text(`Match Report: ${g.name}`, 14, 15);
-    doc.autoTable({ head:[['Round', ...g.players]], body: g.history.map(r => [r.round, ...g.players.map(p => r.scores[p])]), startY: 25 });
+    const body = g.history.map(r => [r.round, ...g.players.map(p => r.scores[p] || '-')]);
+    const finalRow = ['TOTAL', ...g.players.map(p => g.totals[p] || '0')];
+    body.push(finalRow);
+    doc.autoTable({ head:[['Round', ...g.players]], body: body, startY: 25 });
     doc.save(`Report_${g.name}.pdf`);
 }
 
@@ -541,6 +556,11 @@ function viewProfile(uid) {
     document.getElementById('profileModal').style.display = 'flex';
 }
 function viewMyProfile() { if(auth.currentUser) viewProfile(auth.currentUser.uid); }
+function renderPlayers() {
+    let h = `<h2>Players List</h2><table>`;
+    playersDb.forEach(p => h += `<tr><td><span class="status-dot ${p.isOnline?'online':'offline'}"></span> ${p.fullName}</td><td><button onclick="viewProfile('${p.id}')">View Profile</button></td></tr>`);
+    document.getElementById('mainPane').innerHTML = h + `</table>`;
+}
 </script>
 </body>
 </html>
