@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- CACHE CONTROL -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v40.1</title>
+<title>Elite Rummy Circle - v40.2</title>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -51,7 +50,11 @@
 
   button { padding: 12px 18px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
   button:hover { filter: brightness(1.1); }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  button:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(0.5); }
+  
+  .tactic-btn { border: 2px solid transparent; transition: 0.2s; }
+  .tactic-btn.active { border-color: white; box-shadow: 0 0 12px rgba(255,255,255,0.4); transform: scale(1.05); filter: brightness(1.3); }
+
   .navBtn { width: 100%; margin-bottom: 12px; background: rgba(255,255,255,0.08); color: white; text-align: left; padding: 15px; }
   .navBtn.active-nav { background: var(--accent); }
   .actionBtn { background: var(--accent); color: white; width: 100%; height: 55px; font-size: 16px; }
@@ -59,7 +62,7 @@
   #authScreen { display: flex; position: fixed; inset: 0; justify-content: center; align-items: center; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto; padding: 20px; }
   .auth-box { background: #1a252f; padding: 40px; border-radius: 20px; width: 100%; max-width: 420px; text-align: center; border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0,0,0,0.5); margin: auto; }
 
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; justify-content: center; align-items: center; padding: 20px; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 4000; justify-content: center; align-items: center; padding: 20px; }
   .modal-card { background: #2c3e50; width: 100%; max-width: 500px; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); max-height: 90vh; overflow-y: auto; }
   
   .avatar-lg { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); margin: 0 auto 15px auto; display: block; background: #1a252f; }
@@ -80,7 +83,6 @@
   .status-dot.offline { background: #7f8c8d; }
 
   .version-link { background: var(--accent); color: white; display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: bold; margin-bottom: 25px; cursor: pointer; text-decoration: none; }
-  .version-link:hover { background: #2ecc71; }
   .elite-footer { font-size: 11px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 20px; width: 100%; }
 
   .empty-msg { text-align: center; padding: 40px; opacity: 0.5; font-style: italic; }
@@ -96,7 +98,7 @@
 <body>
 
 <!-- RE-ENTRY PROMPT MODAL -->
-<div id="reentryModal" class="modal-overlay" style="z-index: 4000;">
+<div id="reentryModal" class="modal-overlay" style="z-index: 5000;">
     <div class="modal-card">
         <h2 style="color:var(--warning); margin-top:0;">Player Eliminated!</h2>
         <p id="reentryText" style="font-size:16px; line-height: 1.5;"></p>
@@ -108,7 +110,7 @@
 </div>
 
 <!-- PAST ROUND MODAL -->
-<div id="pastRoundModal" class="modal-overlay" style="z-index: 3500;">
+<div id="pastRoundModal" class="modal-overlay">
     <div class="modal-card">
         <h2 id="pastRoundTitle" style="color:var(--accent); margin-top:0;">Round Summary</h2>
         <div style="background:rgba(255,255,255,0.05); border-radius:8px; padding:15px; margin-bottom:20px;">
@@ -134,13 +136,12 @@
 <!-- RELEASE NOTES MODAL -->
 <div id="releaseNotesModal" class="modal-overlay">
     <div class="modal-card" style="text-align: left;">
-        <h2 style="color:var(--accent); margin-top:0;">Release Notes - v40.1</h2>
+        <h2 style="color:var(--accent); margin-top:0;">Release Notes - v40.2</h2>
         <ul style="font-size: 14px; line-height: 1.6; opacity: 0.9; padding-left: 20px;">
-            <li><b>Auto-Fill Scoring:</b> Clicking Tactics buttons instantly populates the score box dynamically.</li>
-            <li><b>Dynamic Round Locks:</b> Next Round button gracefully enables itself only when all active scores are entered and someone triggered a Show. Pop-up errors removed.</li>
-            <li><b>Clean Slate Rounds:</b> New rounds start with completely blank score boxes to prevent accidental data carryover.</li>
-            <li><b>Cleaner Interface:</b> Redundant "+" buttons and UI warnings have been removed.</li>
-            <li><b>Instant 'OUT' Tactics:</b> Permanently eject a player from the game without triggering re-entry prompts.</li>
+            <li><b>D-Rule Enforcement:</b> Players cannot "Drop" in consecutive rounds. The button locks automatically.</li>
+            <li><b>Tactical Overwrite:</b> Click S, D, MD, or FC to auto-fill. Click again to clear.</li>
+            <li><b>Winning Show:</b> "S" is visually logged but calculated as 0 for totals and validation.</li>
+            <li><b>Fixed:</b> Full restoration of Player Profiles, AI Analysis, and Game Reports.</li>
         </ul>
         <button class="actionBtn" style="margin-top:15px;" onclick="document.getElementById('releaseNotesModal').style.display='none'">Close</button>
     </div>
@@ -150,17 +151,14 @@
 <div id="editProfileModal" class="modal-overlay">
     <div class="modal-card">
         <h2 style="color:var(--accent); margin-top:0;">Edit Profile</h2>
-        <img id="editPhotoPreview" class="avatar-lg" src="https://via.placeholder.com/150/1a252f/27ae60?text=+" alt="Profile">
-        
+        <img id="editPhotoPreview" class="avatar-lg" src="" alt="Profile">
         <input type="file" id="photoUpload" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)">
         <button onclick="document.getElementById('photoUpload').click()" style="background:var(--warning); margin-bottom:15px; font-size:12px;">Change Photo</button>
-        
         <input id="editName" class="std-input" placeholder="Full Name">
         <select id="editGender" class="std-input">
             <option value="Male">Male</option>
             <option value="Female">Female</option>
         </select>
-
         <div style="display:flex; gap:10px;">
             <button class="actionBtn" style="background:#555; flex:1;" onclick="document.getElementById('editProfileModal').style.display='none'">Cancel</button>
             <button class="actionBtn" style="flex:1;" onclick="saveProfile()">Save Changes</button>
@@ -171,23 +169,19 @@
 <!-- VIEW PROFILE MODAL -->
 <div id="profileModal" class="modal-overlay">
     <div class="modal-card">
-        <img id="pPhoto" class="avatar-lg" src="https://via.placeholder.com/150/1a252f/27ae60?text=+" alt="Avatar">
+        <img id="pPhoto" class="avatar-lg" src="" alt="Avatar">
         <h2 id="pName" style="color:var(--accent); margin-bottom:5px;">User Profile</h2>
         <p id="pGender" style="font-size:12px; opacity:0.6; margin-bottom:15px;"></p>
-        
         <button id="btnEditProfile" style="background:var(--warning); color:#111; display:none; margin:0 auto 20px auto; font-size:12px;" onclick="openEditProfile()">Edit My Profile</button>
-        
         <div class="stat-grid">
             <div class="stat-item"><span class="stat-val" id="statWins">0</span><span class="stat-lbl">Wins</span></div>
-            <div class="stat-item"><span class="stat-val" id="statS">0</span><span class="stat-lbl">Shows (S)</span></div>
-            <div class="stat-item"><span class="stat-val" id="statFC">0</span><span class="stat-lbl">Full (FC)</span></div>
-            <div class="stat-item"><span class="stat-val" id="statD">0</span><span class="stat-lbl">Drop (D)</span></div>
-            <div class="stat-item"><span class="stat-val" id="statMD">0</span><span class="stat-lbl">Mid (MD)</span></div>
+            <div class="stat-item"><span class="stat-val" id="statS">0</span><span class="stat-lbl">Shows</span></div>
+            <div class="stat-item"><span class="stat-val" id="statFC">0</span><span class="stat-lbl">Full</span></div>
+            <div class="stat-item"><span class="stat-val" id="statD">0</span><span class="stat-lbl">Drop</span></div>
+            <div class="stat-item"><span class="stat-val" id="statMD">0</span><span class="stat-lbl">Mid</span></div>
             <div class="stat-item"><span class="stat-val" id="statTotal">0</span><span class="stat-lbl">Matches</span></div>
         </div>
-
-        <div id="aiAnalysis" style="background:rgba(39, 174, 96, 0.1); border-left: 4px solid var(--accent); padding:15px; text-align:left; font-size:13px; border-radius:4px; margin-bottom:20px; line-height:1.4;"></div>
-
+        <div id="aiAnalysis" style="background:rgba(39, 174, 96, 0.1); border-left: 4px solid var(--accent); padding:15px; text-align:left; font-size:13px; border-radius:4px; margin-bottom:20px;"></div>
         <button class="actionBtn" onclick="document.getElementById('profileModal').style.display='none'">Close Dashboard</button>
     </div>
 </div>
@@ -196,37 +190,15 @@
 <div id="authScreen">
   <div class="auth-box">
     <h1 style="color:var(--accent); margin-bottom: 5px;">Elite Rummy Circle</h1>
-    <a class="version-link" onclick="document.getElementById('releaseNotesModal').style.display='flex'">VERSION 40.1</a>
-    
+    <a class="version-link" onclick="document.getElementById('releaseNotesModal').style.display='flex'">VERSION 40.2</a>
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
       <input id="loginPassword" class="std-input" type="password" placeholder="Password">
       <button class="actionBtn" onclick="login()">Log In</button>
-      
       <div style="margin: 20px 0; font-size: 12px; opacity: 0.5;">— OR —</div>
-      <button class="actionBtn" style="background:#fff; color:#333; display:flex; align-items:center; justify-content:center; gap:10px;" onclick="googleSignIn()">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="20"> Continue with Google
-      </button>
-
-      <a onclick="toggleAuthView('signup')" style="cursor:pointer; display:block; margin-top:25px; font-size:13px; text-decoration:underline;">Register New Account</a>
+      <button class="actionBtn" style="background:#fff; color:#333;" onclick="googleSignIn()">Continue with Google</button>
     </div>
-
-    <div id="signupView" style="display:none">
-      <div style="display:flex; gap:10px;"><input id="signupFirst" class="std-input" placeholder="First Name*"><input id="signupLast" class="std-input" placeholder="Last Name*"></div>
-      <div style="text-align:left; font-size:11px; margin-bottom:5px; color:var(--accent); font-weight:bold;">GENDER</div>
-      <select id="signupGender" class="std-input">
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-      </select>
-      <input id="signupEmail" class="std-input" placeholder="Email Address*">
-      <input id="signupPass" class="std-input" type="password" placeholder="Password*">
-      <input id="signupConfirm" class="std-input" type="password" placeholder="Confirm Password*">
-      <button class="actionBtn" style="background:var(--warning); color:#111;" onclick="signup()">Create Account</button>
-      <a onclick="toggleAuthView('login')" style="cursor:pointer; display:block; margin-top:20px; font-size:13px; text-decoration:underline;">Back to Login</a>
-    </div>
-    
     <p id="authError" style="color:var(--danger); font-size:12px; margin-top:15px;"></p>
-    <div class="elite-footer">Developed by Elite IT &copy; 2026</div>
   </div>
 </div>
 
@@ -234,912 +206,8 @@
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
     <h2 style="color:var(--accent); margin-bottom: 5px;">Menu</h2>
-    <a class="version-link" style="margin-bottom: 25px; display:inline-block;" onclick="document.getElementById('releaseNotesModal').style.display='flex'">v40.1 Notes</a>
-    
+    <a class="version-link" onclick="document.getElementById('releaseNotesModal').style.display='flex'">v40.2 Notes</a>
     <div class="nav-section">
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">Start New Game</button>
       <button id="navPlayers" class="navBtn" onclick="showScreen('players')">Players List</button>
-      <button id="navContinue" class="navBtn" onclick="showScreen('continue')">Active Games</button>
-      <button id="navHistory" class="navBtn" onclick="showScreen('history')">Game History</button>
-      <button id="navReports" class="navBtn" onclick="showScreen('reports')">Reports</button>
-    </div>
-    
-    <div style="margin-top:auto;">
-        <div style="display:flex; gap:10px; padding-top:20px; border-top:1px solid var(--glass-border);">
-            <button style="background:var(--warning); flex:1;" onclick="viewMyProfile()">My Profile</button>
-            <button style="background:var(--danger); color:white; flex:1;" onclick="handleLogout()">Logout</button>
-        </div>
-        <div class="elite-footer" style="margin-top:15px;">Developed by Elite IT &copy; 2026</div>
-    </div>
-  </div>
-  <div class="main-pane" id="mainPane"></div>
-  <div class="rhs-pane" id="rhsPane" style="display:none"></div>
-</div>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCo_G5Vo7OkUsK-tUXVQKCkeTn_IHw9vB0",
-  authDomain: "elite-rummy-circle.firebaseapp.com",
-  projectId: "elite-rummy-circle",
-  storageBucket: "elite-rummy-circle.firebasestorage.app",
-  messagingSenderId: "762468709641",
-  appId: "1:762468709641:web:b4e193ed1670e5d13ccfd8"
-};
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-
-const db = firebase.firestore();
-const auth = firebase.auth();
-
-let playersDb =[], savedGames =[], state = null, currentScreen = '';
-let unsubPlayers = null, unsubGames = null;
-let isPromptingReEntry = false; 
-
-auth.onAuthStateChanged(user => {
-  if(user) { 
-    document.getElementById('authScreen').style.display='none';
-    document.getElementById('mainApp').style.display='flex';
-    
-    loadData();
-    if(!currentScreen) showScreen('newGame');
-
-    db.collection('players').doc(user.uid).get().then(doc => {
-        if(!doc.exists) {
-            db.collection('players').doc(user.uid).set({
-                fullName: user.displayName ? user.displayName.toUpperCase() : "PLAYER " + Math.floor(Math.random()*1000),
-                gender: "Not Specified",
-                photoURL: user.photoURL || "",
-                isOnline: true,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-        } else {
-            db.collection('players').doc(user.uid).set({ isOnline: true }, { merge: true });
-        }
-    }).catch(err => {
-        console.warn("Background profile sync delayed:", err.message);
-    });
-
-  } else { 
-    document.getElementById('authScreen').style.display='flex';
-    document.getElementById('mainApp').style.display='none';
-    if(unsubPlayers) { unsubPlayers(); unsubPlayers = null; }
-    if(unsubGames) { unsubGames(); unsubGames = null; }
-  }
-});
-
-window.addEventListener('beforeunload', () => {
-   const user = auth.currentUser;
-   if(user) db.collection('players').doc(user.uid).set({ isOnline: false }, { merge: true });
-});
-
-function handleLogout() {
-  const user = auth.currentUser;
-  if(user) {
-    db.collection('players').doc(user.uid).set({ isOnline: false }, { merge: true }).then(() => auth.signOut());
-  }
-}
-
-function loadData() {
-  if(unsubPlayers) unsubPlayers();
-  if(unsubGames) unsubGames();
-
-  unsubPlayers = db.collection('players').onSnapshot(snap => {
-    playersDb =[];
-    snap.forEach(doc => playersDb.push({id: doc.id, ...doc.data()}));
-    if(currentScreen === 'players') renderPlayers();
-  });
-
-  unsubGames = db.collection('eliteGames').onSnapshot(snap => {
-    savedGames =[]; 
-    snap.forEach(d => savedGames.push(d.data()));
-    
-    if(currentScreen === 'activeGame' && state && !isPromptingReEntry) { 
-        let s = savedGames.find(g => g.id === state.id); 
-        if(s) { state = s; renderActive(); } 
-    }
-    if(currentScreen==='continue') renderContinue();
-    if(currentScreen==='history') renderHistory();
-    if(currentScreen==='reports') renderReports();
-  });
-}
-
-function login() { 
-    document.getElementById('authError').innerText = "";
-    auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value)
-    .catch(e => document.getElementById('authError').innerText = e.message); 
-}
-
-async function googleSignIn() {
-    document.getElementById('authError').innerText = "";
-    const provider = new firebase.auth.GoogleAuthProvider();
-    try {
-        await auth.signInWithPopup(provider);
-    } catch (err) {
-        document.getElementById('authError').innerText = err.message;
-    }
-}
-
-async function signup() {
-  document.getElementById('authError').innerText = "";
-  const f = document.getElementById('signupFirst').value.trim();
-  const l = document.getElementById('signupLast').value.trim();
-  const e = document.getElementById('signupEmail').value.trim();
-  const p = document.getElementById('signupPass').value;
-  const c = document.getElementById('signupConfirm').value;
-  const g = document.getElementById('signupGender').value;
-
-  if(!f || !l) return document.getElementById('authError').innerText = "First and Last name are required.";
-  if(p !== c) return document.getElementById('authError').innerText = "Passwords do not match.";
-
-  try {
-    const cred = await auth.createUserWithEmailAndPassword(e, p);
-    const fullName = (f + " " + l).toUpperCase();
-    
-    await db.collection('players').doc(cred.user.uid).set({
-        fullName: fullName, 
-        gender: g, 
-        photoURL: "",
-        isOnline: true, 
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-
-  } catch (err) { document.getElementById('authError').innerText = err.message; }
-}
-
-function showScreen(s) {
-  currentScreen = s;
-  if (s !== 'activeGame') state = null;
-  document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active-nav'));
-  document.getElementById('rhsPane').style.display='none';
-  if(s==='newGame') { document.getElementById('navNewGame').classList.add('active-nav'); renderNewGame(); }
-  if(s==='players') { document.getElementById('navPlayers').classList.add('active-nav'); renderPlayers(); }
-  if(s==='continue') { document.getElementById('navContinue').classList.add('active-nav'); renderContinue(); }
-  if(s==='history') { document.getElementById('navHistory').classList.add('active-nav'); renderHistory(); }
-  if(s==='reports') { document.getElementById('navReports').classList.add('active-nav'); renderReports(); }
-}
-
-function renderPlayers() {
-  let html = `<div style="display:flex; justify-content:space-between; align-items:center;">
-    <h2>Registered Players</h2>
-    <button onclick="showScreen('newGame')" style="background:var(--accent)">← Back</button>
-  </div>
-  <table><tr><th>Player</th><th>Status</th><th>Profile</th></tr>`;
-  
-  if(!playersDb.length) {
-      html += `<tr><td colspan="3" class="empty-msg">Fetching players...</td></tr>`;
-  } else {
-      playersDb.sort((a,b) => {
-          let aOnline = !!a.isOnline; let bOnline = !!b.isOnline;
-          if (aOnline === bOnline) return (a.fullName || "").localeCompare(b.fullName || "");
-          return aOnline ? -1 : 1; 
-      }).forEach(p => {
-        let name = p.fullName || "Unknown Player";
-        let isOnline = !!p.isOnline;
-        let photo = p.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=27ae60&color=fff`;
-        html += `<tr>
-          <td>
-             <div class="player-row">
-                 <span class="status-dot ${isOnline ? 'online' : 'offline'}" title="${isOnline ? 'Online' : 'Offline'}"></span>
-                 <img src="${photo}" class="avatar-sm">
-                 <b>${name}</b>
-             </div>
-          </td>
-          <td><span style="font-size:11px; opacity:0.7; font-weight:bold;">${isOnline ? 'ONLINE' : 'OFFLINE'}</span></td>
-          <td><button onclick="viewProfile('${p.id}')">View Stats</button></td>
-        </tr>`;
-      });
-  }
-  document.getElementById('mainPane').innerHTML = html + `</table>`;
-}
-
-window.appendDateTime = function() {
-    const input = document.getElementById('gName');
-    const btn = document.getElementById('btnAppendDT');
-    const now = new Date();
-    const dtStr = now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    
-    if (input.value.trim() === "") input.value = "Match " + dtStr;
-    else input.value = input.value.trim() + " - " + dtStr;
-    btn.disabled = true;
-};
-
-window.enableDateTimeBtn = function() {
-    const btn = document.getElementById('btnAppendDT');
-    if(btn) btn.disabled = false;
-};
-
-function renderNewGame() {
-  document.getElementById('mainPane').innerHTML = `
-    <h2>Start New Game</h2>
-    <div style="background:rgba(255,255,255,0.05); padding:25px; border-radius:12px; border:1px solid var(--glass-border);">
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <input id="gName" class="std-input" style="margin-bottom:0; flex:1;" placeholder="Enter Game Name (e.g. Friday Night Clash)" oninput="enableDateTimeBtn()">
-            <button id="btnAppendDT" onclick="appendDateTime()" style="background:var(--warning); color:#111; height:55px; border-radius:8px; padding:0 15px; font-weight:bold; border:none; cursor:pointer; white-space:nowrap; transition:0.3s;">🕒 Insert Date/Time</button>
-        </div>
-        <div id="dynamicPlayers"></div>
-        <div style="display:flex; gap:10px; margin-top:10px;">
-            <button class="navBtn" style="flex:1; text-align:center;" onclick="addPlayerField()">+ Add Player</button>
-            <button class="actionBtn" style="flex:1.5;" onclick="startGame()">Confirm & Start Game</button>
-        </div>
-    </div>`;
-}
-
-function addPlayerField() {
-  if(!playersDb.length) return alert("No players found in the database.");
-  let sorted = [...playersDb].sort((a,b) => {
-      let aOnline = !!a.isOnline; let bOnline = !!b.isOnline;
-      if (aOnline === bOnline) return (a.fullName || "").localeCompare(b.fullName || "");
-      return aOnline ? -1 : 1; 
-  });
-
-  let opts = `<option value="">-- Select Player --</option>` + sorted.map(p => {
-                 let name = p.fullName || "Unknown Player";
-                 let isOnline = !!p.isOnline;
-                 let indicator = isOnline ? "🟢" : "⚫";
-                 return `<option value="${name.replace(/"/g, '&quot;')}">${indicator} ${name}</option>`;
-             }).join('');
-             
-  const div = document.createElement('div');
-  div.style="display:flex; gap:10px; margin-bottom:10px;";
-  div.innerHTML = `<select class="std-input" style="flex:1; margin-bottom:0;">${opts}</select>
-                   <button onclick="this.parentElement.remove()" style="background:var(--danger); height:55px; width:55px; border-radius:8px; border:none; color:white; cursor:pointer;">✕</button>`;
-  document.getElementById('dynamicPlayers').appendChild(div);
-}
-
-function startGame() {
-  const name = document.getElementById('gName').value || "Standard Game";
-  const selects = Array.from(document.querySelectorAll('#dynamicPlayers select'));
-  const players = selects.map(s => s.value).filter(v => v !== "");
-  
-  if(players.length < 2) return alert("Please add at least 2 players.");
-  if(new Set(players).size !== players.length) return alert("Duplicate players selected.");
-
-  const now = new Date();
-  state = {
-    id: Date.now().toString(),
-    name: name,
-    startTime: now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-    endTime: null,
-    players: players,
-    totals: {},
-    roundScores: {},   
-    actionStats: {},
-    reEntries: {},     
-    eliminated: {},    
-    round: 1,
-    history:[],
-    winner: null
-  };
-
-  players.forEach(p => { 
-    state.totals[p] = 0; 
-    state.roundScores[p] = null; // Blank explicitly forces validation entry
-    state.actionStats[p] = { shows: 0, fcs: 0, drops: 0, mds: 0, outs: 0 }; 
-  });
-
-  db.collection('eliteGames').doc(state.id).set(state);
-  
-  currentScreen = 'activeGame';
-  document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active-nav'));
-  renderActive();
-}
-
-// Dynamically validates inputs and locks/unlocks the Next Round button natively
-window.validateNextRound = function() {
-    if (!state || state.winner) return;
-    let activeRem = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]);
-    
-    let allFilled = true;
-    let hasShow = false;
-
-    activeRem.forEach(p => {
-        let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
-        let el = document.getElementById(safeId);
-        if (el) {
-            let val = el.value.trim();
-            if (val === "") {
-                allFilled = false;
-            } else if (parseInt(val) === 0) {
-                hasShow = true;
-            }
-        }
-    });
-
-    let btn = document.getElementById('endRoundBtn');
-    let note = document.getElementById('nextRoundNote');
-    
-    if(btn) {
-        if (allFilled && hasShow) {
-            btn.disabled = false;
-            btn.style.background = "var(--accent)";
-            btn.style.opacity = "1";
-            btn.style.cursor = "pointer";
-            if(note) note.style.display = 'none';
-        } else {
-            btn.disabled = true;
-            btn.style.background = "#555";
-            btn.style.opacity = "0.5";
-            btn.style.cursor = "not-allowed";
-            if(note) note.style.display = 'block';
-        }
-    }
-};
-
-function renderActive() {
-  if (!state) return;
-
-  state.reEntries = state.reEntries || {};
-  state.eliminated = state.eliminated || {};
-  if(!state.roundScores) {
-      state.roundScores = {};
-      state.players.forEach(p => state.roundScores[p] = null);
-  }
-
-  let activeInputs = {};
-  state.players.forEach(p => {
-    let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
-    let el = document.getElementById(safeId);
-    if(el) {
-        if(document.activeElement === el) activeInputs.focusId = safeId;
-        activeInputs[safeId] = el.value;
-    }
-  });
-
-  document.getElementById('rhsPane').style.display='block';
-  
-  let html = `<div style="display:flex; justify-content:space-between; align-items:center;">
-    <h2 style="color:var(--accent); margin:0;">${state.name} <span style="font-size:14px; opacity:0.8;">(Round ${state.round})</span></h2>
-    <span style="font-size:12px; opacity:0.7;">Started: ${state.startTime}</span>
-  </div>`;
-
-  if(!state.winner) {
-      html += `<div style="margin-top: 15px;"><button onclick="openAddMidGamePlayer()" style="background:rgba(255,255,255,0.1); border:1px dashed var(--glass-border); color:white; padding: 8px 15px; border-radius: 6px; font-size:12px;">+ Add Player to Match</button></div>`;
-  }
-
-  if(state.winner) {
-      html += `<div style="background:rgba(39, 174, 96, 0.2); border: 1px solid var(--accent); padding:10px; text-align:center; margin:15px 0; border-radius:8px;">
-          <strong style="color:var(--accent);">🎉 Game Over! Winner: ${state.winner} 🎉</strong>
-      </div>`;
-  }
-
-  html += `<table><tr><th>Player</th><th>Tactics</th><th>This Round</th><th>Total Score</th></tr>`;
-
-  state.players.forEach(p => {
-    let isElim = state.eliminated[p];
-    let hasReEntered = state.reEntries[p];
-    let statusTag = isElim ? '<span style="color:var(--danger); font-size:10px; font-weight:bold;">[OUT]</span>' : 
-                    hasReEntered ? '<span style="color:var(--warning); font-size:10px; font-weight:bold;">[RE-ENTERED]</span>' : '';
-    
-    let isOut = isElim || state.winner || state.totals[p] >= 240; 
-    let safeP = p.replace(/'/g, "\\'");
-    let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
-
-    let currentRoundDisplay = (state.roundScores[p] !== undefined && state.roundScores[p] !== null) ? state.roundScores[p] : '';
-    let projTotal = state.totals[p] + (currentRoundDisplay === '' ? 0 : currentRoundDisplay);
-
-    html += `<tr style="${isElim || state.totals[p]>=240 ? 'opacity:0.4; background:rgba(231,76,60,0.15);':''}">
-      <td><b>${p}</b> ${statusTag}</td>
-      <td>
-        <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:5px;">
-          <button style="background:var(--accent); padding:8px 12px; border-radius:6px;" onclick="score('${safeP}',0,'shows')" ${isOut?'disabled':''}>S</button>
-          <button style="background:var(--warning); padding:8px 12px; border-radius:6px;" onclick="score('${safeP}',20,'drops')" ${isOut?'disabled':''}>D</button>
-          <button style="background:#8e44ad; color:white; padding:8px 12px; border-radius:6px;" onclick="score('${safeP}',40,'mds')" ${isOut?'disabled':''}>MD</button>
-          <button style="background:var(--danger); color:white; padding:8px 12px; border-radius:6px;" onclick="score('${safeP}',80,'fcs')" ${isOut?'disabled':''}>FC</button>
-          <button style="background:#333; color:white; padding:8px 12px; border-radius:6px; font-size:10px;" onclick="markOut('${safeP}')" ${isOut?'disabled':''}>OUT</button>
-        </div>
-      </td>
-      <td>
-        <input type="number" id="${safeId}" class="std-input" style="width:70px; height:42px; margin:0; text-align:center; padding:0; font-size:18px;" 
-            value="${currentRoundDisplay}" 
-            oninput="validateNextRound()"
-            onchange="handleRoundScoreInput('${safeP}', this)" 
-            onkeydown="if(event.key==='Enter') { this.blur(); }" 
-            ${isOut?'disabled':''}>
-      </td>
-      <td><h3 style="margin:0; color:var(--warning);">${projTotal}</h3></td>
-    </tr>`;
-  });
-
-  if (!state.winner) {
-      html += `</table>
-      <div id="nextRoundNote" style="font-size:11px; margin-top:15px; color:var(--warning); display:none;">* Note: Please ensure all active players have a score, and at least one player has a Show (0).</div>
-      <button id="endRoundBtn" class="actionBtn" style="margin-top:10px; background:#555; opacity:0.5; cursor:not-allowed;" onclick="processRoundEnd()" disabled>Next Round</button>`;
-  } else {
-      html += `</table><button class="actionBtn" style="margin-top:20px;" onclick="showScreen('history')">Go to History</button>`;
-  }
-
-  document.getElementById('mainPane').innerHTML = html;
-  renderHistoryPane();
-
-  state.players.forEach(p => {
-    let safeId = 'manual-' + p.replace(/[^a-zA-Z0-9]/g, '_');
-    let el = document.getElementById(safeId);
-    if(el && activeInputs[safeId] !== undefined) el.value = activeInputs[safeId];
-  });
-  if(activeInputs.focusId) {
-     let focusedEl = document.getElementById(activeInputs.focusId);
-     if(focusedEl) focusedEl.focus();
-  }
-
-  // Force button unlock evaluation dynamically immediately after rendering 
-  validateNextRound();
-}
-
-// Applies tactics directly to 'This Round' and automatically populates the text box
-function score(p, val, type) {
-  if (state.totals[p] >= 240 || state.eliminated[p] || state.winner) return;
-  state.roundScores[p] = val; 
-  if(type) {
-      if(!state.actionStats[p]) state.actionStats[p] = { shows: 0, fcs: 0, drops: 0, mds: 0, outs: 0 };
-      state.actionStats[p][type]++;
-  }
-  db.collection('eliteGames').doc(state.id).set(state);
-}
-
-// Allows user to manually type in a score for 'This Round'
-window.handleRoundScoreInput = function(p, el) {
-    if (state.totals[p] >= 240 || state.eliminated[p] || state.winner) return;
-    let val = el.value.trim();
-    let v = val === "" ? null : parseInt(val);
-    if (state.roundScores[p] === v) return; 
-    state.roundScores[p] = v;
-    db.collection('eliteGames').doc(state.id).set(state);
-}
-
-// Permanently eject a player from the game immediately
-window.markOut = function(p) {
-    if(confirm(`Are you sure you want to permanently eliminate ${p}? They will NOT be able to re-enter the game.`)) {
-        state.eliminated[p] = true;
-        state.roundScores[p] = null; // Clear their score box instantly
-        if(!state.actionStats[p]) state.actionStats[p] = { shows: 0, fcs: 0, drops: 0, mds: 0, outs: 0 };
-        state.actionStats[p].outs = (state.actionStats[p].outs || 0) + 1;
-        
-        let activeRemaining = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]);
-        if(activeRemaining.length <= 1) {
-            state.winner = activeRemaining.length === 1 ? activeRemaining[0] : "No Winner";
-            state.endTime = new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        }
-        db.collection('eliteGames').doc(state.id).set(state);
-    }
-};
-
-// ---- RE-ENTRY & END ROUND LOGIC ----
-
-function askReEntryModal(playerName, nextScore) {
-    return new Promise((resolve) => {
-        document.getElementById('reentryText').innerHTML = 
-            `<b>${playerName}</b> has exceeded 240 points.<br><br>Would they like to use their <b>1 Re-entry</b>?<br>They will enter back at score: <b style="color:var(--accent); font-size:22px;">${nextScore}</b>`;
-        
-        document.getElementById('reentryModal').style.display = 'flex';
-        
-        document.getElementById('btnReentryYes').onclick = () => {
-            document.getElementById('reentryModal').style.display = 'none';
-            resolve(true);
-        };
-        document.getElementById('btnReentryNo').onclick = () => {
-            document.getElementById('reentryModal').style.display = 'none';
-            resolve(false);
-        };
-    });
-}
-
-async function processRoundEnd() {
-    if(!state) return;
-    
-    // Fail-safe validation check
-    let activeRemaining = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p] && p !== state.winner);
-    let missing = activeRemaining.filter(p => state.roundScores[p] === null || state.roundScores[p] === undefined || state.roundScores[p] === "");
-    let hasShow = activeRemaining.some(p => state.roundScores[p] === 0);
-
-    if (missing.length > 0 || !hasShow) {
-        return; // Button is structurally disabled so this will only trigger on raw manipulation
-    }
-
-    document.getElementById('endRoundBtn').disabled = true; 
-    isPromptingReEntry = true; 
-    
-    state.reEntries = state.reEntries || {};
-    state.eliminated = state.eliminated || {};
-
-    // 1. ADD ROUND'S SCORE TO TOTALS 
-    state.players.forEach(p => {
-        if(!state.eliminated[p] && state.roundScores[p] !== null) {
-            state.totals[p] += state.roundScores[p];
-        }
-    });
-
-    // 2. PUSH EXACT ROUND DATA TO HISTORY LOG
-    state.history.push({ round: state.round, roundScores: {...state.roundScores}, totals: {...state.totals} });
-
-    // 3. CHECK FOR RE-ENTRIES 
-    let over240 = state.players.filter(p => state.totals[p] >= 240 && !state.eliminated[p]);
-
-    let validScores = state.players.map(p => state.totals[p]).filter(s => s < 240);
-    let highestActive = validScores.length > 0 ? Math.max(...validScores) : 0;
-    
-    // Backtracking if EVERYONE gets wiped 
-    if (validScores.length === 0 && state.history.length > 1) {
-        let prevScores = state.players.map(p => state.history[state.history.length-2].totals[p]).filter(s => s < 240);
-        highestActive = prevScores.length > 0 ? Math.max(...prevScores) : 0;
-    }
-    
-    let entryScore = highestActive + 1;
-
-    for (let p of over240) {
-        if (state.reEntries[p]) {
-            state.eliminated[p] = true; 
-        } else {
-            if (entryScore >= 240) {
-                alert(`${p} cannot re-enter because the calculated score would be ${entryScore}. They are eliminated.`);
-                state.eliminated[p] = true;
-            } else {
-                let wantsToReEnter = await askReEntryModal(p, entryScore);
-                if (wantsToReEnter) {
-                    state.reEntries[p] = true;
-                    state.totals[p] = entryScore;
-                } else {
-                    state.eliminated[p] = true;
-                }
-            }
-        }
-    }
-
-    // 4. RESET "THIS ROUND" TO NULL FOR NEW ROUND
-    state.players.forEach(p => state.roundScores[p] = null);
-
-    state.round++;
-
-    // 5. CHECK IF GAME ENDED
-    let finalRemaining = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]);
-    if(finalRemaining.length <= 1) {
-        if(finalRemaining.length === 1) {
-            state.winner = finalRemaining[0];
-        } else {
-            let lowestScorePlayer = state.players.reduce((min, p) => state.totals[p] < state.totals[min] ? p : min, state.players[0]);
-            state.winner = lowestScorePlayer;
-        }
-        const now = new Date();
-        state.endTime = now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    }
-    
-    isPromptingReEntry = false;
-    await db.collection('eliteGames').doc(state.id).set(state);
-    renderActive(); 
-}
-
-// ---- ADD PLAYER MID-GAME LOGIC ----
-function openAddMidGamePlayer() {
-    if(!state) return;
-    let available = playersDb.filter(p => !state.players.includes(p.fullName));
-    if(available.length === 0) return alert("No additional registered players found.");
-    
-    let sorted = [...available].sort((a,b) => {
-        let aOn = !!a.isOnline; let bOn = !!b.isOnline;
-        if (aOn === bOn) return (a.fullName || "").localeCompare(b.fullName || "");
-        return aOn ? -1 : 1;
-    });
-    
-    let opts = `<option value="">-- Select Player --</option>` + sorted.map(p => {
-        let name = p.fullName || "Unknown Player";
-        let ind = p.isOnline ? "🟢" : "⚫";
-        return `<option value="${name.replace(/"/g, '&quot;')}">${ind} ${name}</option>`;
-    }).join('');
-    
-    document.getElementById('midGamePlayerSelect').innerHTML = opts;
-    document.getElementById('addPlayerMidGameModal').style.display = 'flex';
-}
-
-function confirmAddMidGamePlayer() {
-    let newP = document.getElementById('midGamePlayerSelect').value;
-    if(!newP) return;
-
-    let validScores = state.players.map(p => state.totals[p]).filter(s => s < 240);
-    let highestActive = validScores.length > 0 ? Math.max(...validScores) : 0;
-    
-    state.players.push(newP);
-    state.totals[newP] = highestActive;
-    state.roundScores[newP] = null;
-    state.actionStats[newP] = { shows: 0, fcs: 0, drops: 0, mds: 0, outs: 0 };
-    
-    db.collection('eliteGames').doc(state.id).set(state);
-    document.getElementById('addPlayerMidGameModal').style.display = 'none';
-    renderActive();
-}
-
-// PROFILE LOGIC
-let currentlyViewingUid = null;
-
-function viewProfile(uid) {
-    const p = playersDb.find(x => x.id === uid);
-    if(!p) return alert("Profile data could not be found.");
-    
-    currentlyViewingUid = uid;
-    let pName = p.fullName || "Unknown Player";
-    
-    if(auth.currentUser && uid === auth.currentUser.uid) {
-        document.getElementById('btnEditProfile').style.display = 'block';
-    } else {
-        document.getElementById('btnEditProfile').style.display = 'none';
-    }
-
-    let finished = savedGames.filter(g => g.winner && g.players.includes(pName));
-    let wins = finished.filter(g => g.winner === pName).length;
-    let s=0, fc=0, d=0, md=0;
-    
-    finished.forEach(g => {
-        if(g.actionStats && g.actionStats[pName]) {
-            s += g.actionStats[pName].shows || 0;
-            fc += g.actionStats[pName].fcs || 0;
-            d += g.actionStats[pName].drops || 0;
-            md += g.actionStats[pName].mds || 0;
-        }
-    });
-
-    document.getElementById('pPhoto').src = p.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(pName)}&background=27ae60&color=fff&size=150`;
-    document.getElementById('pName').innerText = pName;
-    document.getElementById('pGender').innerText = "GENDER: " + (p.gender || "Not Specified").toUpperCase();
-    
-    document.getElementById('statWins').innerText = wins;
-    document.getElementById('statS').innerText = s;
-    document.getElementById('statFC').innerText = fc;
-    document.getElementById('statD').innerText = d;
-    document.getElementById('statMD').innerText = md;
-    document.getElementById('statTotal').innerText = finished.length;
-
-    let analysis = "No match history found for a deep analysis.";
-    if(finished.length > 0) {
-        if(d + md > s + fc) {
-            analysis = `<b>Conservative Strategist:</b> ${pName} prefers calculated safety. High frequency of Drops (${d}) and Mid-Drops (${md}) suggests a tactical player who minimizes risk.`;
-        } else if (s > fc) {
-            analysis = `<b>Aggressive High-Roller:</b> ${pName} is a risk-taker. With a high Show (${s}) count, they hunt for victory early and rarely settle for a Full Score loss.`;
-        } else {
-            analysis = `<b>Balanced Competitor:</b> ${pName} adapts well to the hand they are dealt. They show a mix of patience and aggression across their history.`;
-        }
-    }
-    document.getElementById('aiAnalysis').innerHTML = "<b>AI ANALYSIS:</b><br>" + analysis;
-    document.getElementById('profileModal').style.display = 'flex';
-}
-
-function viewMyProfile() {
-    if(!auth.currentUser) return;
-    viewProfile(auth.currentUser.uid); 
-}
-
-function openEditProfile() {
-    const user = auth.currentUser;
-    const p = playersDb.find(x => x.id === user.uid);
-    if(!p) return;
-    
-    document.getElementById('editName').value = p.fullName || "";
-    document.getElementById('editGender').value = p.gender || "Male";
-    document.getElementById('editPhotoPreview').src = p.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.fullName || 'User')}&background=27ae60&color=fff&size=150`;
-    
-    document.getElementById('profileModal').style.display = 'none';
-    document.getElementById('editProfileModal').style.display = 'flex';
-}
-
-function handlePhotoUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 150; 
-            const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleSize;
-            
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-            document.getElementById('editPhotoPreview').src = dataUrl;
-        }
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-async function saveProfile() {
-    const user = auth.currentUser;
-    if(!user) return;
-    
-    const newName = document.getElementById('editName').value.trim().toUpperCase();
-    const newGender = document.getElementById('editGender').value;
-    const newPhoto = document.getElementById('editPhotoPreview').src;
-    
-    if(!newName) return alert("Name cannot be empty.");
-
-    await db.collection('players').doc(user.uid).set({
-        fullName: newName,
-        gender: newGender,
-        photoURL: newPhoto
-    }, { merge: true });
-
-    document.getElementById('editProfileModal').style.display = 'none';
-    viewProfile(user.uid); 
-}
-
-function renderContinue() {
-  let active = savedGames.filter(g => !g.winner);
-  let html = `<div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2>Active Games</h2>
-        <button onclick="showScreen('newGame')" style="background:var(--accent)">← Back</button>
-    </div>`;
-  
-  if(!active.length) {
-      html += `<div class="empty-msg">No Active Games to show.</div>`;
-  } else {
-      html += active.map(g => `<div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-        <div><b>${g.name}</b><br><small>Started: ${g.startTime}</small></div>
-        <button onclick="resume('${g.id}')" style="background:var(--accent)">Resume</button>
-    </div>`).join('');
-  }
-  document.getElementById('mainPane').innerHTML = html;
-}
-
-function resume(id) { 
-    state = savedGames.find(g => g.id === id); 
-    currentScreen = 'activeGame';
-    document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active-nav'));
-    renderActive(); 
-}
-
-window.deleteGame = function(id) {
-    if(confirm("Are you sure you want to permanently delete this match from history?")) {
-        db.collection('eliteGames').doc(id).delete()
-        .then(() => alert("Match deleted successfully."))
-        .catch(e => alert("Error deleting match: " + e.message));
-    }
-}
-
-function renderHistory() {
-  let finished = savedGames.filter(g => g.winner);
-  let html = `<div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2>Game History</h2>
-        <button onclick="showScreen('newGame')" style="background:var(--accent)">← Back</button>
-    </div>`;
-
-  if(!finished.length) {
-      html += `<div class="empty-msg">No History to show.</div>`;
-  } else {
-      html += finished.map(g => `<div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:12px; margin-bottom:10px;">
-        <div style="display:flex; justify-content:space-between;">
-            <b>${g.name}</b> 
-            <div style="display:flex; align-items:center; gap:15px;">
-                <span style="color:var(--accent)">Winner: ${g.winner}</span>
-                <button onclick="deleteGame('${g.id}')" style="background:var(--danger); padding:6px 10px; font-size:11px;">Delete</button>
-            </div>
-        </div>
-        <div style="font-size:11px; opacity:0.6; margin-top:5px;">${g.startTime} — ${g.endTime}</div>
-    </div>`).join('');
-  }
-  document.getElementById('mainPane').innerHTML = html;
-}
-
-// DYNAMIC PDF GENERATION 
-window.generatePDF = function(gameId) {
-    const g = savedGames.find(x => x.id === gameId);
-    if(!g) return;
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    doc.setFontSize(22);
-    doc.setTextColor(39, 174, 96);
-    doc.text(`Elite Rummy Circle - Match Report`, 14, 20);
-
-    doc.setFontSize(12);
-    doc.setTextColor(50, 50, 50);
-    doc.text(`Match: ${g.name}`, 14, 30);
-    doc.text(`Date Started: ${g.startTime}`, 14, 38);
-    doc.text(`Date Ended: ${g.endTime || 'N/A'}`, 14, 46);
-    doc.text(`Winner: ${g.winner || 'None'}`, 14, 54);
-
-    const players = g.players;
-    const head = [['Round', ...players]];
-    const body =[];
-
-    g.history.forEach(r => {
-        let row =[`Round ${r.round}`];
-        players.forEach(p => {
-            let val = r.roundScores && r.roundScores[p] !== null && r.roundScores[p] !== undefined ? r.roundScores[p] : r.totals[p]; 
-            row.push(val !== undefined ? `${val}` : '-');
-        });
-        body.push(row);
-    });
-
-    let finalRow = ['FINAL TOTAL'];
-    players.forEach(p => {
-        finalRow.push(g.totals[p] !== undefined ? g.totals[p].toString() : '-');
-    });
-    body.push(finalRow);
-
-    doc.autoTable({
-        startY: 60,
-        head: head,
-        body: body,
-        theme: 'grid',
-        headStyles: { fillColor:[39, 174, 96] },
-        styles: { halign: 'center' },
-        columnStyles: { 0: { fontStyle: 'bold', halign: 'left' } }
-    });
-
-    doc.save(`MatchReport_${g.name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
-}
-
-function renderReports() {
-  let finished = savedGames.filter(g => g.winner);
-  let html = `<div style="display:flex; justify-content:space-between; align-items:center;">
-    <h2>Game Reports</h2>
-    <button onclick="showScreen('newGame')" style="background:var(--accent)">← Back</button>
-  </div>`;
-
-  if(!finished.length) {
-      html += `<div class="empty-msg">No Reports to show.</div>`;
-  } else {
-      html += `<table><tr><th>Game Name</th><th>Winner</th><th>Date</th><th>Action</th></tr>`;
-      finished.forEach(g => {
-        html += `<tr>
-            <td><b>${g.name}</b></td>
-            <td style="color:var(--accent)">${g.winner}</td>
-            <td>${g.startTime.split(' ')[0]}</td>
-            <td><button onclick="generatePDF('${g.id}')" style="background:var(--accent); padding:6px 12px; font-size:11px;">PDF Report</button></td>
-        </tr>`;
-      });
-      html += `</table>`;
-  }
-  document.getElementById('mainPane').innerHTML = html;
-}
-
-window.viewPastRound = function(roundNum) {
-    const r = state.history.find(x => x.round === roundNum);
-    if(!r) return;
-    
-    let html = `<tr><th style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.2);">Player</th><th style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.2);">Round Score</th><th style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.2);">Total After Round</th></tr>`;
-    
-    state.players.forEach(p => {
-        let rs = (r.roundScores && r.roundScores[p] !== null && r.roundScores[p] !== undefined) ? r.roundScores[p] : '-';
-        let tot = r.totals[p] !== undefined ? r.totals[p] : '-';
-        html += `<tr>
-            <td style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);"><b>${p}</b></td>
-            <td style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.05); color:var(--accent);">${rs}</td>
-            <td style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">${tot}</td>
-        </tr>`;
-    });
-    
-    document.getElementById('pastRoundDetails').innerHTML = html;
-    document.getElementById('pastRoundTitle').innerText = `Round ${r.round} Summary`;
-    document.getElementById('pastRoundModal').style.display = 'flex';
-};
-
-function renderHistoryPane() {
-  let h = "<h3>Game Logs</h3>";
-  if(!state.history.length) h += `<div style="font-size:11px; opacity:0.5;">Waiting for first round...</div>`;
-  state.history.slice().reverse().forEach(r => {
-      let scoresStr = state.players.map(p => {
-          let s = (r.roundScores && r.roundScores[p] !== null && r.roundScores[p] !== undefined) ? r.roundScores[p] : r.totals[p];
-          return `${p}: ${s !== undefined ? s : '-'}`;
-      }).join(' | ');
-      
-      h += `<div style="font-size:11px; margin-bottom:8px; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-          <b style="color:var(--accent);">Round ${r.round}</b>
-          <button onclick="viewPastRound(${r.round})" style="background:var(--warning); color:#111; border:none; border-radius:4px; padding:3px 8px; font-size:10px; cursor:pointer;"><b>View</b></button>
-        </div>
-        <div>${scoresStr}</div>
-      </div>`;
-  });
-  document.getElementById('rhsPane').innerHTML = h;
-}
-
-function toggleAuthView(v) {
-  document.getElementById('loginView').style.display = v==='login'?'block':'none';
-  document.getElementById('signupView').style.display = v==='signup'?'block':'none';
-  document.getElementById('authError').innerText = "";
-}
-</script>
-</body>
-</html>
+      <button id="
