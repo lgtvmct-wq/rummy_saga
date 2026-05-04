@@ -7,14 +7,14 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v40.5</title>
+<title>Elite Rummy Circle - v40.8</title>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
-<!-- PDF Generation Libraries -->
+<!-- PDF Generation -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
@@ -50,32 +50,40 @@
 
   button { padding: 12px 18px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
   button:hover { filter: brightness(1.1); }
-  button:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(0.8); }
+  button:disabled { opacity: 0.2; cursor: not-allowed; filter: grayscale(1); }
   
   .tactic-btn { border: 2px solid transparent; }
   .tactic-btn.active { border-color: white; box-shadow: 0 0 10px rgba(255,255,255,0.5); filter: brightness(1.3); }
 
   .dealer-badge { background: var(--warning); color: #000; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-right: 10px; box-shadow: 0 0 10px var(--warning); }
+  .reentry-tag { color: var(--warning); font-size: 10px; font-weight: bold; border: 1px solid var(--warning); padding: 1px 4px; border-radius: 3px; margin-left: 5px; }
 
   .navBtn { width: 100%; margin-bottom: 12px; background: rgba(255,255,255,0.08); color: white; text-align: left; padding: 15px; }
   .navBtn.active-nav { background: var(--accent); }
   .actionBtn { background: var(--accent); color: white; width: 100%; height: 55px; font-size: 16px; }
 
+  .version-link { background: var(--accent); color: white; display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: bold; margin-bottom: 25px; cursor: pointer; text-decoration: none; }
+
   #authScreen { display: flex; position: fixed; inset: 0; justify-content: center; align-items: center; background: rgba(0,0,0,0.8); z-index: 2000; padding: 20px; }
   .auth-box { background: #1a252f; padding: 40px; border-radius: 20px; width: 100%; max-width: 420px; text-align: center; border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
 
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 4000; justify-content: center; align-items: center; padding: 20px; }
-  .modal-card { background: #2c3e50; width: 100%; max-width: 500px; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); }
+  .modal-card { background: #2c3e50; width: 100%; max-width: 500px; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); overflow-y: auto; max-height: 90vh; }
   
   .avatar-sm { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid var(--accent); background: #1a252f; }
   .avatar-lg { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); margin-bottom: 15px; }
 
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 20px 0; }
+  .stat-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+  .stat-val { font-size: 18px; font-weight: bold; color: var(--accent); display: block; }
+  .stat-lbl { font-size: 10px; color: #aaa; text-transform: uppercase; }
+
   .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-  .online { background: #2ecc71; box-shadow: 0 0 5px #2ecc71; }
+  .online { background: #2ecc71; }
   .offline { background: #95a5a6; }
 
   table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-  th { text-align: left; padding: 12px; color: var(--accent); font-size: 11px; border-bottom: 2px solid var(--glass-border); }
+  th { text-align: left; padding: 12px; color: var(--accent); font-size: 11px; border-bottom: 2px solid var(--glass-border); text-transform: uppercase; }
   td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
   .elite-footer { font-size: 11px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 20px; width: 100%; }
@@ -87,10 +95,15 @@
 <div id="authScreen">
   <div class="auth-box">
     <h1 style="color:var(--accent); margin-bottom: 5px;">Elite Rummy Circle</h1>
+    <a class="version-link">VERSION 40.8</a>
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
       <input id="loginPassword" class="std-input" type="password" placeholder="Password">
       <button class="actionBtn" onclick="login()">Log In</button>
+      <div style="margin: 20px 0; font-size: 12px; opacity: 0.5;">— OR —</div>
+      <button class="actionBtn" style="background:#fff; color:#333; display:flex; align-items:center; justify-content:center; gap:10px;" onclick="googleSignIn()">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="20"> Continue with Google
+      </button>
       <p onclick="toggleAuthView('signup')" style="margin-top:25px; cursor:pointer; text-decoration:underline; font-size:13px;">Register New Account</p>
     </div>
     <div id="signupView" style="display:none">
@@ -122,7 +135,15 @@
     <div class="modal-card">
         <img id="pPhoto" class="avatar-lg" src="">
         <h2 id="pName" style="color:var(--accent); margin:0;"></h2>
-        <div id="aiAnalysis" style="font-size:12px; padding:15px; opacity:0.8;"></div>
+        <div class="stat-grid">
+            <div class="stat-item"><span class="stat-val" id="statWins">0</span><span class="stat-lbl">Wins</span></div>
+            <div class="stat-item"><span class="stat-val" id="statS">0</span><span class="stat-lbl">Shows</span></div>
+            <div class="stat-item"><span class="stat-val" id="statFC">0</span><span class="stat-lbl">Full</span></div>
+            <div class="stat-item"><span class="stat-val" id="statD">0</span><span class="stat-lbl">Drops</span></div>
+            <div class="stat-item"><span class="stat-val" id="statMD">0</span><span class="stat-lbl">Mid</span></div>
+            <div class="stat-item"><span class="stat-val" id="statTotal">0</span><span class="stat-lbl">Total</span></div>
+        </div>
+        <div id="aiAnalysis" style="background:rgba(39, 174, 96, 0.1); border-left: 4px solid var(--accent); padding:15px; text-align:left; font-size:13px; border-radius:4px; margin-bottom:20px;"></div>
         <button class="actionBtn" onclick="document.getElementById('profileModal').style.display='none'">Close</button>
     </div>
 </div>
@@ -130,7 +151,7 @@
 <!-- APP -->
 <div class="app-wrapper" id="mainApp">
   <div class="left-sidebar">
-    <h2 style="color:var(--accent)">Elite Rummy</h2>
+    <h2 style="color:var(--accent)">Elite Circle</h2>
     <div class="nav-section">
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">Start New Game</button>
       <button id="navPlayers" class="navBtn" onclick="showScreen('players')">Players List</button>
@@ -139,8 +160,9 @@
       <button id="navReports" class="navBtn" onclick="showScreen('reports')">Reports</button>
     </div>
     <div style="margin-top:auto;">
+        <button style="background:var(--warning); color:#111; width:100%; margin-bottom:10px;" onclick="viewMyProfile()">My Profile</button>
         <button style="background:var(--danger); color:white; width:100%;" onclick="handleLogout()">Logout</button>
-        <div class="elite-footer">Developed by Elite IT &copy; 2026</div>
+        <div class="elite-footer" style="margin-top:15px;">Elite IT &copy; 2026</div>
     </div>
   </div>
   <div class="main-pane" id="mainPane"></div>
@@ -148,6 +170,7 @@
 </div>
 
 <script>
+// INITIALIZATION
 const firebaseConfig = {
   apiKey: "AIzaSyCo_G5Vo7OkUsK-tUXVQKCkeTn_IHw9vB0",
   authDomain: "elite-rummy-circle.firebaseapp.com",
@@ -163,12 +186,12 @@ const auth = firebase.auth();
 let playersDb =[], savedGames =[], state = null, currentScreen = '';
 let isPromptingReEntry = false;
 
-// AUTH & ONLINE STATUS
+// AUTH
 auth.onAuthStateChanged(user => {
   if(user) {
     document.getElementById('authScreen').style.display='none';
     document.getElementById('mainApp').style.display='flex';
-    db.collection('players').doc(user.uid).update({ isOnline: true });
+    db.collection('players').doc(user.uid).set({ isOnline: true }, {merge:true});
     loadData();
     if(!currentScreen) showScreen('newGame');
   } else {
@@ -185,6 +208,11 @@ function toggleAuthView(v) {
 function login() {
   auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value)
   .catch(e => document.getElementById('authError').innerText = e.message);
+}
+
+async function googleSignIn() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(e => document.getElementById('authError').innerText = e.message);
 }
 
 async function signup() {
@@ -215,7 +243,45 @@ function loadData() {
   });
 }
 
-// SCREEN NAVIGATION
+// SCORING RULES
+function applyTactic(p, type) {
+    if (state.winner || state.eliminated[p]) return;
+    let newVal = null;
+    
+    if (type === 'S') {
+        // Clear winner from others
+        state.players.forEach(pl => { if(state.roundScores[pl] === 'S') state.roundScores[pl] = null; });
+        newVal = (state.roundScores[p] === 'S') ? null : 'S';
+    } 
+    else if (type === 'D') newVal = (state.roundScores[p] === 20) ? null : 20;
+    else if (type === 'MD') newVal = (state.roundScores[p] === 40) ? null : 40;
+    else if (type === 'FC') newVal = (state.roundScores[p] === 80) ? null : 80;
+
+    state.roundScores[p] = newVal;
+    db.collection('eliteGames').doc(state.id).update({ roundScores: state.roundScores });
+}
+
+function manualInput(p, val) {
+    if (state.winner || state.eliminated[p]) return;
+    let v = val.toUpperCase() === 'S' ? 'S' : (val === '' ? null : parseInt(val));
+    
+    if(v === 'S') {
+        state.players.forEach(pl => { if(state.roundScores[pl] === 'S') state.roundScores[pl] = null; });
+    }
+    state.roundScores[p] = v;
+    db.collection('eliteGames').doc(state.id).update({ roundScores: state.roundScores });
+}
+
+function markOutInstant(p) {
+    if(confirm(`Eject ${p} immediately? (240 points)`)) {
+        state.eliminated[p] = true;
+        state.totals[p] = 240;
+        state.roundScores[p] = 240;
+        db.collection('eliteGames').doc(state.id).set(state);
+    }
+}
+
+// NAVIGATION
 function showScreen(s) {
   currentScreen = s;
   document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active-nav'));
@@ -227,46 +293,60 @@ function showScreen(s) {
   if(s==='reports') renderReports();
 }
 
-// GAME SETUP (LOCK OFFLINE PLAYERS)
 function renderNewGame() {
   document.getElementById('mainPane').innerHTML = `
     <h2>New Match Setup</h2>
     <div style="display:flex; gap:10px; margin-bottom:15px;">
-        <input id="gName" class="std-input" style="flex:1; margin-bottom:0;" placeholder="Enter Match Name">
+        <input id="gName" class="std-input" style="flex:1; margin-bottom:0;" placeholder="Match Name">
         <button onclick="appendDateTime()" style="background:var(--warning); color:#111; height:55px;">🕒 Date/Time</button>
     </div>
     <div id="dynamicPlayers"></div>
     <button class="navBtn" onclick="addPlayerField()">+ Add Player</button>
-    <button class="actionBtn" onclick="startGame()">Randomize Seating & Start Match</button>
+    <button class="actionBtn" onclick="startGame()">Start (Seat Cut)</button>
     <div class="elite-footer">Developed by Elite IT &copy; 2026</div>`;
 }
 
 function appendDateTime() {
     const now = new Date();
-    const dtStr = now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    document.getElementById('gName').value += " " + dtStr;
+    document.getElementById('gName').value += " " + now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 }
 
 function addPlayerField() {
-  // Logic to show all but LOCK (disable) offline ones
+  const selected = Array.from(document.querySelectorAll('#dynamicPlayers select')).map(s => s.value);
   let opts = `<option value="">-- Select Player --</option>` + 
     playersDb.map(p => {
-        let status = p.isOnline ? 'ONLINE' : 'OFFLINE';
+        if(selected.includes(p.fullName)) return '';
         let disabled = p.isOnline ? '' : 'disabled';
-        return `<option value="${p.fullName}" ${disabled}>${p.fullName} (${status})</option>`;
+        return `<option value="${p.fullName}" ${disabled}>${p.fullName} (${p.isOnline?'ONLINE':'OFFLINE'})</option>`;
     }).join('');
 
   const div = document.createElement('div');
   div.style="display:flex; gap:10px; margin-bottom:10px;";
-  div.innerHTML = `<select class="std-input">${opts}</select><button onclick="this.parentElement.remove()" style="background:var(--danger)">✕</button>`;
+  div.innerHTML = `<select class="std-input" onchange="refreshSelections()">${opts}</select><button onclick="this.parentElement.remove(); refreshSelections();" style="background:var(--danger)">✕</button>`;
   document.getElementById('dynamicPlayers').appendChild(div);
+}
+
+function refreshSelections() {
+    const selects = Array.from(document.querySelectorAll('#dynamicPlayers select'));
+    const vals = selects.map(s => s.value);
+    selects.forEach((sel, i) => {
+        const cur = sel.value;
+        let h = `<option value="">-- Select Player --</option>`;
+        playersDb.forEach(p => {
+            if(!vals.includes(p.fullName) || cur === p.fullName) {
+                let disabled = p.isOnline ? '' : 'disabled';
+                h += `<option value="${p.fullName}" ${disabled} ${cur===p.fullName?'selected':''}>${p.fullName} (${p.isOnline?'ONLINE':'OFFLINE'})</option>`;
+            }
+        });
+        sel.innerHTML = h;
+    });
 }
 
 function startGame() {
   let pList = Array.from(document.querySelectorAll('#dynamicPlayers select')).map(s => s.value).filter(v => v !== "");
   if(pList.length < 2) return alert("Select at least 2 players");
 
-  // SEAT CUT (Shuffle)
+  // SHUFFLE (Seat Cut)
   for (let i = pList.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pList[i], pList[j]] = [pList[j], pList[i]];
@@ -286,7 +366,7 @@ function startGame() {
     round: 1, history: [], winner: null
   };
   pList.forEach(p => { 
-    state.totals[p] = 0; state.roundScores[p] = 0; 
+    state.totals[p] = 0; state.roundScores[p] = null; 
     state.lastDropRound[p] = -1;
     state.actionStats[p] = { shows: 0, fcs: 0, drops: 0, mds: 0 };
   });
@@ -295,32 +375,7 @@ function startGame() {
   renderActive();
 }
 
-// SCORING
-function applyTactic(p, type) {
-    if (state.winner || state.eliminated[p]) return;
-    let newVal = 0;
-    if (type === 'S') {
-        state.players.forEach(pl => { if(state.roundScores[pl] === 'S') state.roundScores[pl] = 0; });
-        newVal = (state.roundScores[p] === 'S') ? 0 : 'S';
-    } 
-    else if (type === 'D') newVal = (state.roundScores[p] === 20) ? 0 : 20;
-    else if (type === 'MD') newVal = (state.roundScores[p] === 40) ? 0 : 40;
-    else if (type === 'FC') newVal = (state.roundScores[p] === 80) ? 0 : 80;
-
-    state.roundScores[p] = newVal;
-    db.collection('eliteGames').doc(state.id).update({ roundScores: state.roundScores });
-}
-
-function markOutInstant(p) {
-    if(confirm(`Eject ${p} immediately? (Sets score to 240)`)) {
-        state.eliminated[p] = true;
-        state.totals[p] = 240;
-        state.roundScores[p] = 240;
-        db.collection('eliteGames').doc(state.id).set(state);
-    }
-}
-
-// ACTIVE GAME VIEW
+// ACTIVE GAME RENDER
 function renderActive() {
   if (!state) return;
   document.getElementById('rhsPane').style.display='block';
@@ -333,9 +388,10 @@ function renderActive() {
     let score = state.roundScores[p];
     let isOut = state.eliminated[p] || state.totals[p] >= 240;
     let dLocked = (state.lastDropRound[p] === (state.round - 1));
+    let hasRe = state.reEntries[p];
 
     h += `<tr style="${isOut?'opacity:0.4':''}">
-        <td>${p === dealerName ? '<span class="dealer-badge">🃏 DEALER</span>':''} <b>${p}</b></td>
+        <td>${p === dealerName ? '<span class="dealer-badge">🃏 DEALER</span>':''} <b>${p}</b> ${hasRe?'<span class="reentry-tag">RE-ENTERED</span>':''}</td>
         <td>
             <div style="display:flex; gap:4px;">
                 <button class="tactic-btn ${score==='S'?'active':''}" style="background:var(--accent)" onclick="applyTactic('${p.replace(/'/g,"\\'")}', 'S')" ${isOut?'disabled':''}>S</button>
@@ -345,18 +401,33 @@ function renderActive() {
                 <button style="background:#333; font-size:10px;" onclick="markOutInstant('${p.replace(/'/g,"\\'")}')" ${isOut?'disabled':''}>OUT</button>
             </div>
         </td>
-        <td><input class="std-input" style="width:55px; height:40px; margin:0; text-align:center;" value="${score}" readonly></td>
+        <td><input class="std-input" style="width:55px; height:40px; margin:0; text-align:center;" value="${score===null?'':score}" onchange="manualInput('${p.replace(/'/g,"\\'")}', this.value)" ${isOut?'disabled':''}></td>
         <td><b style="color:var(--warning)">${state.totals[p]}</b></td>
     </tr>`;
   });
 
-  if(!state.winner) h += `</table><button id="endBtn" class="actionBtn" style="margin-top:20px;" onclick="processRoundEnd()">Next Round</button>`;
-  else h += `</table><h2 style="color:var(--accent); text-align:center;">Winner: ${state.winner}</h2>`;
-
+  if(!state.winner) {
+      h += `</table><button id="endBtn" class="actionBtn" style="margin-top:20px;" onclick="processRoundEnd()">Next Round</button>`;
+  } else {
+      h += `</table><h2 style="color:var(--accent); text-align:center;">Winner: ${state.winner}</h2>`;
+  }
   document.getElementById('mainPane').innerHTML = h;
   renderHistoryPane();
-  let hasWin = state.players.some(p => state.roundScores[p] === 'S' || state.roundScores[p] === 0);
-  document.getElementById('endBtn').disabled = !hasWin;
+  validateBtn();
+}
+
+function validateBtn() {
+    let active = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
+    // MUST have exactly one Winner 'S'
+    let winners = active.filter(p => state.roundScores[p] === 'S' || state.roundScores[p] === 0);
+    // MUST have all players filled (not null)
+    let filled = active.every(p => state.roundScores[p] !== null && state.roundScores[p] !== '');
+    
+    const btn = document.getElementById('endBtn');
+    if(btn) {
+        btn.disabled = !(winners.length === 1 && filled);
+        btn.style.background = btn.disabled ? "#555" : "var(--accent)";
+    }
 }
 
 async function processRoundEnd() {
@@ -368,7 +439,7 @@ async function processRoundEnd() {
         if (!state.eliminated[p]) {
             let num = scores[p] === 'S' ? 0 : (parseInt(scores[p]) || 0);
             state.totals[p] += num;
-            if(scores[p] === 'S') state.actionStats[p].shows++;
+            if(scores[p] === 'S' || scores[p] === 0) state.actionStats[p].shows++;
             if(scores[p] === 20) { state.actionStats[p].drops++; state.lastDropRound[p] = state.round; }
             if(scores[p] === 40) state.actionStats[p].mds++;
             if(scores[p] === 80) state.actionStats[p].fcs++;
@@ -377,6 +448,8 @@ async function processRoundEnd() {
     });
 
     state.history.push(histEntry);
+    
+    // RE-ENTRY
     let active = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]).map(p => state.totals[p]);
     let entryScore = (active.length > 0 ? Math.max(...active) : 0) + 1;
 
@@ -392,7 +465,8 @@ async function processRoundEnd() {
     }
 
     state.round++;
-    state.players.forEach(p => state.roundScores[p] = 0);
+    state.players.forEach(p => state.roundScores[p] = null); // RESET TO NULL
+    
     let survivors = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
     if(survivors.length === 1) { state.winner = survivors[0]; state.endTime = new Date().toLocaleString(); }
 
@@ -421,13 +495,13 @@ function renderPlayers() {
 
 function renderContinue() {
     let act = savedGames.filter(g => !g.winner);
-    let h = `<h2>Active Matches</h2>`;
+    let h = `<h2>Active Games</h2>`;
     act.forEach(g => h += `
         <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-            <div><b>${g.name}</b><br><small>Round: ${g.round} | Started: ${g.startTime}</small></div>
+            <div><b>${g.name}</b><br><small>Round ${g.round} | Started: ${g.startTime}</small></div>
             <div style="display:flex; gap:10px;">
                 <button onclick="resume('${g.id}')" style="background:var(--accent)">Resume</button>
-                <button onclick="deleteMatch('${g.id}')" style="background:var(--danger)">Cancel Game</button>
+                <button onclick="deleteMatch('${g.id}')" style="background:var(--danger)">Cancel</button>
             </div>
         </div>`);
     document.getElementById('mainPane').innerHTML = h;
@@ -439,18 +513,18 @@ function renderHistory() {
     fin.forEach(g => h += `
         <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
             <div><b>${g.name}</b><br><small>Winner: ${g.winner} | Date: ${g.endTime}</small></div>
-            <button onclick="deleteMatch('${g.id}')" style="background:var(--danger)">Delete Match</button>
+            <button onclick="deleteMatch('${g.id}')" style="background:var(--danger)">Delete</button>
         </div>`);
     document.getElementById('mainPane').innerHTML = h;
 }
 
-function deleteMatch(id) { if(confirm("Permanently delete this match and its data?")) db.collection('eliteGames').doc(id).delete(); }
+function deleteMatch(id) { if(confirm("Permanently delete this match data?")) db.collection('eliteGames').doc(id).delete(); }
 function resume(id) { state = savedGames.find(g => g.id === id); currentScreen = 'activeGame'; renderActive(); }
 
 function renderReports() {
     let fin = savedGames.filter(g => g.winner);
     let h = `<h2>PDF Reports</h2><table><tr><th>Match</th><th>Action</th></tr>`;
-    fin.forEach(g => h += `<tr><td>${g.name}</td><td><button onclick="genPDF('${g.id}')">Download Report</button></td></tr>`);
+    fin.forEach(g => h += `<tr><td>${g.name}</td><td><button onclick="genPDF('${g.id}')">Download</button></td></tr>`);
     document.getElementById('mainPane').innerHTML = h + `</table>`;
 }
 
@@ -466,10 +540,42 @@ function genPDF(id) {
 function viewProfile(uid) {
     const p = playersDb.find(x => x.id === uid);
     if(!p) return;
-    document.getElementById('pName').innerText = p.fullName;
-    document.getElementById('pPhoto').src = p.photoURL || 'https://ui-avatars.com/api/?name='+p.fullName;
+    const name = p.fullName;
+    
+    let matches = savedGames.filter(g => g.winner && g.players.includes(name));
+    let wins = matches.filter(g => g.winner === name).length;
+    let s=0, fc=0, d=0, md=0;
+
+    matches.forEach(g => {
+        if(g.actionStats && g.actionStats[name]) {
+            s += g.actionStats[name].shows || 0;
+            fc += g.actionStats[name].fcs || 0;
+            d += g.actionStats[name].drops || 0;
+            md += g.actionStats[name].mds || 0;
+        }
+    });
+
+    document.getElementById('pName').innerText = name;
+    document.getElementById('pPhoto').src = p.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=27ae60&color=fff&size=150`;
+    
+    document.getElementById('statWins').innerText = wins;
+    document.getElementById('statS').innerText = s;
+    document.getElementById('statFC').innerText = fc;
+    document.getElementById('statD').innerText = d;
+    document.getElementById('statMD').innerText = md;
+    document.getElementById('statTotal').innerText = matches.length;
+
+    let ai = "Strategic data pending...";
+    if(matches.length > 0) {
+        if(d + md > s + fc) ai = "<b>Defensive Strategist:</b> Prefers minimizing losses via tactical drops.";
+        else if (s > fc) ai = "<b>Aggressive Competitor:</b> Plays high-risk rounds aiming for the win.";
+        else ai = "<b>Versatile Tactician:</b> Balances offense and defense based on match context.";
+    }
+    document.getElementById('aiAnalysis').innerHTML = "<b>AI ANALYSIS:</b><br>" + ai;
     document.getElementById('profileModal').style.display = 'flex';
 }
+
+function viewMyProfile() { if(auth.currentUser) viewProfile(auth.currentUser.uid); }
 </script>
 </body>
 </html>
