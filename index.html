@@ -287,7 +287,12 @@ function formatEliteDate(dateObj) {
     const d = (dateObj instanceof Date) ? dateObj : new Date(dateObj);
     if (isNaN(d.getTime())) return '-';
     
-    return d.toLocaleDateString('en-GB') + ', ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    
+    return `${day}${month}${year}, ${time}`;
 }
 
 function startGame() {
@@ -421,6 +426,7 @@ async function nextRound() {
     });
 
     // Check for re-entries
+    let activePlayersAtStart = state.players.filter(p => !state.eliminated[p]);
     let activeSurvivors = state.players.filter(p => state.totals[p]<240 && !state.eliminated[p]).map(p => state.totals[p]);
     let entryScore = (activeSurvivors.length > 0 ? Math.max(...activeSurvivors) : 0) + 1;
     
@@ -587,6 +593,9 @@ function viewTableReport(id) {
     const g = savedGames.find(x => x.id === id);
     if(!g) return;
 
+    // Helper to get first name
+    const getFirstName = (fullName) => fullName.split(' ')[0];
+
     let h = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h3 style="margin:0;">Report View</h3>
@@ -597,23 +606,50 @@ function viewTableReport(id) {
                 <div><span style="opacity:0.6">Match Name:</span><br><b>${g.name}</b></div>
                 <div><span style="opacity:0.6">Start Time:</span><br><b>${g.startTime || '-'}</b></div>
                 <div><span style="opacity:0.6">End Time:</span><br><b>${g.endTime || '-'}</b></div>
-                <div><span style="opacity:0.6">Tournament Winner:</span><br><b style="color:var(--accent)">${g.winner}</b></div>
+                <div><span style="opacity:0.6">Tournament Winner:</span><br><b style="color:var(--accent)">${getFirstName(g.winner || '')}</b></div>
             </div>
         </div>
-        <div style="overflow-x:auto; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; border:1px solid var(--glass-border);">
-            <table style="min-width:400px;">
+        <div style="overflow-x:auto; background: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url('https://images.unsplash.com/photo-1511193311914-0346f16efe90?q=80&w=2073&auto=format&fit=crop'); background-size: cover; background-position: center; padding:15px; border-radius:12px; border:1px solid #ddd; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top:10px;">
+            <table style="min-width:400px; color: #111; border-collapse: collapse; border: 1px solid #ddd; background: transparent;">
                 <thead>
-                    <tr>
-                        <th style="width:50px;">Rnd</th>
-                        ${g.players.map(p => `<th>${p}</th>`).join('')}
+                    <tr style="background:#f1f8f4;">
+                        <th style="width:50px; color:#27ae60; border: 1px solid #ddd; padding:12px 8px; text-align: center;">Rnd</th>
+                        ${g.players.map(p => `<th style="color:#27ae60; border: 1px solid #ddd; padding:12px 8px; text-align: center;">${getFirstName(p)}</th>`).join('')}
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style="color: #333;">
     `;
 
-    g.history.filter(r => Object.values(r.scores).some(v => v !== null)).forEach(r => {
+    // Filter out rows where NO one has a score OR rounds that occur after a winner is already determined
+    // Also remove rounds where an OUT player erroneously played twice.
+    let winnerFoundInHistory = false;
+    let prevTotals = {};
+    const validHistory = g.history.filter(r => {
+        if (winnerFoundInHistory) return false;
+        
+        const hasScore = Object.values(r.scores).some(v => v !== null && v !== undefined && v !== "");
+        if (!hasScore) return false;
+
+        // Check if an OUT player played (error detection)
+        const outPlayerPlayed = g.players.some(p => {
+            const wasOut = prevTotals[p] !== undefined && prevTotals[p] >= 240;
+            const hasCurrentScore = r.scores[p] !== null && r.scores[p] !== undefined && r.scores[p] !== "";
+            return wasOut && hasCurrentScore;
+        });
+        if (outPlayerPlayed) return false;
+
+        // Check if this round resulted in a single survivor
+        const survivors = g.players.filter(p => (r.totals[p] || 0) < 240);
+        if (survivors.length <= 1) {
+            winnerFoundInHistory = true;
+        }
+        prevTotals = {...r.totals};
+        return true;
+    });
+
+    validHistory.forEach(r => {
         h += `<tr>
-            <td style="color:var(--accent); font-weight:bold;">${r.round}</td>
+            <td style="color:#27ae60; font-weight:bold; padding:12px 8px; border: 1px solid #ddd; text-align: center;">${r.round}</td>
             ${g.players.map(p => {
                 let s = r.scores[p];
                 let t = r.totals[p];
@@ -627,37 +663,40 @@ function viewTableReport(id) {
                 let subVal = "";
                 
                 if (notJoined) {
-                    val = `<span style="opacity:0.4; font-size:10px;">Not Played</span>`;
+                    val = `<span style="opacity:0.4; font-size:10px; color:#999;">Not Played</span>`;
                     subVal = ""; // No total shown
                 } else if (isOut) {
-                    val = `<span style="color:var(--danger); font-weight:bold;">OUT</span>`;
-                    subVal = `<div style="font-size:10px; opacity:0.6;">Total: ${t}</div>`;
+                    val = `<span style="color:#e74c3c; font-weight:bold;">OUT</span>`;
+                    subVal = `<div style="font-size:10px; opacity:0.7; color:#666;">Total: ${t}</div>`;
                 } else {
-                    if (s === 'S') val = `<span style="color:var(--accent); font-weight:bold;">Show</span>`;
-                    else if (re) val = `<span style="color:var(--warning); font-weight:bold;">${s}</span>`;
-                    else val = (s !== null && s !== undefined) ? s : '-';
+                    if (s === 'S') val = `<span style="color:#27ae60; font-weight:bold;">Show</span>`;
+                    else if (re) val = `<span style="color:#f39c12; font-weight:bold;">${s}</span>`;
+                    else val = (s !== null && s !== undefined) ? `<span style="color:#111; font-weight:500;">${s}</span>` : '-';
                     
-                    let totStyle = re ? `color:var(--warning); font-weight:bold;` : `opacity:0.6;`;
+                    let totStyle = re ? `color:#f39c12; font-weight:bold;` : `opacity:0.9; color:#444;`;
                     subVal = `<div style="font-size:10px; ${totStyle}">Total: ${t}</div>`;
                 }
 
-                return `<td>
+                return `<td style="padding:12px 8px; border: 1px solid #ddd; text-align: center;">
                     <div>${val}</div>
                     ${subVal}
-                    ${re ? '<div style="font-size:9px; color:var(--warning); font-weight:bold;">[RE-ENTERED]</div>' : ''}
+                    ${re ? '<div style="font-size:9px; color:#f39c12; font-weight:bold;">[RE-ENTERED]</div>' : ''}
                 </td>`;
             }).join('')}
         </tr>`;
     });
 
+    const reportTotals = validHistory.length > 0 ? validHistory[validHistory.length - 1].totals : g.totals;
+
     h += `
-                <tr style="background:rgba(255,255,255,0.1); border-top:2px solid var(--accent);">
-                    <td style="color:var(--warning); font-weight:bold;">TOTAL</td>
+                <tr style="background:#f8f9fa;">
+                    <td style="color:#f39c12; font-weight:bold; padding:15px 8px; border: 1px solid #ddd; text-align: center;">TOTAL</td>
                     ${g.players.map(p => {
                         let isWinner = g.winner === p;
-                        return `<td style="color:var(--warning); font-weight:bold;">
-                            ${g.totals[p]}
-                            ${isWinner ? '<div style="color:var(--accent); font-size:10px; margin-top:2px;">WINNER</div>' : ''}
+                        const t = reportTotals[p] !== undefined ? reportTotals[p] : (g.totals[p] || 0);
+                        return `<td style="color:#f39c12; font-weight:bold; padding:15px 8px; border: 1px solid #ddd; text-align: center;">
+                            <span style="font-size:16px;">${t}</span>
+                            ${isWinner ? '<div style="color:#27ae60; font-size:10px; margin-top:2px;">WINNER</div>' : ''}
                         </td>`;
                     }).join('')}
                 </tr>
@@ -672,13 +711,39 @@ function viewTableReport(id) {
 function genPDF(id) {
     const g = savedGames.find(x => x.id === id);
     const doc = new jspdf.jsPDF();
+    
+    // Helper to get first name
+    const getFirstName = (fullName) => fullName.split(' ')[0];
+
     doc.setFontSize(18);
     doc.text(`Match Report: ${g.name}`, 14, 20);
     doc.setFontSize(10);
     doc.text(`Start: ${g.startTime || '-'}  |  End: ${g.endTime || '-'}`, 14, 28);
-    doc.text(`Winner: ${g.winner}`, 14, 34);
+    doc.text(`Winner: ${getFirstName(g.winner || '')}`, 14, 34);
 
-    const sigHistory = g.history.filter(r => Object.values(r.scores).some(v => v !== null));
+    let winnerFoundInHistory = false;
+    let prevPdfTotals = {};
+    const sigHistory = g.history.filter(r => {
+        if (winnerFoundInHistory) return false;
+        const hasScore = Object.values(r.scores).some(v => v !== null && v !== undefined && v !== "");
+        if (!hasScore) return false;
+        
+        const outPlayerPlayed = g.players.some(p => {
+            const wasOut = prevPdfTotals[p] !== undefined && prevPdfTotals[p] >= 240;
+            const hasCurrentScore = r.scores[p] !== null && r.scores[p] !== undefined && r.scores[p] !== "";
+            return wasOut && hasCurrentScore;
+        });
+        if (outPlayerPlayed) return false;
+
+        const survivors = g.players.filter(p => (r.totals[p] || 0) < 240);
+        if (survivors.length <= 1) winnerFoundInHistory = true;
+        prevPdfTotals = {...r.totals};
+        return true;
+    });
+    
+    const headNames = g.players.map(p => getFirstName(p));
+    const pdfTotals = sigHistory.length > 0 ? sigHistory[sigHistory.length - 1].totals : g.totals;
+
     const body = sigHistory.map(r => [
         r.round, 
         ...g.players.map(p => {
@@ -690,13 +755,15 @@ function genPDF(id) {
             return s === 'S' ? 'Show' : (s === null ? '-' : s);
         })
     ]);
+    
     body.push(['TOTAL', ...g.players.map(p => {
         let isWinner = g.winner === p;
-        return g.totals[p] + (isWinner ? ' (Winner)' : '');
+        const t = pdfTotals[p] !== undefined ? pdfTotals[p] : (g.totals[p] || 0);
+        return t + (isWinner ? ' (Winner)' : '');
     })]);
 
     doc.autoTable({ 
-        head:[['Rnd', ...g.players]], 
+        head:[['Rnd', ...headNames]], 
         body: body, 
         startY: 40,
         didParseCell: function(data) {
