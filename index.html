@@ -91,7 +91,7 @@
 <div id="authScreen">
   <div class="modal-card" style="background:#1a252f; width:100%; max-width:400px;">
     <h1 style="color:var(--accent); margin:0;">Elite Rummy Circle</h1>
-    <span style="font-size: 10px; opacity: 0.6; display: block; margin-bottom: 20px;">VERSION 43.0 (MOBILE OPTIMIZED VERSION)</span>
+    <span style="font-size: 10px; opacity: 0.6; display: block; margin-bottom: 20px;">VERSION 43.0</span>
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
       <input id="loginPassword" class="std-input" type="password" placeholder="Password">
@@ -109,7 +109,6 @@
       <button class="actionBtn" style="background:var(--warning); color:#111;" onclick="signup()">Register</button>
       <p onclick="toggleAuthView('login')" style="margin-top:20px; cursor:pointer; text-decoration:underline; font-size:13px;">Back to Login</p>
     </div>
-    <div style="font-size: 10px; opacity: 0.4; margin-top: 20px;">Elite IT &copy; 2026</div>
   </div>
 </div>
 
@@ -283,13 +282,21 @@ function addPlayerField() {
   document.getElementById('playerList').appendChild(div);
 }
 
+function formatEliteDate(dateObj) {
+    if (!dateObj) return '-';
+    const d = (dateObj instanceof Date) ? dateObj : new Date(dateObj);
+    if (isNaN(d.getTime())) return '-';
+    
+    return d.toLocaleDateString('en-GB') + ', ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
 function startGame() {
   let pList = Array.from(document.querySelectorAll('#playerList select')).map(s => s.value).filter(v => v !== "");
   if(pList.length < 2) return alert("Select at least 2 players");
   for(let i=pList.length-1; i>0; i--){ let j=Math.floor(Math.random()*(i+1)); [pList[i],pList[j]]=[pList[j],pList[i]]; }
   state = {
     id: Date.now().toString(), name: document.getElementById('gName').value || "Match",
-    startTime: new Date().toLocaleString(), players: pList, totals: {}, roundScores: {}, lastDropRound: {},
+    startTime: formatEliteDate(new Date()), players: pList, totals: {}, roundScores: {}, lastDropRound: {},
     eliminated: {}, reEntries: {}, actionStats: {}, round: 1, history: [], winner: null
   };
   pList.forEach(p => { state.totals[p]=0; state.roundScores[p]=null; state.lastDropRound[p]=-1; state.actionStats[p]={shows:0,fcs:0,drops:0,mds:0}; });
@@ -314,9 +321,14 @@ function renderActive() {
     let rs = state.roundScores[p];
     let isOut = state.eliminated[p] || state.totals[p] >= 240;
     let dLock = state.lastDropRound[p] === (state.round-1);
+    let hasReEntered = state.reEntries && state.reEntries[p];
 
     h += `<tr style="${isOut?'opacity:0.3':''}">
-        <td>${p===dealer?'<span class="dealer-badge">D</span>':''} <b>${p}</b></td>
+        <td>
+            ${p===dealer?'<span class="dealer-badge">D</span>':''} 
+            <b>${p}</b>
+            ${hasReEntered ? '<span style="background:var(--warning); color:#000; padding:1px 4px; border-radius:3px; font-size:8px; margin-left:4px; font-weight:bold;">RE</span>' : ''}
+        </td>
         <td>
             <div style="display:flex; gap:3px; flex-wrap:wrap;">
                 <button class="tactic-btn ${rs==='S'?'active':''}" style="background:var(--accent)" onclick="setTactic('${p}', 'S')" ${isOut?'disabled':''}>S</button>
@@ -346,7 +358,9 @@ function renderActive() {
           h += `<div style="font-size:11px; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;">
               <b style="color:var(--accent);">Round ${r.round}</b>: ${state.players.map(p => {
                   let rs = r.scores[p] === undefined ? '-' : r.scores[p];
-                  return `${p}: ${rs==240||state.eliminated[p]?'OUT':rs+' ('+(r.totals[p]||'0')+')'}`;
+                  let tot = r.totals[p] !== undefined ? r.totals[p] : '-';
+                  let re = (r.reentries && r.reentries[p]) ? ` <span style="color:var(--warning)">[RE: ${r.reentries[p]}]</span>` : '';
+                  return `${p}: ${rs==240||state.eliminated[p]?'OUT':rs+' ('+tot+')'}${re}`;
               }).join(' | ')}
           </div>`;
       });
@@ -392,7 +406,9 @@ function markOut(p) {
 async function nextRound() {
     isPromptingReEntry = true;
     let scores = {...state.roundScores};
-    let entry = { round: state.round, scores: scores, totals: {} };
+    let entry = { round: state.round, scores: scores, totals: {}, reentries: {} };
+    
+    // First calculate the totals for the current round
     state.players.forEach(p => {
         if(!state.eliminated[p]) {
             let n = (scores[p]==='S')?0: (parseInt(scores[p])||0);
@@ -402,23 +418,47 @@ async function nextRound() {
             if(scores[p]===40) state.actionStats[p].mds++;
             if(scores[p]===80) state.actionStats[p].fcs++;
         }
-        entry.totals[p] = state.totals[p];
     });
-    state.history.push(entry);
-    let active = state.players.filter(p => state.totals[p]<240 && !state.eliminated[p]).map(p => state.totals[p]);
-    let entryScore = (active.length > 0 ? Math.max(...active) : 0) + 1;
+
+    // Check for re-entries
+    let activeSurvivors = state.players.filter(p => state.totals[p]<240 && !state.eliminated[p]).map(p => state.totals[p]);
+    let entryScore = (activeSurvivors.length > 0 ? Math.max(...activeSurvivors) : 0) + 1;
+    
     for(let p of state.players) {
         if(state.totals[p]>=240 && !state.eliminated[p]) {
-            if(state.reEntries[p] || entryScore >= 240) state.eliminated[p]=true;
-            else {
+            if(state.reEntries[p] || entryScore >= 240) {
+                state.eliminated[p]=true;
+            } else {
                 let re = confirm(`${p} reached ${state.totals[p]}. Re-enter at ${entryScore}?`);
-                if(re) { state.reEntries[p]=true; state.totals[p]=entryScore; } else state.eliminated[p]=true;
+                if(re) { 
+                    state.reEntries[p] = true; 
+                    state.totals[p] = entryScore;
+                    entry.reentries[p] = entryScore; // Track re-entry in this round's log
+                } else {
+                    state.eliminated[p] = true;
+                }
             }
         }
     }
-    state.round++; state.players.forEach(p => state.roundScores[p]=null);
-    let survivors = state.players.filter(p => !state.eliminated[p] && state.totals[p]<240);
-    if(survivors.length === 1) { state.winner=survivors[0]; state.endTime=new Date().toLocaleString(); }
+
+    // Capture final totals for this round (post re-entry)
+    state.players.forEach(p => {
+        entry.totals[p] = state.totals[p];
+    });
+
+    state.history.push(entry);
+    state.round++; 
+    state.players.forEach(p => state.roundScores[p]=null);
+    
+    let currentWinners = state.players.filter(p => !state.eliminated[p] && state.totals[p]<240);
+    if(currentWinners.length === 1) { 
+        state.winner=currentWinners[0]; 
+        state.endTime=formatEliteDate(new Date()); 
+    } else if (currentWinners.length === 0) {
+        state.winner = "Draw/No survivors";
+        state.endTime = formatEliteDate(new Date());
+    }
+    
     await db.collection('eliteGames').doc(state.id).set(state);
     isPromptingReEntry=false;
     renderActive();
@@ -533,16 +573,142 @@ function delMatch(id) { if(confirm("Delete this match?")) db.collection('eliteGa
 
 function renderReports() {
     let fin = savedGames.filter(g => g.winner);
-    document.getElementById('mainPane').innerHTML = `<h2>PDF Reports</h2>` + fin.map(g => `<div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:5px; border-radius:8px; display:flex; justify-content:space-between;"><span>${g.name}</span><button onclick="genPDF('${g.id}')" style="background:var(--info)">PDF</button></div>`).join('');
+    document.getElementById('mainPane').innerHTML = `<h2>Game Reports</h2>` + fin.map(g => `
+        <div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:5px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <span style="flex:1;"><b>${g.name}</b><br><small style="opacity:0.6">${g.endTime || ''}</small></span>
+            <div style="display:flex; gap:5px;">
+                <button onclick="viewTableReport('${g.id}')" style="background:var(--accent); font-size:12px;">Table View</button>
+                <button onclick="genPDF('${g.id}')" style="background:var(--info); font-size:12px;">PDF</button>
+            </div>
+        </div>`).join('');
+}
+
+function viewTableReport(id) {
+    const g = savedGames.find(x => x.id === id);
+    if(!g) return;
+
+    let h = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0;">Report View</h3>
+            <button onclick="showScreen('reports')" class="pause-btn">Back to List</button>
+        </div>
+        <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-bottom:15px; border:1px solid var(--glass-border);">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:13px;">
+                <div><span style="opacity:0.6">Match Name:</span><br><b>${g.name}</b></div>
+                <div><span style="opacity:0.6">Start Time:</span><br><b>${g.startTime || '-'}</b></div>
+                <div><span style="opacity:0.6">End Time:</span><br><b>${g.endTime || '-'}</b></div>
+                <div><span style="opacity:0.6">Tournament Winner:</span><br><b style="color:var(--accent)">${g.winner}</b></div>
+            </div>
+        </div>
+        <div style="overflow-x:auto; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; border:1px solid var(--glass-border);">
+            <table style="min-width:400px;">
+                <thead>
+                    <tr>
+                        <th style="width:50px;">Rnd</th>
+                        ${g.players.map(p => `<th>${p}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    g.history.filter(r => Object.values(r.scores).some(v => v !== null)).forEach(r => {
+        h += `<tr>
+            <td style="color:var(--accent); font-weight:bold;">${r.round}</td>
+            ${g.players.map(p => {
+                let s = r.scores[p];
+                let t = r.totals[p];
+                let re = (r.reentries && r.reentries[p]);
+                
+                // Detection if player had not joined yet
+                let notJoined = (t === undefined);
+                let isOut = (t >= 240 && !re);
+                
+                let val = "";
+                let subVal = "";
+                
+                if (notJoined) {
+                    val = `<span style="opacity:0.4; font-size:10px;">Not Played</span>`;
+                    subVal = ""; // No total shown
+                } else if (isOut) {
+                    val = `<span style="color:var(--danger); font-weight:bold;">OUT</span>`;
+                    subVal = `<div style="font-size:10px; opacity:0.6;">Total: ${t}</div>`;
+                } else {
+                    if (s === 'S') val = `<span style="color:var(--accent); font-weight:bold;">Show</span>`;
+                    else if (re) val = `<span style="color:var(--warning); font-weight:bold;">${s}</span>`;
+                    else val = (s !== null && s !== undefined) ? s : '-';
+                    
+                    let totStyle = re ? `color:var(--warning); font-weight:bold;` : `opacity:0.6;`;
+                    subVal = `<div style="font-size:10px; ${totStyle}">Total: ${t}</div>`;
+                }
+
+                return `<td>
+                    <div>${val}</div>
+                    ${subVal}
+                    ${re ? '<div style="font-size:9px; color:var(--warning); font-weight:bold;">[RE-ENTERED]</div>' : ''}
+                </td>`;
+            }).join('')}
+        </tr>`;
+    });
+
+    h += `
+                <tr style="background:rgba(255,255,255,0.1); border-top:2px solid var(--accent);">
+                    <td style="color:var(--warning); font-weight:bold;">TOTAL</td>
+                    ${g.players.map(p => {
+                        let isWinner = g.winner === p;
+                        return `<td style="color:var(--warning); font-weight:bold;">
+                            ${g.totals[p]}
+                            ${isWinner ? '<div style="color:var(--accent); font-size:10px; margin-top:2px;">WINNER</div>' : ''}
+                        </td>`;
+                    }).join('')}
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    document.getElementById('mainPane').innerHTML = h;
 }
 
 function genPDF(id) {
     const g = savedGames.find(x => x.id === id);
     const doc = new jspdf.jsPDF();
-    doc.text(`Match: ${g.name}`, 14, 15);
-    const body = g.history.map(r => [r.round, ...g.players.map(p => r.scores[p] || '-')]);
-    body.push(['TOTAL', ...g.players.map(p => g.totals[p])]);
-    doc.autoTable({ head:[['Rnd', ...g.players]], body: body, startY: 20 });
+    doc.setFontSize(18);
+    doc.text(`Match Report: ${g.name}`, 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Start: ${g.startTime || '-'}  |  End: ${g.endTime || '-'}`, 14, 28);
+    doc.text(`Winner: ${g.winner}`, 14, 34);
+
+    const sigHistory = g.history.filter(r => Object.values(r.scores).some(v => v !== null));
+    const body = sigHistory.map(r => [
+        r.round, 
+        ...g.players.map(p => {
+            let s = r.scores[p];
+            let t = r.totals[p];
+            if (t === undefined) return 'Not Played';
+            if (r.reentries && r.reentries[p]) return `${s} (RE)`;
+            if (t >= 240) return 'OUT';
+            return s === 'S' ? 'Show' : (s === null ? '-' : s);
+        })
+    ]);
+    body.push(['TOTAL', ...g.players.map(p => {
+        let isWinner = g.winner === p;
+        return g.totals[p] + (isWinner ? ' (Winner)' : '');
+    })]);
+
+    doc.autoTable({ 
+        head:[['Rnd', ...g.players]], 
+        body: body, 
+        startY: 40,
+        didParseCell: function(data) {
+            if (data.row.index < sigHistory.length) {
+                const round = sigHistory[data.row.index];
+                const player = g.players[data.column.index - 1]; // -1 because first col is 'Rnd'
+                if (round && round.reentries && round.reentries[player]) {
+                    data.cell.styles.textColor = [243, 156, 18]; // --warning color
+                }
+            }
+        }
+    });
     doc.save(`${g.name}.pdf`);
 }
 </script>
