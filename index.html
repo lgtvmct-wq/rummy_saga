@@ -7,83 +7,92 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v43.0</title>
+<title>Elite Rummy Circle - v44.0</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <style>
-  :root {
-    --primary-bg: #1a252f;
-    --accent: #27ae60;
-    --danger: #e74c3c;
-    --warning: #f39c12;
-    --info: #3498db;
-    --text-light: #ffffff;
-    --glass-border: rgba(255, 255, 255, 0.15);
-  }
+:root {
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --accent: #38bdf8;
+  --text: #f8fafc;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+}
 
-  body { 
-    margin: 0; font-family: 'Segoe UI', Arial, sans-serif; 
-    color: var(--text-light); min-height: 100vh;
-    background: linear-gradient(rgba(44, 62, 80, 0.9), rgba(44, 62, 80, 0.95)), url('https://images.unsplash.com/photo-1511193311914-0346f16efe90?q=80&w=2073&auto=format&fit=crop');
-    background-size: cover; background-position: center; background-attachment: fixed;
-    overflow-x: hidden;
-  }
+body {
+  margin: 0; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg); color: var(--text);
+  height: 100vh; overflow: hidden;
+}
 
-  #mainApp, #authScreen { display: none; }
-  .app-wrapper { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
-  .left-sidebar { width: 260px; background: var(--primary-bg); padding: 25px; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; }
-  .main-pane { flex: 3; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-  
-  @media (max-width: 900px) {
-    .app-wrapper { flex-direction: column; }
-    .left-sidebar { width: 100%; height: auto; padding: 10px; border-right: none; border-bottom: 1px solid var(--glass-border); }
-    .nav-section { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; scrollbar-width: none; }
-    .nav-section::-webkit-scrollbar { display: none; }
-    .navBtn { min-width: 110px; margin-bottom: 0 !important; font-size: 11px !important; padding: 10px !important; text-align: center !important; }
-    .main-pane { padding: 15px; }
-    .sidebar-footer { display: none; }
-  }
+#app { display: flex; height: 100vh; width: 100vw; }
 
-  .std-input { width: 100%; height: 50px; padding: 0 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--glass-border); background: #ffffff; color: #333; font-size: 16px; font-weight: 600; box-sizing: border-box; }
-  button { padding: 12px 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-  button:active { transform: scale(0.95); }
-  button:disabled { opacity: 0.2; filter: grayscale(1); }
-  
-  .tactic-btn { border: 2px solid transparent; flex: 1; padding: 8px 5px; font-size: 11px; }
-  .tactic-btn.active { border-color: white; box-shadow: 0 0 10px rgba(255,255,255,0.5); filter: brightness(1.3); }
+.sidebar {
+  width: 200px; background: #0f172a; border-right: 1px solid rgba(255,255,255,0.05);
+  display: flex; flex-direction: column; padding: 20px; gap: 10px;
+}
 
-  .navBtn { width: 100%; margin-bottom: 10px; background: rgba(255,255,255,0.08); color: white; text-align: left; }
-  .navBtn.active-nav { background: var(--accent); }
-  .actionBtn { background: var(--accent); color: white; width: 100%; height: 50px; font-size: 16px; margin-top: 5px; }
+.main-pane { flex: 1; overflow-y: auto; padding: 20px; position: relative; }
 
-  .dealer-badge { background: var(--warning); color: #000; padding: 2px 5px; border-radius: 4px; font-size: 9px; font-weight: bold; }
-  
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  th { text-align: left; padding: 8px 5px; color: var(--accent); font-size: 10px; text-transform: uppercase; border-bottom: 2px solid var(--glass-border); }
-  td { padding: 8px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+.modal-card {
+  background: var(--panel); border-radius: 12px; padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 20px;
+}
 
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; justify-content: center; align-items: center; padding: 20px; overflow-y: auto; }
-  .modal-card { background: #2c3e50; width: 100%; max-width: 450px; padding: 25px; border-radius: 15px; text-align: center; max-height: 90vh; overflow-y: auto; border: 1px solid var(--glass-border); }
+.navBtn {
+  background: #334155; color: white; border: none; padding: 12px; border-radius: 8px;
+  cursor: pointer; text-align: left; font-size: 14px; transition: 0.2s;
+}
+.navBtn:hover { background: #475569; }
+.navBtn.active { background: var(--accent); color: #0f172a; font-weight: bold; }
 
-  .avatar-lg { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); margin: 0 auto 15px auto; display: block; background: #1a252f; }
-  .avatar-sm { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid var(--accent); vertical-align: middle; margin-right: 5px; }
-  
-  .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px 0; }
-  .stat-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
-  .stat-val { font-size: 16px; font-weight: bold; color: var(--accent); display: block; }
-  .stat-lbl { font-size: 9px; color: #aaa; text-transform: uppercase; }
+.std-input {
+  background: #0f172a; border: 1px solid #334155; color: white; padding: 10px;
+  border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 10px;
+}
 
-  .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; border: 1px solid rgba(0,0,0,0.2); }
-  .online-dot { background: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
-  .offline-dot { background: #95a5a6; }
-  .status-text { font-size: 10px; font-weight: bold; text-transform: uppercase; }
+/* Authentication Screen Specifics */
+#authScreen {
+  position: fixed; inset: 0; background: var(--bg); z-index: 1000;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
 
-  .pause-btn { background: var(--info); color: white; border: 1px solid rgba(255,255,255,0.3); font-size: 11px; padding: 8px 12px; }
+/* Tables */
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th { text-align: left; opacity: 0.6; font-size: 11px; padding: 10px; border-bottom: 2px solid #334155; }
+td { padding: 8px 10px; border-bottom: 1px solid #334155; font-size: 13px; vertical-align: middle; }
+
+/* Action Buttons */
+.btn {
+  padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; font-size: 12px;
+}
+.btn-primary { background: var(--accent); color: #0f172a; }
+.btn-danger { background: var(--danger); color: white; }
+
+.tactic-btn { font-size: 10px; padding: 4px 8px; border-radius: 4px; border: 1px solid #334155; height: 28px; }
+.tactic-btn.active { border-color: var(--accent); color: var(--accent); font-weight: bold; border-width: 2px; }
+
+/* Grid for New Game */
+.player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin: 15px 0; }
+.player-tag { background: #334155; padding: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
+
+@media (max-width: 600px) {
+  .sidebar { width: 60px; padding: 10px 5px; }
+  .navBtn { font-size: 0; padding: 15px 0; text-align: center; display: flex; justify-content: center; }
+  .navBtn::before { font-size: 18px; }
+  #nav-home::before { content: '🏠'; }
+  #nav-continue::before { content: '📁'; }
+  #nav-history::before { content: '📜'; }
+  #nav-reports::before { content: '📊'; }
+  .player-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.show-pill { background: var(--success); color: #052e16; font-weight: bold; font-size: 10px; padding: 2px 6px; border-radius: 4px; }
 </style>
 </head>
 <body>
@@ -91,536 +100,687 @@
 <div id="authScreen">
   <div class="modal-card" style="background:#1a252f; width:100%; max-width:400px;">
     <h1 style="color:var(--accent); margin:0;">Elite Rummy Circle</h1>
-    <span style="font-size: 10px; opacity: 0.6; display: block; margin-bottom: 20px;">VERSION 43.0</span>
+    <span style="font-size: 10px; opacity: 0.6; display: block; margin-bottom: 5px;">VERSION 44.0</span>
+    <span style="font-size: 9px; opacity: 0.5; color: var(--warning); display: block; margin-bottom: 20px;">Developer: Elite IT | Release: Enhanced Keypad</span>
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
       <input id="loginPassword" class="std-input" type="password" placeholder="Password">
-      <button class="actionBtn" onclick="login()">Log In</button>
-      <button class="actionBtn" style="background:#fff; color:#333; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="googleSignIn()">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="18"> Continue with Google
-      </button>
-      <p onclick="toggleAuthView('signup')" style="margin-top:20px; cursor:pointer; text-decoration:underline; font-size:13px;">Create Account</p>
+      <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="handleLogin()">Login</button>
+      <div style="margin-top:20px; text-align:center; font-size:12px; opacity:0.6;">
+        Don't have an account? <a href="#" style="color:var(--accent)" onclick="toggleAuth(false)">Sign Up</a>
+      </div>
     </div>
-    <div id="signupView" style="display:none">
-      <input id="signupFirst" class="std-input" placeholder="First Name">
-      <input id="signupLast" class="std-input" placeholder="Last Name">
-      <input id="signupEmail" class="std-input" placeholder="Email Address">
-      <input id="signupPass" class="std-input" type="password" placeholder="Password">
-      <button class="actionBtn" style="background:var(--warning); color:#111;" onclick="signup()">Register</button>
-      <p onclick="toggleAuthView('login')" style="margin-top:20px; cursor:pointer; text-decoration:underline; font-size:13px;">Back to Login</p>
+    <div id="signupView" style="display:none;">
+      <input id="regName" class="std-input" placeholder="Full Name">
+      <input id="regEmail" class="std-input" placeholder="Email Address">
+      <input id="regPassword" class="std-input" type="password" placeholder="Password">
+      <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="handleSignup()">Create Account</button>
+      <div style="margin-top:20px; text-align:center; font-size:12px; opacity:0.6;">
+        Already signed up? <a href="#" style="color:var(--accent)" onclick="toggleAuth(true)">Login</a>
+      </div>
     </div>
   </div>
 </div>
 
-<div id="reentryModal" class="modal-overlay">
-    <div class="modal-card">
-        <h2 style="color:var(--warning);">Player Elimination</h2>
-        <p id="reentryText"></p>
-        <div style="display:flex; gap:10px;">
-            <button class="actionBtn" style="background:#555; flex:1;" id="btnReentryNo">Leave</button>
-            <button class="actionBtn" style="background:var(--accent); flex:1;" id="btnReentryYes">Re-enter</button>
-        </div>
-    </div>
-</div>
-
-<div id="profileModal" class="modal-overlay">
-    <div class="modal-card">
-        <img id="pPhoto" class="avatar-lg" src="">
-        <h2 id="pName" style="color:var(--accent); margin:0;"></h2>
-        <p id="pID" style="font-size:10px; opacity:0.5; margin-bottom:10px;"></p>
-        <div class="stat-grid">
-            <div class="stat-item"><span class="stat-val" id="statWins">0</span><span class="stat-lbl">Wins</span></div>
-            <div class="stat-item"><span class="stat-val" id="statS">0</span><span class="stat-lbl">Shows</span></div>
-            <div class="stat-item"><span class="stat-val" id="statFC">0</span><span class="stat-lbl">Full</span></div>
-            <div class="stat-item"><span class="stat-val" id="statD">0</span><span class="stat-lbl">Drops</span></div>
-            <div class="stat-item"><span class="stat-val" id="statMD">0</span><span class="stat-lbl">Mid</span></div>
-            <div class="stat-item"><span class="stat-val" id="statTotal">0</span><span class="stat-lbl">Matches</span></div>
-        </div>
-        <div id="aiAnalysis" style="background:rgba(39, 174, 96, 0.1); border-left: 4px solid var(--accent); padding:12px; text-align:left; font-size:12px; border-radius:4px; margin-bottom:15px; line-height:1.5;"></div>
-        <button id="btnEditProfile" style="background:var(--warning); color:#111; margin-bottom:10px; font-size:12px; display:none;" onclick="openEditProfile()">Edit My Profile</button>
-        <button class="actionBtn" onclick="document.getElementById('profileModal').style.display='none'">Close</button>
-    </div>
-</div>
-
-<div id="editProfileModal" class="modal-overlay">
-    <div class="modal-card">
-        <h2>Edit Profile</h2>
-        <img id="editPhotoPreview" class="avatar-lg" src="">
-        <input type="file" id="photoUpload" style="display:none;" onchange="handlePhotoUpload(event)">
-        <button onclick="document.getElementById('photoUpload').click()" style="background:var(--warning); margin-bottom:15px;">Change Photo</button>
-        <input id="editName" class="std-input" placeholder="Display Name">
-        <button class="actionBtn" onclick="saveProfile()">Save Changes</button>
-        <button class="actionBtn" style="background:#555; margin-top:10px;" onclick="document.getElementById('editProfileModal').style.display='none'">Cancel</button>
-    </div>
-</div>
-
-<div id="addMidGameModal" class="modal-overlay">
-    <div class="modal-card">
-        <h2>Add Player Mid-Game</h2>
-        <select id="midGameSelect" class="std-input"></select>
-        <button class="actionBtn" onclick="confirmAddMidGame()">Add Now</button>
-        <button class="actionBtn" style="background:#555; margin-top:10px;" onclick="document.getElementById('addMidGameModal').style.display='none'">Cancel</button>
-    </div>
-</div>
-
-<div class="app-wrapper" id="mainApp">
-  <div class="left-sidebar">
-    <h2 style="color:var(--accent); margin-bottom:15px; margin-top:0;">Elite Circle</h2>
-    <div class="nav-section">
-      <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">New Match</button>
-      <button id="navContinue" class="navBtn" onclick="showScreen('continue')">Active</button>
-      <button id="navPlayers" class="navBtn" onclick="showScreen('players')">Players</button>
-      <button id="navHistory" class="navBtn" onclick="showScreen('history')">History</button>
-      <button id="navReports" class="navBtn" onclick="showScreen('reports')">Reports</button>
+<div id="app" style="display:none;">
+  <div class="sidebar">
+    <h2 style="font-size:14px; color:var(--accent); margin-bottom:20px;">ELITE</h2>
+    <button id="nav-home" class="navBtn" onclick="showScreen('newGame')">New Game</button>
+    <button id="nav-continue" class="navBtn" onclick="showScreen('continue')">Continue</button>
+    <button id="nav-history" class="navBtn" onclick="showScreen('history')">History</button>
+    <button id="nav-reports" class="navBtn" onclick="showScreen('reports')">Reports</button>
+    
+    <div style="margin-top:20px; display:flex; flex-direction:column; gap:8px;">
       <button class="navBtn" style="background:var(--warning); color:#000;" onclick="viewMyProfile()">My Stats</button>
       <button class="navBtn" style="background:var(--danger);" onclick="handleLogout()">Logout</button>
     </div>
-    <div style="margin-top:auto; text-align:center;" class="sidebar-footer">
-        <div style="font-size: 10px; opacity: 0.4;">Developed by Elite IT &copy; 2026</div>
+    <div style="margin-top:auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
+        <div style="font-size: 11px; color: var(--accent); font-weight: bold; margin-bottom: 5px;">Release Note v44.0</div>
+        <div style="font-size: 9px; opacity: 0.6; line-height: 1.4; margin-bottom: 10px;">
+            The numeric keypad now remains active during score entry until the Enter key is pressed, improving focus management.
+        </div>
+        <div style="font-size: 10px; opacity: 0.4;">Developer: Elite IT &copy; 2026</div>
     </div>
   </div>
   <div class="main-pane" id="mainPane"></div>
 </div>
 
+<!-- Simple Modals -->
+<div id="reentryModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center;">
+    <div class="modal-card" style="width:300px; text-align:center;">
+        <h3 style="color:var(--warning)">Re-entry Prompt</h3>
+        <p id="reentryText" style="font-size:14px; line-height:1.4;"></p>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button id="btnReentryYes" class="btn btn-primary" style="flex:1">YES</button>
+            <button id="btnReentryNo" class="btn btn-danger" style="flex:1">NO</button>
+        </div>
+    </div>
+</div>
+
 <script>
-// --- FIREBASE INIT ---
+// CONFIG - REPLACE WITH YOURS
 const firebaseConfig = {
-  apiKey: "AIzaSyCo_G5Vo7OkUsK-tUXVQKCkeTn_IHw9vB0",
-  authDomain: "elite-rummy-circle.firebaseapp.com",
-  projectId: "elite-rummy-circle",
-  storageBucket: "elite-rummy-circle.firebasestorage.app",
-  messagingSenderId: "762468709641",
-  appId: "1:762468709641:web:b4e193ed1670e5d13ccfd8"
+  apiKey: "AIzaSyB...", // Provided by platform at runtime
+  authDomain: "elite-rummy.firebaseapp.com",
+  projectId: "elite-rummy",
+  storageBucket: "elite-rummy.appspot.com",
+  messagingSenderId: "...",
+  appId: "..."
 };
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-let playersDb =[], savedGames =[], state = null, currentScreen = '';
+let user = null;
+let profile = null;
+let currentScreen = 'newGame';
+let state = null; // Current Game State
+let savedGames = [];
+let allHistory = [];
 let isPromptingReEntry = false;
 
-// --- AUTH ---
-auth.onAuthStateChanged(user => {
-  if(user) {
-    document.getElementById('authScreen').style.display='none';
-    document.getElementById('mainApp').style.display='flex';
-    db.collection('players').doc(user.uid).set({ isOnline: true }, {merge:true});
-    loadData();
-    if(!currentScreen) showScreen('newGame');
+// AUTH LOGIC
+auth.onAuthStateChanged(async (u) => {
+  if (u) {
+    user = u;
+    const snap = await db.collection('eliteUsers').doc(u.uid).get();
+    profile = snap.data();
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    initRealtime();
+    showScreen('newGame');
   } else {
-    document.getElementById('authScreen').style.display='flex';
-    document.getElementById('mainApp').style.display='none';
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
   }
 });
 
-function login() { auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); }
-async function googleSignIn() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-async function signup() {
-    const cred = await auth.createUserWithEmailAndPassword(document.getElementById('signupEmail').value, document.getElementById('signupPass').value);
-    await db.collection('players').doc(cred.user.uid).set({ 
-        fullName: (document.getElementById('signupFirst').value + " " + document.getElementById('signupLast').value).toUpperCase(), 
-        isOnline: true, photoURL: "", createdAt: firebase.firestore.FieldValue.serverTimestamp() 
-    });
-}
-function handleLogout() { if(auth.currentUser) db.collection('players').doc(auth.currentUser.uid).update({ isOnline: false }).then(() => auth.signOut()); }
-function toggleAuthView(v) {
-  document.getElementById('loginView').style.display = v==='login'?'block':'none';
-  document.getElementById('signupView').style.display = v==='signup'?'block':'none';
-}
-
-// --- DATA LISTENER ---
-function loadData() {
-  db.collection('players').onSnapshot(snap => { 
-    playersDb =[]; snap.forEach(doc => playersDb.push({id: doc.id, ...doc.data()})); 
-    if(currentScreen === 'players') showScreen('players');
-  });
+function initRealtime() {
   db.collection('eliteGames').onSnapshot(snap => {
-    savedGames =[]; snap.forEach(d => savedGames.push(d.data()));
+    savedGames = []; snap.forEach(d => savedGames.push(d.data()));
     if(currentScreen === 'activeGame' && state && !isPromptingReEntry) {
         let s = savedGames.find(g => g.id === state.id);
-        if(s) { state = s; renderActive(); } else { state = null; showScreen('newGame'); }
+        if(s) {
+            // Check if we need full render or just UI sync
+            const needsFull = state.round !== s.round || state.winner !== s.winner || state.players.length !== s.players.length;
+            state = s;
+            if (needsFull) renderActive();
+            else updateRoundScoresUI();
+        } else {
+            state = null; showScreen('newGame');
+        }
     } else if(['continue', 'history', 'reports'].includes(currentScreen)) {
         showScreen(currentScreen);
     }
   });
 }
 
-// --- NAVIGATION ---
-function showScreen(s) {
-  currentScreen = s;
-  document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active-nav'));
-  const btn = document.getElementById('nav' + s.charAt(0).toUpperCase() + s.slice(1));
-  if(btn) btn.classList.add('active-nav');
-  if(s==='newGame') renderNewGame();
-  if(s==='players') renderPlayers();
-  if(s==='continue') renderContinue();
-  if(s==='history') renderHistory();
-  if(s==='reports') renderReports();
+function showScreen(key) {
+  currentScreen = key;
+  document.querySelectorAll('.navBtn').forEach(b => b.classList.toggle('active', b.id === `nav-${key}`));
+  const container = document.getElementById('mainPane');
+  
+  if (key === 'newGame') renderNewGame();
+  else if (key === 'continue') renderContinue();
+  else if (key === 'history') renderHistory();
+  else if (key === 'reports') renderReports();
 }
 
-// --- VIEWS ---
+// SCREENS
+let newPlayers = [];
 function renderNewGame() {
-  document.getElementById('mainPane').innerHTML = `
-    <h2>New Match Setup</h2>
-    <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px;">
-        <input id="gName" class="std-input" placeholder="Enter Match Name">
-        <button onclick="appendDT()" style="background:var(--warning); width:100%; color:#111; margin-bottom:15px;">🕒 Insert Date/Time</button>
-        <div id="playerList"></div>
-        <button class="navBtn" style="background:rgba(255,255,255,0.1); width:100%; border:1px dashed var(--glass-border);" onclick="addPlayerField()">+ Add Player</button>
-        <button class="actionBtn" onclick="startGame()">Start Random Match</button>
-    </div>`;
+  const container = document.getElementById('mainPane');
+  container.innerHTML = `
+    <div class="modal-card">
+        <h2>Start New Match</h2>
+        <div style="display:flex; gap:10px;">
+            <input id="pName" class="std-input" placeholder="Player Name" onkeydown="if(event.key==='Enter') addPlayer()">
+            <button class="btn btn-primary" onclick="addPlayer()">ADD</button>
+        </div>
+        <div id="pList" class="player-grid"></div>
+        <button id="startBtn" class="btn btn-primary" style="width:100%; margin-top:10px;" disabled onclick="startMatch()">CREATE MATCH</button>
+    </div>
+  `;
+  updatePlayerListUI();
 }
 
-function appendDT() { document.getElementById('gName').value += " " + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
-
-function addPlayerField() {
-  const selected = Array.from(document.querySelectorAll('#playerList select')).map(s => s.value);
-  let opts = `<option value="">-- Select Player --</option>` + 
-    playersDb.map(p => {
-        if(selected.includes(p.fullName)) return '';
-        const name = p.fullName || `Elite-User-${p.id.substring(0,5)}`;
-        return `<option value="${name}" ${p.isOnline?'':'disabled'}>${name} ${p.isOnline?'':'(OFFLINE)'}</option>`;
-    }).join('');
-  const div = document.createElement('div');
-  div.style="display:flex; gap:10px; margin-bottom:10px;";
-  div.innerHTML = `<select class="std-input" style="margin-bottom:0; flex:1;">${opts}</select><button onclick="this.parentElement.remove()" style="background:var(--danger); width:50px;">✕</button>`;
-  document.getElementById('playerList').appendChild(div);
+function addPlayer() {
+  const input = document.getElementById('pName');
+  const name = input.value.trim();
+  if (name && !newPlayers.includes(name)) {
+    newPlayers.push(name);
+    input.value = '';
+    updatePlayerListUI();
+  }
 }
 
-function formatEliteDate(dateObj) {
-    if (!dateObj) return '-';
-    const d = (dateObj instanceof Date) ? dateObj : new Date(dateObj);
-    if (isNaN(d.getTime())) return '-';
+function updatePlayerListUI() {
+    const list = document.getElementById('pList');
+    if(!list) return;
+    list.innerHTML = newPlayers.map(p => `
+        <div class="player-tag">
+            <span>${p}</span>
+            <span style="color:var(--danger); cursor:pointer;" onclick="newPlayers=newPlayers.filter(x=>x!=='${p}'); updatePlayerListUI();">✕</span>
+        </div>
+    `).join('');
+    document.getElementById('startBtn').disabled = newPlayers.length < 2;
+}
+
+async function startMatch() {
+    const id = "M-" + Date.now();
+    state = {
+        id,
+        creator: user.uid,
+        players: [...newPlayers],
+        totals: {},
+        eliminated: {},
+        reEntries: {},
+        history: [],
+        round: 1,
+        startTime: formatEliteDate(new Date()),
+        endTime: null,
+        roundScores: {},
+        actionStats: {},
+        lastDropRound: {},
+        winner: null
+    };
+    state.players.forEach(p => { 
+        state.totals[p] = 0; 
+        state.eliminated[p] = false;
+        state.reEntries[p] = false;
+        state.roundScores[p] = null;
+        state.actionStats[p] = { shows: 0, drops: 0, mds: 0 };
+    });
     
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    await db.collection('eliteGames').doc(id).set(state);
+    newPlayers = [];
+    currentScreen = 'activeGame';
+    renderActive();
+}
+
+function renderContinue() {
+    const container = document.getElementById('mainPane');
+    const myGames = savedGames.filter(g => !g.winner).sort((a,b) => b.id.localeCompare(a.id));
+    container.innerHTML = `
+        <h2>Live Matches</h2>
+        ${myGames.length ? 
+            myGames.map(g => `
+                <div class="modal-card" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-weight:bold;">${g.players.join(', ')}</div>
+                        <div style="font-size:11px; opacity:0.6;">Round ${g.round} • Started ${g.startTime}</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="resume('${g.id}')">RESUME</button>
+                </div>
+            `).join('')
+            : '<div style="opacity:0.5;">No active games found.</div>'
+        }
+    `;
+}
+
+function renderActive(focusPlayer = null) {
+  if (!state) return showScreen('newGame');
+  const container = document.getElementById('mainPane');
+  
+  if (state.winner) {
+    container.innerHTML = `
+        <div class="modal-card" style="text-align:center;">
+            <h1 style="color:var(--success); font-size:40px;">🏆</h1>
+            <h2>WINNER: ${state.winner}</h2>
+            <div style="font-size:12px; margin-bottom:20px;">Match concluded at ${state.endTime}</div>
+            <button class="btn btn-primary" style="width:100%" onclick="showScreen('newGame')">NEW GAME</button>
+        </div>
+        ${renderGameSummary()}
+    `;
+    return;
+  }
+
+  const dealerIdx = (state.round - 1) % state.players.length;
+  const dealer = state.players[dealerIdx];
+  
+  container.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h2 style="margin:0;">Round ${state.round}</h2>
+        <div style="font-size:11px; padding:4px 8px; background:rgba(0,0,0,0.3); border-radius:4px;">
+            Dealer: <b style="color:var(--accent)">${dealer}</b>
+        </div>
+    </div>
+    <div class="modal-card" style="padding:10px;">
+        <table>
+            <thead>
+                <tr>
+                    <th>PLAYER</th>
+                    <th style="width:140px;">R${state.round}</th>
+                    <th style="width:40px;">TOTAL</th>
+                </tr>
+            </thead>
+            <tbody id="scoreBody">
+                ${state.players.map(p => renderPlayerInputRow(p)).join('')}
+            </tbody>
+        </table>
+    </div>
+    <button id="endBtn" class="btn btn-primary" style="width:100%; height:50px; font-size:16px;" onclick="nextRound()" disabled>FINISH ROUND</button>
+    ${renderHistoryTab()}
+  `;
+  
+  updateEndBtnState();
+  
+  // Logic for initial focus
+  if(!focusPlayer) {
+      // Find first player after dealer who isn't out
+      for(let i=1; i<=state.players.length; i++) {
+          let idx = (dealerIdx + i) % state.players.length;
+          let p = state.players[idx];
+          if(!state.eliminated[p] && state.totals[p] < 240) {
+              const inp = document.getElementById(`input-${p}`);
+              if(inp) inp.focus();
+              break;
+          }
+      }
+  } else {
+      const inp = document.getElementById(`input-${focusPlayer}`);
+      if(inp) inp.focus();
+  }
+}
+
+function renderPlayerInputRow(p) {
+    const rs = state.roundScores[p];
+    const isOut = state.eliminated[p] || state.totals[p] >= 240;
+    const isShowReady = state.roundScores[p] === 'S';
     
-    return `${day}${month}${year}, ${time}`;
-}
-
-function startGame() {
-  let pList = Array.from(document.querySelectorAll('#playerList select')).map(s => s.value).filter(v => v !== "");
-  if(pList.length < 2) return alert("Select at least 2 players");
-  for(let i=pList.length-1; i>0; i--){ let j=Math.floor(Math.random()*(i+1)); [pList[i],pList[j]]=[pList[j],pList[i]]; }
-  state = {
-    id: Date.now().toString(), name: document.getElementById('gName').value || "Match",
-    startTime: formatEliteDate(new Date()), players: pList, totals: {}, roundScores: {}, lastDropRound: {},
-    eliminated: {}, reEntries: {}, actionStats: {}, round: 1, history: [], winner: null
-  };
-  pList.forEach(p => { state.totals[p]=0; state.roundScores[p]=null; state.lastDropRound[p]=-1; state.actionStats[p]={shows:0,fcs:0,drops:0,mds:0}; });
-  db.collection('eliteGames').doc(state.id).set(state);
-  currentScreen='activeGame';
-  renderActive();
-}
-
-function renderActive() {
-  if(!state) return;
-  let dealerIdx = (state.round-1) % state.players.length;
-  let dealer = state.players[dealerIdx];
-
-  let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-    <h3 style="margin:0;">${state.name}</h3>
-    <button onclick="state=null; showScreen('newGame')" class="pause-btn">${state.winner?'Home':'Pause'}</button>
-  </div><table style="table-layout: fixed;">
-    <colgroup><col style="width:32%"><col style="width:48%"><col style="width:20%"></colgroup>
-    <tr><th>Player</th><th>Tactics</th><th>Total</th></tr>`;
-
-  state.players.forEach(p => {
-    let rs = state.roundScores[p];
-    let isOut = state.eliminated[p] || state.totals[p] >= 240;
-    let dLock = state.lastDropRound[p] === (state.round-1);
-    let hasReEntered = state.reEntries && state.reEntries[p];
-
-    h += `<tr style="${isOut?'opacity:0.3':''}">
+    return `
+    <tr style="${isOut ? 'opacity:0.3;' : ''}">
         <td>
-            ${p===dealer?'<span class="dealer-badge">D</span>':''} 
-            <b>${p}</b>
-            ${hasReEntered ? '<span style="background:var(--warning); color:#000; padding:1px 4px; border-radius:3px; font-size:8px; margin-left:4px; font-weight:bold;">RE</span>' : ''}
+            <div style="font-weight:bold;">${p}</div>
+            <div style="font-size:10px; opacity:0.6;">${state.reEntries[p]?'Re-entered':''}</div>
         </td>
         <td>
-            <div style="display:flex; gap:3px; flex-wrap:wrap;">
-                <button class="tactic-btn ${rs==='S'?'active':''}" style="background:var(--accent)" onclick="setTactic('${p}', 'S')" ${isOut?'disabled':''}>S</button>
-                <button class="tactic-btn ${rs===20?'active':''}" style="background:var(--warning)" onclick="setTactic('${p}', 'D')" ${isOut || dLock?'disabled':''}>D</button>
-                <button class="tactic-btn ${rs===40?'active':''}" style="background:#8e44ad; color:white;" onclick="setTactic('${p}', 'MD')" ${isOut?'disabled':''}>MD</button>
-                <button class="tactic-btn ${rs===80?'active':''}" style="background:var(--danger); color:white;" onclick="setTactic('${p}', 'FC')" ${isOut?'disabled':''}>FC</button>
-                <button class="tactic-btn ${rs===0?'active':''}" style="background:#2c3e50; color:white;" onclick="setTactic('${p}', 'FS')" ${isOut?'disabled':''}>FS</button>
+            <div style="display:flex; gap:4px;">
+                <button class="tactic-btn t-S ${rs==='S'?'active':''}" style="background:var(--success); color:#000;" onclick="setTactic('${p}', 'S')" ${isOut?'disabled':''}>S</button>
+                <button class="tactic-btn t-D ${rs===20?'active':''}" style="background:var(--danger); color:white;" onclick="setTactic('${p}', 'D')" ${isOut?'disabled':''}>D</button>
+                <button class="tactic-btn t-MD ${rs===40?'active':''}" style="background:var(--warning); color:#000;" onclick="setTactic('${p}', 'MD')" ${isOut?'disabled':''}>MD</button>
+                <button class="tactic-btn t-FS ${rs===0?'active':''}" style="background:#2c3e50; color:white;" onclick="setTactic('${p}', 'FS')" ${isOut?'disabled':''}>FS</button>
                 <button style="background:#333; color:white; font-size:10px; border:none; border-radius:4px; padding:5px;" onclick="markOut('${p}')" ${isOut?'disabled':''}>OUT</button>
             </div>
-            <input type="text" inputmode="numeric" class="std-input" style="height:35px; margin:5px 0 0 0; text-align:center; font-size:12px; width:100%;" value="${rs===null?'':rs}" oninput="manualInput('${p}', this.value)" ${isOut?'disabled':''}>
+            <input type="text" id="input-${p}" inputmode="numeric" pattern="[0-9]*" class="std-input score-input" data-player="${p}" style="height:35px; margin:5px 0 0 0; text-align:center; font-size:12px; width:100%;" value="${rs===null?'':rs}" oninput="manualInput('${p}', this.value)" onkeydown="if(event.key==='Enter') { event.preventDefault(); focusNext('${p}'); }" ${isOut?'disabled':''}>
         </td>
         <td><b style="color:var(--warning)">${state.totals[p]}</b></td>
     </tr>`;
-  });
+}
 
-  if(!state.winner) {
-      h += `</table><button id="endBtn" class="actionBtn" style="margin-top:15px;" onclick="nextRound()">Next Round</button>
-            <button class="actionBtn" style="background:#555; height:45px; font-size:12px;" onclick="openMidGame()">+ Add Player Mid-Game</button>`;
-  } else {
-      h += `</table><div style="text-align:center; padding:15px;"><h2 style="color:var(--accent); margin:0;">Winner: ${state.winner}</h2></div>`;
-  }
-  
-  h += `<div style="margin-top: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border:1px solid var(--glass-border);">
-        <h4 style="margin: 0 0 10px 0; color:var(--accent);">Scoreboard Logs</h4>`;
-  if (state.history.length === 0) h += `<div style="font-size:11px; opacity:0.5;">Waiting for round completion...</div>`;
-  else {
-      state.history.slice().reverse().forEach(r => {
-          h += `<div style="font-size:11px; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;">
-              <b style="color:var(--accent);">Round ${r.round}</b>: ${state.players.map(p => {
-                  let rs = r.scores[p] === undefined ? '-' : r.scores[p];
-                  let tot = r.totals[p] !== undefined ? r.totals[p] : '-';
-                  let re = (r.reentries && r.reentries[p]) ? ` <span style="color:var(--warning)">[RE: ${r.reentries[p]}]</span>` : '';
-                  return `${p}: ${rs==240||state.eliminated[p]?'OUT':rs+' ('+tot+')'}${re}`;
-              }).join(' | ')}
-          </div>`;
-      });
-  }
-  h += `</div>`;
-  document.getElementById('mainPane').innerHTML = h;
-  validateEndBtn();
+function updateRoundScoresUI() {
+    state.players.forEach(p => {
+        const row = document.getElementById(`input-${p}`)?.closest('tr');
+        if(!row) return;
+        const rs = state.roundScores[p];
+        const isOut = state.eliminated[p] || state.totals[p] >= 240;
+        
+        row.style.opacity = isOut ? '0.3' : '1.0';
+        const input = document.getElementById(`input-${p}`);
+        if(input) {
+            input.value = (rs === null || rs === 'S') ? '' : rs;
+            input.placeholder = rs === 'S' ? 'SHOW' : '';
+        }
+        
+        row.querySelectorAll('.tactic-btn').forEach(b => {
+             const type = b.classList.contains('t-S') ? 'S' : (b.classList.contains('t-D') ? 20 : (b.classList.contains('t-MD') ? 40 : 0));
+             b.classList.toggle('active', rs === type);
+        });
+    });
+    updateEndBtnState();
+}
+
+function updateEndBtnState() {
+    let allPopulated = true;
+    let anyShow = false;
+    state.players.forEach(p => {
+        if (!state.eliminated[p] && state.totals[p] < 240) {
+            if (state.roundScores[p] === null) allPopulated = false;
+            if (state.roundScores[p] === 'S') anyShow = true;
+        }
+    });
+    const btn = document.getElementById('endBtn');
+    if(btn) btn.disabled = !allPopulated || !anyShow;
 }
 
 function setTactic(p, type) {
-    if(state.winner || state.eliminated[p]) return;
-    let v = null;
-    if(type==='S'){ 
-        const isCurrentlyS = state.roundScores[p] === 'S';
-        // Clear only other 'S' marks. S is mandatory for winning.
-        state.players.forEach(pl => {
-            if(state.roundScores[pl]==='S') state.roundScores[pl]=null;
-        }); 
-        v = isCurrentlyS ? null : 'S'; 
-    }
-    else if(type==='D') v=(state.roundScores[p]===20)?null:20;
-    else if(type==='MD') v=(state.roundScores[p]===40)?null:40;
-    else if(type==='FC') v=(state.roundScores[p]===80)?null:80;
-    else if(type==='FS') {
-        // FS (Full Show) gives a score of 0. It is NOT a winner mark ('S').
-        v = (state.roundScores[p]===0) ? null : 0;
-    }
-    state.roundScores[p] = v;
-    renderActive(); 
-    db.collection('eliteGames').doc(state.id).update({ roundScores: state.roundScores });
-}
-
-function manualInput(p, val) {
-    let raw = val.trim();
-    if(raw === "") {
-        state.roundScores[p] = null;
-    } else {
-        let v = (raw.toUpperCase()==='S') ? 'S' : parseInt(raw);
-        // If setting 'S' manually, clear other 'S' marks
-        if(v==='S') {
-            state.players.forEach(pl => {
-                if(pl !== p && state.roundScores[pl]==='S') state.roundScores[pl]=null;
-            });
-        }
-        // If v is not 'S' and is not a valid number (NaN), set to null
-        if(v !== 'S' && isNaN(v)) v = null;
-        state.roundScores[p] = v;
-    }
-    renderActive(); 
-    db.collection('eliteGames').doc(state.id).update({ roundScores: state.roundScores });
-}
-
-function validateEndBtn() {
-    if(!state) return;
-    // Active players include those under 240 and not eliminated
-    let active = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < 240);
+    if(type === 'S') state.roundScores[p] = 'S';
+    else if(type === 'D') state.roundScores[p] = 20;
+    else if(type === 'MD') state.roundScores[p] = 40;
+    else if(type === 'FS') state.roundScores[p] = 0;
     
-    // Exactly one player MUST be marked with 'S' (Show) - FS (0) is NOT a winner mark
-    let shows = active.filter(p => state.roundScores[p] === 'S');
-    
-    // Ensure ALL active players have some score entered
-    let allEntered = active.every(p => {
-        const val = state.roundScores[p];
-        if (val === 'S') return true;
-        // FS (0) or any numeric score is valid
-        if (typeof val === 'number' && !isNaN(val)) return true;
-        return false;
-    });
-
-    const btn = document.getElementById('endBtn');
-    if(btn) { 
-        const isReady = (shows.length === 1 && allEntered);
-        btn.disabled = !isReady; 
-        if (isReady) {
-            btn.style.background = "#27ae60"; // Highlight Green when ready
-            btn.style.color = "white";
-            btn.style.opacity = "1";
-            btn.style.cursor = "pointer";
-            btn.style.boxShadow = "0 0 15px rgba(39, 174, 96, 0.4)";
-        } else {
-            btn.style.background = "#555";
-            btn.style.color = "rgba(255,255,255,0.5)";
-            btn.style.opacity = "0.5";
-            btn.style.cursor = "not-allowed";
-            btn.style.boxShadow = "none";
-        }
-    }
+    updateRoundScoresUI();
+    db.collection('eliteGames').doc(state.id).update({ roundScores: state.roundScores });
 }
 
 function markOut(p) {
-    if(confirm(`Eject ${p} immediately?`)) {
-        state.eliminated[p]=true; state.totals[p]=240; state.roundScores[p]=240;
+    if(confirm(`Eliminate ${p} immediately?`)) {
+        state.eliminated[p] = true;
+        state.roundScores[p] = 'OUT';
         db.collection('eliteGames').doc(state.id).set(state);
+        renderActive();
+    }
+}
+
+function manualInput(p, val) {
+    let raw = val.replace(/[^0-9]/g, '');
+    let num = parseInt(raw);
+    
+    if(raw === '') {
+        state.roundScores[p] = null;
+    } else {
+        if(num > 80) num = 80;
+        state.roundScores[p] = num;
+    }
+    
+    // Surgical UI update
+    updateRoundScoresUI();
+    
+    // Maintain focus to keep numeric keypad active for typing
+    const el = document.getElementById(`input-${p}`);
+    if (el) el.focus();
+    
+    db.collection('eliteGames').doc(state.id).update({ roundScores: state.roundScores });
+}
+
+function focusNext(p) {
+    const idx = state.players.indexOf(p);
+    let nextP = null;
+    for (let i = 1; i < state.players.length; i++) {
+        let checkIdx = (idx + i) % state.players.length;
+        let testP = state.players[checkIdx];
+        if (!state.eliminated[testP] && state.totals[testP] < 240) {
+            nextP = testP;
+            break;
+        }
+    }
+    
+    if (nextP) {
+        const nextInput = document.getElementById(`input-${nextP}`);
+        if (nextInput) {
+            // Use a tiny delay to ensure keyboard stays up on all devices
+            setTimeout(() => {
+                nextInput.focus();
+                nextInput.select();
+            }, 10);
+            return;
+        }
+    }
+    
+    // If no next input, try to finish round if ready
+    const btn = document.getElementById('endBtn');
+    if (btn && !btn.disabled) {
+        nextRound();
     }
 }
 
 async function nextRound() {
+    if(isPromptingReEntry) return;
     isPromptingReEntry = true;
-    let scores = {...state.roundScores};
-    let entry = { round: state.round, scores: scores, totals: {}, reentries: {} };
-    
-    // First calculate the totals for the current round
-    state.players.forEach(p => {
-        if(!state.eliminated[p]) {
-            let n = (scores[p]==='S')?0: (parseInt(scores[p])===0 ? 0 : (parseInt(scores[p])||0));
-            state.totals[p] += n;
-            // Only 'S' counts as a winning show in action stats
-            if(scores[p]==='S') state.actionStats[p].shows++;
-            if(scores[p]===20) { state.actionStats[p].drops++; state.lastDropRound[p]=state.round; }
-            if(scores[p]===40) state.actionStats[p].mds++;
-            if(scores[p]===80) state.actionStats[p].fcs++;
-        }
-    });
+    try {
+        let scores = {...state.roundScores};
+        let entry = { round: state.round, scores: scores, totals: {}, reentries: {} };
+        
+        // 1. Calculate totals
+        state.players.forEach(p => {
+            if(!state.eliminated[p]) {
+                let n = (scores[p]==='S')?0: (parseInt(scores[p])===0 ? 0 : (parseInt(scores[p])||0));
+                state.totals[p] += n;
+                
+                if(scores[p]==='S') state.actionStats[p].shows++;
+                if(scores[p]===20) { state.actionStats[p].drops++; state.lastDropRound[p]=state.round; }
+                if(scores[p]===40) state.actionStats[p].mds++;
+            }
+        });
 
-    // Check for re-entries
-    let activeSurvivors = state.players.filter(p => state.totals[p]<240 && !state.eliminated[p]).map(p => state.totals[p]);
-    let entryScore = (activeSurvivors.length > 0 ? Math.max(...activeSurvivors) : 0) + 1;
-    
-    for(let p of state.players) {
-        if(state.totals[p]>=240 && !state.eliminated[p]) {
-            if(state.reEntries[p] || entryScore >= 240) {
-                state.eliminated[p]=true;
-            } else {
-                let re = confirm(`${p} reached ${state.totals[p]}. Re-enter at ${entryScore}?`);
-                if(re) { 
-                    state.reEntries[p] = true; 
-                    state.totals[p] = entryScore;
-                    entry.reentries[p] = entryScore;
-                } else {
-                    state.eliminated[p] = true;
+        // 2. Check for survivors
+        let activeSurvivors = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]);
+        
+        if (activeSurvivors.length === 0) {
+            // Sudden death/Draw logic
+            let allInRound = state.players.filter(p => !state.eliminated[p]);
+            let minScore = Math.min(...allInRound.map(p => state.totals[p]));
+            let winners = allInRound.filter(p => state.totals[p] === minScore);
+            state.winner = winners[0]; 
+            state.endTime = formatEliteDate(new Date());
+            state.players.forEach(p => { entry.totals[p] = state.totals[p]; });
+            state.history.push(entry);
+        } else {
+            // 3. Process Re-entries using Modal
+            let reEntryQueue = [];
+            let entryScore = Math.max(...activeSurvivors.map(p => state.totals[p])) + 1;
+            
+            for(let p of state.players) {
+                if(!state.eliminated[p] && state.totals[p] >= 240) {
+                    if(state.reEntries[p] || entryScore >= 240) {
+                        state.eliminated[p] = true;
+                    } else {
+                        reEntryQueue.push({ player: p, score: entryScore });
+                    }
                 }
             }
+            
+            if (reEntryQueue.length > 0) {
+                await processReEntryQueue(reEntryQueue, entry);
+            } else {
+                finalizeRound(entry);
+            }
+            return; // finalizeRound will handle the rest
         }
+        
+        await db.collection('eliteGames').doc(state.id).set(state);
+    } catch(e) {
+        console.error(e);
+    } finally {
+        isPromptingReEntry = false;
     }
-
-    state.players.forEach(p => { entry.totals[p] = state.totals[p]; });
-    state.history.push(entry);
-    state.round++; 
-    state.players.forEach(p => state.roundScores[p]=null);
-    
-    let currentWinners = state.players.filter(p => !state.eliminated[p] && state.totals[p]<240);
-    if(currentWinners.length === 1) { 
-        state.winner=currentWinners[0]; 
-        state.endTime=formatEliteDate(new Date()); 
-    }
-    
-    await db.collection('eliteGames').doc(state.id).set(state);
-    isPromptingReEntry=false;
     renderActive();
 }
 
-function viewProfile(uid) {
-    const p = playersDb.find(x => x.id === uid); if(!p) return;
-    const name = p.fullName || `Elite-ID: ${p.id.substring(0,8)}`;
-    let matches = savedGames.filter(g => g.winner && g.players.includes(name));
-    let wins = matches.filter(g => g.winner === name).length;
-    let s=0, fc=0, d=0, md=0;
-    matches.forEach(g => { if(g.actionStats[name]){ s+=g.actionStats[name].shows; fc+=g.actionStats[name].fcs; d+=g.actionStats[name].drops; md+=g.actionStats[name].mds; } });
-    
-    document.getElementById('pPhoto').src = p.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=27ae60&color=fff&size=150`;
-    document.getElementById('pName').innerText = name;
-    document.getElementById('pID').innerText = "PLAYER ID: " + p.id;
-    document.getElementById('statWins').innerText = wins;
-    document.getElementById('statS').innerText = s;
-    document.getElementById('statFC').innerText = fc;
-    document.getElementById('statD').innerText = d;
-    document.getElementById('statMD').innerText = md;
-    document.getElementById('statTotal').innerText = matches.length;
-
-    let ai = "Insufficient match history to build a strategic profile.";
-    if(matches.length >= 3) {
-        const dropRatio = (d + md) / matches.length;
-        const showRatio = s / matches.length;
-        const fullRatio = fc / matches.length;
-        if (dropRatio > 1.5 && showRatio < 0.5) ai = "<b>Defensive Strategist:</b> Plays with extreme caution.";
-        else if (showRatio > 1.2) ai = "<b>Aggressive Hunter:</b> High-risk, high-reward player.";
-        else if (fullRatio > 1.0) ai = "<b>Stubborn Competitor:</b> Holds cards too long.";
-        else ai = "<b>Balanced Professional:</b> Adapts seamlessly to the table.";
+function processReEntryQueue(queue, entry) {
+    if (queue.length === 0) {
+        finalizeRound(entry);
+        return;
     }
-    document.getElementById('aiAnalysis').innerHTML = "<b>AI STRATEGIC PROFILE:</b><br>" + ai;
-    document.getElementById('btnEditProfile').style.display = (auth.currentUser && uid === auth.currentUser.uid) ? 'inline-block' : 'none';
-    document.getElementById('profileModal').style.display='flex';
-}
-
-function viewMyProfile() { if(auth.currentUser) viewProfile(auth.currentUser.uid); }
-function openEditProfile() {
-    const p = playersDb.find(x => x.id === auth.currentUser.uid);
-    document.getElementById('editName').value = p.fullName || "";
-    document.getElementById('editPhotoPreview').src = p.photoURL || "";
-    document.getElementById('profileModal').style.display = 'none';
-    document.getElementById('editProfileModal').style.display = 'flex';
-}
-async function saveProfile() {
-    await db.collection('players').doc(auth.currentUser.uid).update({ fullName: document.getElementById('editName').value.toUpperCase(), photoURL: document.getElementById('editPhotoPreview').src });
-    document.getElementById('editProfileModal').style.display = 'none';
-    viewMyProfile();
-}
-function handlePhotoUpload(event) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 150; canvas.height = img.height * (150 / img.width);
-            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-            document.getElementById('editPhotoPreview').src = canvas.toDataURL('image/jpeg', 0.7);
-        }
-        img.src = e.target.result;
+    
+    let { player, score } = queue.shift();
+    document.getElementById('reentryText').innerHTML = `<b>${player}</b> reached <b>${state.totals[player]}</b>.<br>Re-enter at <b>${score}</b>?`;
+    document.getElementById('reentryModal').style.display = 'flex';
+    
+    document.getElementById('btnReentryYes').onclick = () => {
+        state.reEntries[player] = true;
+        state.totals[player] = score;
+        entry.reentries[player] = score;
+        document.getElementById('reentryModal').style.display = 'none';
+        processReEntryQueue(queue, entry);
     };
-    reader.readAsDataURL(event.target.files[0]);
+    
+    document.getElementById('btnReentryNo').onclick = () => {
+        state.eliminated[player] = true;
+        document.getElementById('reentryModal').style.display = 'none';
+        processReEntryQueue(queue, entry);
+    };
 }
 
-function openMidGame() {
-    let avail = playersDb.filter(p => !state.players.includes(p.fullName));
-    document.getElementById('midGameSelect').innerHTML = `<option value="">-- Select --</option>` + avail.map(p => `<option value="${p.fullName}">${p.fullName}</option>`).join('');
-    document.getElementById('addMidGameModal').style.display='flex';
-}
-async function confirmAddMidGame() {
-    let name = document.getElementById('midGameSelect').value; if(!name) return;
-    let act = state.players.filter(p => !state.eliminated[p] && state.totals[p]<240).map(p => state.totals[p]);
-    let es = (act.length > 0 ? Math.max(...act) : 0) + 1;
-    state.players.push(name); state.totals[name]=es; state.roundScores[name]=null; state.actionStats[name]={shows:0,fcs:0,drops:0,mds:0};
+async function finalizeRound(entry) {
+    state.players.forEach(p => { entry.totals[p] = state.totals[p]; });
+    state.history.push(entry);
+    state.round++; 
+    state.players.forEach(p => state.roundScores[p] = null);
+
+    let currentSurvivors = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
+    if (currentSurvivors.length === 1) {
+        state.winner = currentSurvivors[0];
+        state.endTime = formatEliteDate(new Date());
+    }
+    
     await db.collection('eliteGames').doc(state.id).set(state);
-    document.getElementById('addMidGameModal').style.display='none';
+    isPromptingReEntry = false;
+
+    let focusP = null;
+    if (state && !state.winner) {
+        let dealerIdx = (state.round - 1) % state.players.length;
+        for (let i = 1; i <= state.players.length; i++) {
+            let checkIdx = (dealerIdx + i) % state.players.length;
+            let p = state.players[checkIdx];
+            if (!state.eliminated[p] && state.totals[p] < 240) {
+                focusP = p;
+                break;
+            }
+        }
+    }
+    renderActive(focusP);
 }
 
-function renderPlayers() {
-    document.getElementById('mainPane').innerHTML = `<h2>Players</h2><table>` + playersDb.map(p => `<tr><td><span class="status-dot ${p.isOnline?'online-dot':'offline-dot'}"></span> <b>${p.fullName}</b></td><td><button onclick="viewProfile('${p.id}')">Profile</button></td></tr>`).join('') + `</table>`;
+function renderHistoryTab() {
+    if(!state.history || !state.history.length) return '';
+    const h = [...state.history].reverse();
+    return `
+        <h3 style="margin-top:30px;">Round Log</h3>
+        ${h.map(round => `
+            <div class="modal-card" style="padding:10px; font-size:12px; border-left:4px solid var(--accent);">
+                <div style="font-weight:bold; margin-bottom:5px; color:var(--accent);">ROUND ${round.round}</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px;">
+                    ${state.players.map(p => `
+                        <div>
+                            <b>${p}:</b> ${round.scores[p]==='S'?'<span class="show-pill">SHOW</span>':(round.scores[p]||0)} 
+                            <span style="opacity:0.6; font-size:10px;">→ ${round.totals[p]}</span>
+                            ${round.reentries[p] ? `<div style="color:var(--warning); font-size:9px;">Re-entered at ${round.reentries[p]}</div>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('')}
+    `;
 }
-function renderContinue() {
-    let act = savedGames.filter(g => !g.winner);
-    document.getElementById('mainPane').innerHTML = `<h2>Active</h2>` + act.map(g => `<div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;"><b>${g.name}</b><button onclick="resume('${g.id}')">Resume</button></div>`).join('') || `<p>None.</p>`;
+
+function renderGameSummary() {
+    return `
+        <h3>Performance Analysis</h3>
+        <div class="player-grid">
+            ${state.players.map(p => `
+                <div class="modal-card">
+                    <div style="font-weight:bold; color:var(--accent);">${p}</div>
+                    <div style="font-size:11px; margin-top:5px;">
+                        🏆 Shows: ${state.actionStats[p].shows}<br>
+                        💨 Drops: ${state.actionStats[p].drops}<br>
+                        ⚠️ MDs: ${state.actionStats[p].mds}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
 }
-function resume(id) { state=savedGames.find(g => g.id === id); currentScreen='activeGame'; renderActive(); }
+
 function renderHistory() {
-    let fin = savedGames.filter(g => g.winner);
-    document.getElementById('mainPane').innerHTML = `<h2>History</h2>` + fin.map(g => `<div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;"><b>${g.name}</b><button onclick="delMatch('${g.id}')">Del</button></div>`).join('');
+    const container = document.getElementById('mainPane');
+    const past = savedGames.filter(g => g.winner).sort((a,b) => b.id.localeCompare(a.id));
+    container.innerHTML = `
+        <h2>Match Archives</h2>
+        ${past.length ? 
+            past.map(g => `
+                <div class="modal-card">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <div style="font-weight:bold;">Winner: <span style="color:var(--success)">${g.winner}</span></div>
+                            <div style="font-size:11px; opacity:0.6;">Players: ${g.players.join(', ')}</div>
+                            <div style="font-size:11px; opacity:0.6;">Date: ${g.endTime}</div>
+                        </div>
+                        <button class="btn btn-primary" onclick="viewDetailedHistory('${g.id}')">DETAILS</button>
+                    </div>
+                </div>
+            `).join('')
+            : '<div style="opacity:0.5;">No match history yet.</div>'
+        }
+    `;
 }
-function delMatch(id) { if(confirm("Delete?")) db.collection('eliteGames').doc(id).delete(); }
+
+function viewDetailedHistory(id) {
+    state = savedGames.find(g => g.id === id);
+    currentScreen = 'activeGame';
+    renderActive();
+}
+
 function renderReports() {
-  document.getElementById('mainPane').innerHTML = `<h2>Reports</h2>` + savedGames.filter(g => g.winner).map(g => `<div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:5px; border-radius:8px; display:flex; justify-content:space-between;"><b>${g.name}</b><button onclick="viewTableReport('${g.id}')">View</button></div>`).join('');
+    const container = document.getElementById('mainPane');
+    const past = savedGames.filter(g => g.winner);
+    
+    let stats = {};
+    past.forEach(g => {
+        g.players.forEach(p => {
+            if(!stats[p]) stats[p] = { wins: 0, games: 0, shows: 0, drops: 0 };
+            stats[p].games++;
+            if(p === g.winner) stats[p].wins++;
+            if(g.actionStats && g.actionStats[p]) {
+                stats[p].shows += g.actionStats[p].shows || 0;
+                stats[p].drops += g.actionStats[p].drops || 0;
+            }
+        });
+    });
+    
+    const sorted = Object.entries(stats).sort((a,b) => b[1].wins - a[1].wins);
+
+    container.innerHTML = `
+        <h2>Global Leaderboard</h2>
+        <div class="modal-card">
+            <table>
+                <thead>
+                    <tr><th>PLAYER</th><th>WINS</th><th>GAMES</th><th>SHOWS</th><th>DRP</th></tr>
+                </thead>
+                <tbody>
+                    ${sorted.map(([name, s]) => `
+                        <tr>
+                            <td><b>${name}</b></td>
+                            <td style="color:var(--success)">${s.wins}</td>
+                            <td>${s.games}</td>
+                            <td>${s.shows}</td>
+                            <td>${s.drops}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
 }
-function viewTableReport(id) {
-    const g = savedGames.find(x => x.id === id); if(!g) return;
-    let h = `<h3>Report: ${g.name}</h3><table><tr><th>Rnd</th>${g.players.map(p => `<th>${p.split(' ')[0]}</th>`).join('')}</tr>`;
-    g.history.forEach(r => { h += `<tr><td>${r.round}</td>${g.players.map(p => `<td>${r.scores[p]||'-'}<br><small>${r.totals[p]||0}</small></td>`).join('')}</tr>`; });
-    h += `</table><button onclick="showScreen('reports')">Back</button>`;
-    document.getElementById('mainPane').innerHTML = h;
+
+// UTILS
+function formatEliteDate(d) {
+    const opt = { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' };
+    return d.toLocaleDateString('en-GB', opt);
 }
+
+function toggleAuth(showLogin) {
+    document.getElementById('loginView').style.display = showLogin ? 'block' : 'none';
+    document.getElementById('signupView').style.display = showLogin ? 'none' : 'block';
+}
+
+async function handleSignup() {
+    const n = document.getElementById('regName').value;
+    const e = document.getElementById('regEmail').value;
+    const p = document.getElementById('regPassword').value;
+    try {
+        const res = await auth.createUserWithEmailAndPassword(e, p);
+        await db.collection('eliteUsers').doc(res.user.uid).set({ name: n, email: e, uid: res.user.uid });
+    } catch(err) { alert(err.message); }
+}
+
+async function handleLogin() {
+    const e = document.getElementById('loginEmail').value;
+    const p = document.getElementById('loginPassword').value;
+    try { await auth.signInWithEmailAndPassword(e, p); }
+    catch(err) { alert(err.message); }
+}
+
+function handleLogout() { auth.signOut(); }
+
+function resume(id) { state=savedGames.find(g => g.id === id); currentScreen='activeGame'; renderActive(); }
+
+function viewMyProfile() {
+    const myGames = savedGames.filter(g => g.winner && g.players.includes(profile.name));
+    const wins = myGames.filter(g => g.winner === profile.name).length;
+    alert(`Elite Stats for ${profile.name}:\n\nTotal Games Played: ${myGames.length}\nTotal Victories: ${wins}\nWin Rate: ${myGames.length ? ((wins/myGames.length)*100).toFixed(1) : 0}%`);
+}
+
 </script>
 </body>
 </html>
