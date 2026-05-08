@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v47.0</title>
+<title>Elite Rummy Circle - v48.0</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -125,7 +125,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v47.0</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v48.0</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -186,11 +186,11 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
         <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
         <div style="margin-bottom: 20px;">
-            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v47.0 - Security & Session Reset</b>
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v48.0 - Robuster Session Reset</b>
             <ul style="padding-left: 20px; list-style: disc; opacity: 0.9; font-size: 13px; line-height: 1.6;">
-                <li>New daily house-keeping: All players are automatically logged out at 01:45 AM local time daily.</li>
-                <li>Logged out players are automatically set to 'Offline' status.</li>
-                <li>General stability improvements and minor UI refinements.</li>
+                <li>Improved '1:45 AM' logout logic to ensure all active users are reset even if the app was in the background.</li>
+                <li>Fixed visibility of online/offline status after automatic logout.</li>
+                <li>Minor styling fixes for input boxes on mobile.</li>
                 <li>Developer: Elite IT</li>
             </ul>
         </div>
@@ -211,13 +211,13 @@
       <button class="navBtn" style="background:var(--danger);" onclick="handleLogout()">Logout</button>
     </div>
     <div style="margin-top:auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);">
-        <div onclick="showReleaseNotes()" style="font-size: 11px; color: var(--accent); font-weight: bold; cursor: pointer; text-decoration: underline;">v47.0</div>
+        <div onclick="showReleaseNotes()" style="font-size: 11px; color: var(--accent); font-weight: bold; cursor: pointer; text-decoration: underline;">v48.0</div>
         <div style="font-size: 9px; opacity: 0.4;">Developer: Elite IT</div>
     </div>
   </div>
   <div class="main-pane" id="mainPane"></div>
   <div style="position: fixed; bottom: 8px; right: 12px; z-index: 4000; text-align: right; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v47.0</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v48.0</div>
   </div>
 </div>
 
@@ -240,29 +240,32 @@ let isPromptingReEntry = false;
 
 // --- AUTH ---
 function checkScheduledLogout() {
+  if (!auth.currentUser) return;
   const now = new Date();
   const hour = now.getHours();
   const min = now.getMinutes();
-  const currentDate = now.toDateString();
+  const today145 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 1, 45, 0);
   
-  // Target: 01:45 AM daily local time
-  if (hour === 1 && min === 45 && auth.currentUser) {
-    const lastTrigger = localStorage.getItem('lastScheduledLogout');
-    if (lastTrigger !== currentDate + " 01:45") {
-      localStorage.setItem('lastScheduledLogout', currentDate + " 01:45");
+  if (now >= today145) {
+    const lastTrigger = localStorage.getItem('lastScheduledLogoutDate');
+    const todayStr = now.toDateString();
+    
+    if (lastTrigger !== todayStr) {
+      localStorage.setItem('lastScheduledLogoutDate', todayStr);
       handleLogout();
       alert("Daily scheduled logout (01:45 AM). You have been logged out and set to offline.");
     }
   }
 }
-setInterval(checkScheduledLogout, 30000); // Check every 30 seconds
+setInterval(checkScheduledLogout, 20000); // Check every 20 seconds
 
 auth.onAuthStateChanged(user => {
   if(user) {
-    // Prevent immediate logout if they log in precisely at 1:45
     const now = new Date();
-    if (now.getHours() === 1 && now.getMinutes() === 45) {
-      localStorage.setItem('lastScheduledLogout', now.toDateString() + " 01:45");
+    const today145 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 1, 45, 0);
+    // If they log in AFTER 1:45 AM, don't kick them out until tomorrow 1:45 AM
+    if (now >= today145) {
+      localStorage.setItem('lastScheduledLogoutDate', now.toDateString());
     }
     
     document.getElementById('authScreen').style.display='none';
