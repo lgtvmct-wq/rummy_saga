@@ -1,3 +1,4 @@
+<!-- /index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -218,7 +219,7 @@ async function googleSignIn() { auth.signInWithPopup(new firebase.auth.GoogleAut
 async function signup() {
     const cred = await auth.createUserWithEmailAndPassword(document.getElementById('signupEmail').value, document.getElementById('signupPass').value);
     await db.collection('players').doc(cred.user.uid).set({ 
-        fullName: (document.getElementById('signupFirst').value + " " + document.getElementById('signupLast').value).toUpperCase(), 
+    fullName: (document.getElementById('signupFirst').value + " " + document.getElementById('signupLast').value).toUpperCase(), 
         isOnline: true, photoURL: "", createdAt: firebase.firestore.FieldValue.serverTimestamp() 
     });
 }
@@ -292,7 +293,7 @@ function formatEliteDate(dateObj) {
     const year = d.getFullYear();
     const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
     
-    return `${day}${month}${year}, ${time}`;
+    return `${day}-${month}-${year}, ${time}`;
 }
 
 function startGame() {
@@ -342,7 +343,7 @@ function renderActive() {
                 <button class="tactic-btn ${rs===80?'active':''}" style="background:var(--danger); color:white;" onclick="setTactic('${p}', 'FC')" ${isOut?'disabled':''}>FC</button>
                 <button style="background:#333; color:white; font-size:10px; border:none; border-radius:4px; padding:5px;" onclick="markOut('${p}')" ${isOut?'disabled':''}>OUT</button>
             </div>
-            <input type="text" class="std-input" style="height:35px; margin:5px 0 0 0; text-align:center; font-size:12px; width:100%;" value="${rs===null?'':rs}" onchange="manualInput('${p}', this.value)" ${isOut?'disabled':''}>
+            <input type="text" inputmode="numeric" class="std-input" style="height:35px; margin:5px 0 0 0; text-align:center; font-size:12px; width:100%;" value="${rs===null?'':rs}" onchange="manualInput('${p}', this.value)" ${isOut?'disabled':''}>
         </td>
         <td><b style="color:var(--warning)">${state.totals[p]}</b></td>
     </tr>`;
@@ -413,6 +414,9 @@ async function nextRound() {
     let scores = {...state.roundScores};
     let entry = { round: state.round, scores: scores, totals: {}, reentries: {} };
     
+    // Track active players at round start for the 2-player Instant Elimination rule
+    let activePlayersAtStart = state.players.filter(p => !state.eliminated[p]);
+
     // First calculate the totals for the current round
     state.players.forEach(p => {
         if(!state.eliminated[p]) {
@@ -426,12 +430,17 @@ async function nextRound() {
     });
 
     // Check for re-entries
-    let activePlayersAtStart = state.players.filter(p => !state.eliminated[p]);
     let activeSurvivors = state.players.filter(p => state.totals[p]<240 && !state.eliminated[p]).map(p => state.totals[p]);
     let entryScore = (activeSurvivors.length > 0 ? Math.max(...activeSurvivors) : 0) + 1;
     
     for(let p of state.players) {
         if(state.totals[p]>=240 && !state.eliminated[p]) {
+            // Instant Elimination Law: If only 2 players were playing, no re-entry permitted.
+            if (activePlayersAtStart.length === 2) {
+                state.eliminated[p] = true;
+                continue;
+            }
+
             if(state.reEntries[p] || entryScore >= 240) {
                 state.eliminated[p]=true;
             } else {
@@ -439,7 +448,7 @@ async function nextRound() {
                 if(re) { 
                     state.reEntries[p] = true; 
                     state.totals[p] = entryScore;
-                    entry.reentries[p] = entryScore; // Track re-entry in this round's log
+                    entry.reentries[p] = entryScore; 
                 } else {
                     state.eliminated[p] = true;
                 }
@@ -447,7 +456,7 @@ async function nextRound() {
         }
     }
 
-    // Capture final totals for this round (post re-entry)
+    // Capture final totals for this round
     state.players.forEach(p => {
         entry.totals[p] = state.totals[p];
     });
@@ -593,7 +602,6 @@ function viewTableReport(id) {
     const g = savedGames.find(x => x.id === id);
     if(!g) return;
 
-    // Helper to get first name
     const getFirstName = (fullName) => fullName.split(' ')[0];
 
     let h = `
@@ -620,17 +628,13 @@ function viewTableReport(id) {
                 <tbody style="color: #333;">
     `;
 
-    // Filter out rows where NO one has a score OR rounds that occur after a winner is already determined
-    // Also remove rounds where an OUT player erroneously played twice.
     let winnerFoundInHistory = false;
     let prevTotals = {};
     const validHistory = g.history.filter(r => {
         if (winnerFoundInHistory) return false;
-        
         const hasScore = Object.values(r.scores).some(v => v !== null && v !== undefined && v !== "");
         if (!hasScore) return false;
 
-        // Check if an OUT player played (error detection)
         const outPlayerPlayed = g.players.some(p => {
             const wasOut = prevTotals[p] !== undefined && prevTotals[p] >= 240;
             const hasCurrentScore = r.scores[p] !== null && r.scores[p] !== undefined && r.scores[p] !== "";
@@ -638,11 +642,8 @@ function viewTableReport(id) {
         });
         if (outPlayerPlayed) return false;
 
-        // Check if this round resulted in a single survivor
         const survivors = g.players.filter(p => (r.totals[p] || 0) < 240);
-        if (survivors.length <= 1) {
-            winnerFoundInHistory = true;
-        }
+        if (survivors.length <= 1) winnerFoundInHistory = true;
         prevTotals = {...r.totals};
         return true;
     });
@@ -654,17 +655,12 @@ function viewTableReport(id) {
                 let s = r.scores[p];
                 let t = r.totals[p];
                 let re = (r.reentries && r.reentries[p]);
-                
-                // Detection if player had not joined yet
                 let notJoined = (t === undefined);
                 let isOut = (t >= 240 && !re);
-                
-                let val = "";
-                let subVal = "";
+                let val = "", subVal = "";
                 
                 if (notJoined) {
                     val = `<span style="opacity:0.4; font-size:10px; color:#999;">Not Played</span>`;
-                    subVal = ""; // No total shown
                 } else if (isOut) {
                     val = `<span style="color:#e74c3c; font-weight:bold;">OUT</span>`;
                     subVal = `<div style="font-size:10px; opacity:0.7; color:#666;">Total: ${t}</div>`;
@@ -672,14 +668,12 @@ function viewTableReport(id) {
                     if (s === 'S') val = `<span style="color:#27ae60; font-weight:bold;">Show</span>`;
                     else if (re) val = `<span style="color:#f39c12; font-weight:bold;">${s}</span>`;
                     else val = (s !== null && s !== undefined) ? `<span style="color:#111; font-weight:500;">${s}</span>` : '-';
-                    
                     let totStyle = re ? `color:#f39c12; font-weight:bold;` : `opacity:0.9; color:#444;`;
                     subVal = `<div style="font-size:10px; ${totStyle}">Total: ${t}</div>`;
                 }
 
                 return `<td style="padding:12px 8px; border: 1px solid #ddd; text-align: center;">
-                    <div>${val}</div>
-                    ${subVal}
+                    <div>${val}</div>${subVal}
                     ${re ? '<div style="font-size:9px; color:#f39c12; font-weight:bold;">[RE-ENTERED]</div>' : ''}
                 </td>`;
             }).join('')}
@@ -702,17 +696,13 @@ function viewTableReport(id) {
                 </tr>
                 </tbody>
             </table>
-        </div>
-    `;
-
+        </div>`;
     document.getElementById('mainPane').innerHTML = h;
 }
 
 function genPDF(id) {
     const g = savedGames.find(x => x.id === id);
     const doc = new jspdf.jsPDF();
-    
-    // Helper to get first name
     const getFirstName = (fullName) => fullName.split(' ')[0];
 
     doc.setFontSize(18);
@@ -727,14 +717,12 @@ function genPDF(id) {
         if (winnerFoundInHistory) return false;
         const hasScore = Object.values(r.scores).some(v => v !== null && v !== undefined && v !== "");
         if (!hasScore) return false;
-        
         const outPlayerPlayed = g.players.some(p => {
             const wasOut = prevPdfTotals[p] !== undefined && prevPdfTotals[p] >= 240;
             const hasCurrentScore = r.scores[p] !== null && r.scores[p] !== undefined && r.scores[p] !== "";
             return wasOut && hasCurrentScore;
         });
         if (outPlayerPlayed) return false;
-
         const survivors = g.players.filter(p => (r.totals[p] || 0) < 240);
         if (survivors.length <= 1) winnerFoundInHistory = true;
         prevPdfTotals = {...r.totals};
@@ -747,8 +735,7 @@ function genPDF(id) {
     const body = sigHistory.map(r => [
         r.round, 
         ...g.players.map(p => {
-            let s = r.scores[p];
-            let t = r.totals[p];
+            let s = r.scores[p], t = r.totals[p];
             if (t === undefined) return 'Not Played';
             if (r.reentries && r.reentries[p]) return `${s} (RE)`;
             if (t >= 240) return 'OUT';
@@ -769,9 +756,9 @@ function genPDF(id) {
         didParseCell: function(data) {
             if (data.row.index < sigHistory.length) {
                 const round = sigHistory[data.row.index];
-                const player = g.players[data.column.index - 1]; // -1 because first col is 'Rnd'
+                const player = g.players[data.column.index - 1];
                 if (round && round.reentries && round.reentries[player]) {
-                    data.cell.styles.textColor = [243, 156, 18]; // --warning color
+                    data.cell.styles.textColor = [243, 156, 18];
                 }
             }
         }
