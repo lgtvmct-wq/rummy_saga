@@ -85,6 +85,19 @@
   .status-text { font-size: 10px; font-weight: bold; text-transform: uppercase; }
 
   .pause-btn { background: var(--info); color: white; border: 1px solid rgba(255,255,255,0.3); font-size: 11px; padding: 8px 12px; }
+  
+  /* Fullscreen TV Mode Styles */
+  #fullscreenOverlay { display: none; position: fixed; inset: 0; background: #000; z-index: 6000; flex-direction: column; padding: 2vh 5vw; overflow-y: auto; }
+  .tv-table { width: 100%; border-collapse: separate; border-spacing: 0 1vh; }
+  .tv-table th { font-size: 2.5vh; color: var(--accent); border-bottom: 2px solid #333; padding: 2vh 1vh; }
+  .tv-table td { font-size: 5vh; font-weight: bold; padding: 2vh 1vh; border-bottom: 1px solid #222; }
+  .tv-title { font-size: 4vh; color: var(--accent); margin: 2vh 0; text-align: center; }
+  .tv-badge { font-size: 2vh; vertical-align: middle; }
+  .tv-close { position: fixed; top: 10px; right: 10px; background: rgba(255,255,255,0.1); border-radius: 50%; width: 40px; height: 40px; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; }
+  
+  @media print {
+    #fullscreenOverlay { display: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -216,6 +229,10 @@
     </div>
   </div>
   <div class="main-pane" id="mainPane"></div>
+  <div id="fullscreenOverlay">
+      <div class="tv-close" onclick="closeFullScreen()">✕</div>
+      <div id="tvContent"></div>
+  </div>
   <div style="position: fixed; bottom: 8px; right: 12px; z-index: 4000; text-align: right; pointer-events: auto;">
       <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v51.0</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
@@ -267,6 +284,19 @@ auth.onAuthStateChanged(user => {
       localStorage.setItem('lastLogoutTriggeredTodayGST', nowInDubai.toDateString());
     }
     
+    // Check for Fullscreen Parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const fsGameId = urlParams.get('fullscreen');
+    if (fsGameId) {
+        db.collection('eliteGames').doc(fsGameId).onSnapshot(doc => {
+            if (doc.exists) {
+                state = doc.data();
+                showTVViewOnly();
+            }
+        });
+        return; // Prevent normal UI load
+    }
+    
     document.getElementById('authScreen').style.display='none';
     document.getElementById('mainApp').style.display='flex';
     db.collection('players').doc(user.uid).set({ isOnline: true }, {merge:true});
@@ -311,8 +341,13 @@ function loadData() {
             // Check if we need full render or just UI sync
             const needsFull = state.round !== s.round || state.winner !== s.winner || state.players.length !== s.players.length;
             state = s;
-            if (needsFull) renderActive();
-            else updateRoundScoresUI();
+            if (needsFull) {
+                renderActive();
+                if (document.getElementById('fullscreenOverlay').style.display === 'flex') renderTVContent();
+            } else {
+                updateRoundScoresUI();
+                if (document.getElementById('fullscreenOverlay').style.display === 'flex') renderTVContent();
+            }
         } else {
             state = null; showScreen('newGame');
         }
@@ -398,9 +433,12 @@ function renderActive(focusPlayer = null) {
   let activeCandidates = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
   let dealer = activeCandidates.length > 0 ? activeCandidates[(state.round - 1) % activeCandidates.length] : null;
 
-  let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-    <h3 style="margin:0;">${state.name}</h3>
-    <button onclick="state=null; showScreen('newGame')" class="pause-btn">${state.winner?'Home':'Pause'}</button>
+  let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px; flex-wrap:wrap;">
+    <h3 style="margin:0; flex:1;">${state.name}</h3>
+    <div style="display:flex; gap:5px;">
+        <button onclick="toggleFullScreen()" class="pause-btn" style="background:var(--accent);">Full Screen</button>
+        <button onclick="state=null; showScreen('newGame')" class="pause-btn">${state.winner?'Home':'Pause'}</button>
+    </div>
   </div><table style="table-layout: fixed;">
     <colgroup><col style="width:32%"><col style="width:48%"><col style="width:20%"></colgroup>
     <tr><th>Player</th><th>Tactics</th><th>Total</th></tr>`;
@@ -811,6 +849,79 @@ function handlePhotoUpload(event) {
 }
 
 // --- UTILS & SCREENS ---
+function toggleFullScreen() {
+    if (window.innerWidth < 900) {
+        // Mobile: Open in new tab with fullscreen mode
+        window.open('?fullscreen=' + state.id, '_blank');
+    } else {
+        // TV/Desktop: Toggle local overlay and browser fullscreen
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(e => console.log(e));
+        }
+        renderTVContent();
+        document.getElementById('fullscreenOverlay').style.display = 'flex';
+    }
+}
+
+function closeFullScreen() {
+    document.getElementById('fullscreenOverlay').style.display = 'none';
+    if (document.exitFullscreen) {
+        document.exitFullscreen().catch(e => console.log(e));
+    }
+}
+
+function showTVViewOnly() {
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('fullscreenOverlay').style.display = 'flex';
+    document.querySelector('.tv-close').style.display = 'none'; // No close button in view-only mode
+    renderTVContent();
+}
+
+function renderTVContent() {
+    if (!state) return;
+    let activeCandidates = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
+    let dealer = activeCandidates.length > 0 ? activeCandidates[(state.round - 1) % activeCandidates.length] : null;
+
+    let h = `<div class="tv-title">${state.name}</div>
+    <div style="text-align:center; font-size: 3vh; margin-bottom: 2vh; opacity: 0.8;">Round ${state.round}</div>
+    <table class="tv-table">
+        <tr><th style="width:50%;">Player</th><th style="text-align:center;">Round</th><th style="text-align:center;">Total</th></tr>`;
+
+    const sorted = [...state.players].sort((a, b) => {
+        const aOut = state.eliminated[a] || state.totals[a] >= 240;
+        const bOut = state.eliminated[b] || state.totals[b] >= 240;
+        if (aOut && !bOut) return 1;
+        if (!aOut && bOut) return -1;
+        return 0;
+    });
+
+    sorted.forEach(p => {
+        let isOut = state.eliminated[p] || state.totals[p] >= 240;
+        let rs = state.roundScores[p];
+        let tot = state.totals[p] || 0;
+        
+        h += `<tr style="${isOut ? 'opacity:0.2' : ''}">
+            <td>
+                ${p === dealer ? '<span class="tv-badge" style="background:var(--warning); color:#000; padding:2px 8px; border-radius:4px; margin-right:15px;">D</span>' : ''}
+                ${p}
+            </td>
+            <td style="text-align:center; color:var(--accent);">${isOut ? '-' : (rs === null ? '' : rs)}</td>
+            <td style="text-align:center; color:var(--warning);">${tot}</td>
+        </tr>`;
+    });
+
+    h += `</table>`;
+    if (state.winner) {
+        h = `<div style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+                <div class="tv-title" style="font-size: 8vh; margin-bottom: 5vh;">🏆 WINNER 🏆</div>
+                <div style="font-size: 15vh; color: var(--accent); font-weight: 900;">${state.winner}</div>
+                <div style="font-size: 4vh; margin-top: 5vh; opacity:0.6;">${state.name} Completed</div>
+             </div>`;
+    }
+    document.getElementById('tvContent').innerHTML = h;
+}
+
 function openMidGame() {
     // Check if any round score is entered for active players
     const isRoundInProgress = Object.keys(state.roundScores).some(p => {
