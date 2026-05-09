@@ -126,6 +126,12 @@
     <div id="loginView">
       <input id="loginEmail" class="std-input" placeholder="Email Address">
       <input id="loginPassword" class="std-input" type="password" placeholder="Password">
+      
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:15px; font-size:13px; opacity:0.8; user-select:none;">
+          <input type="checkbox" id="showPassToggle" onchange="togglePasswordVisibility(this.checked)" style="width:16px; height:16px; cursor:pointer;">
+          <label for="showPassToggle" style="cursor:pointer;">Show Password</label>
+      </div>
+
       <button class="actionBtn" onclick="login()">Log In</button>
       
       <div style="margin: 15px 0; display: flex; align-items: center; gap: 10px;">
@@ -148,6 +154,13 @@
       <input id="signupLast" class="std-input" placeholder="Last Name">
       <input id="signupEmail" class="std-input" placeholder="Email Address">
       <input id="signupPass" class="std-input" type="password" placeholder="Password">
+      <input id="signupConfirmPass" class="std-input" type="password" placeholder="Confirm Password">
+      
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:15px; font-size:13px; opacity:0.8; user-select:none;">
+          <input type="checkbox" id="showPassToggleSignup" onchange="togglePasswordVisibility(this.checked)" style="width:16px; height:16px; cursor:pointer;">
+          <label for="showPassToggleSignup" style="cursor:pointer;">Show Password</label>
+      </div>
+
       <button class="actionBtn" style="background:var(--warning); color:#111;" onclick="signup()">Register Now</button>
       <p style="margin-top:20px; font-size:14px;">
         Already have an account? <span onclick="toggleAuthView('login')" style="color:var(--accent); cursor:pointer; text-decoration:underline; font-weight:bold;">Back to Login</span>
@@ -216,11 +229,13 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
         <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
         <div style="margin-bottom: 20px;">
-            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v53.0 - Brand Identity Update</b>
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v53.0 - Security & UI Refinement</b>
             <ul style="padding-left: 20px; list-style: disc; opacity: 0.9; font-size: 13px; line-height: 1.6;">
-                <li>Added official branded favicon for improved browser tab recognition.</li>
-                <li>Strategic UI refinements for better navigation clarity.</li>
-                <li>Enhanced scoreboard stability during high-traffic sessions.</li>
+                <li>Added 'Confirm Password' validation and 'Show Password' toggle for secure onboarding.</li>
+                <li>Redesigned Full Screen TV Mode with Superhuman avatars and optimized typography.</li>
+                <li>Enabled flexible player selection in match setup regardless of online status.</li>
+                <li>Players manually marked as 'OUT' are now correctly eligible for re-entry rules.</li>
+                <li>Added official branded favicon and tactical button refinements.</li>
                 <li>Developer: Elite IT</li>
             </ul>
         </div>
@@ -328,13 +343,41 @@ auth.onAuthStateChanged(user => {
 function login() { auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); }
 async function googleSignIn() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 async function signup() {
-    const cred = await auth.createUserWithEmailAndPassword(document.getElementById('signupEmail').value, document.getElementById('signupPass').value);
+    const pass = document.getElementById('signupPass').value;
+    const confirm = document.getElementById('signupConfirmPass').value;
+    
+    if (pass !== confirm) {
+        alert("Passwords do not match!");
+        return;
+    }
+    if (pass.length < 6) {
+        alert("Password should be at least 6 characters.");
+        return;
+    }
+
+    const cred = await auth.createUserWithEmailAndPassword(document.getElementById('signupEmail').value, pass);
     await db.collection('players').doc(cred.user.uid).set({ 
         fullName: (document.getElementById('signupFirst').value + " " + document.getElementById('signupLast').value).toUpperCase(), 
         isOnline: true, photoURL: "", createdAt: firebase.firestore.FieldValue.serverTimestamp() 
     });
 }
 function handleLogout() { if(auth.currentUser) db.collection('players').doc(auth.currentUser.uid).update({ isOnline: false }).then(() => auth.signOut()); }
+
+function togglePasswordVisibility(isVisible) {
+  const type = isVisible ? 'text' : 'password';
+  const fields = ['loginPassword', 'signupPass', 'signupConfirmPass'];
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.type = type;
+  });
+  // Sync all toggle checkboxes
+  const toggles = ['showPassToggle', 'showPassToggleSignup'];
+  toggles.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = isVisible;
+  });
+}
+
 function toggleAuthView(v) {
   document.getElementById('loginView').style.display = v==='login'?'block':'none';
   document.getElementById('signupView').style.display = v==='signup'?'block':'none';
@@ -408,7 +451,7 @@ function addPlayerField() {
     playersDb.map(p => {
         if(selected.includes(p.fullName)) return '';
         const name = p.fullName || `Elite-User-${p.id.substring(0,5)}`;
-        return `<option value="${name}" ${p.isOnline?'':'disabled'}>${name} ${p.isOnline?'':'(OFFLINE)'}</option>`;
+        return `<option value="${name}">${name} ${p.isOnline?'':'(OFFLINE)'}</option>`;
     }).join('');
   const div = document.createElement('div');
   div.style="display:flex; gap:10px; margin-bottom:10px;";
@@ -453,7 +496,7 @@ function renderActive(focusPlayer = null) {
   let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px; flex-wrap:wrap;">
     <h3 style="margin:0; flex:1;">${state.name}</h3>
     <div style="display:flex; gap:5px;">
-        <button onclick="toggleFullScreen()" class="pause-btn" style="background:var(--accent);">Full Screen</button>
+        <button onclick="toggleFullScreen()" class="pause-btn" style="background: linear-gradient(to bottom, var(--accent), #1e8449); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 0 10px rgba(39, 174, 96, 0.3);">Full Screen</button>
         <button onclick="state=null; showScreen('newGame')" class="pause-btn">${state.winner?'Home':'Pause'}</button>
     </div>
   </div><table style="table-layout: fixed;">
@@ -487,7 +530,7 @@ function renderActive(focusPlayer = null) {
                 <button class="tactic-btn t-D ${rs===20?'active':''}" style="background:var(--warning)" onclick="setTactic('${p}', 'D')" ${isOut || dLock?'disabled':''}>D</button>
                 <button class="tactic-btn t-MD ${rs===40?'active':''}" style="background:#8e44ad; color:white;" onclick="setTactic('${p}', 'MD')" ${isOut?'disabled':''}>MD</button>
                 <button class="tactic-btn t-FC ${rs===80?'active':''}" style="background:var(--danger); color:white;" onclick="setTactic('${p}', 'FC')" ${isOut?'disabled':''}>FC</button>
-                <button class="tactic-btn t-FS ${rs===0?'active':''}" style="background:#2c3e50; color:white;" onclick="setTactic('${p}', 'FS')" ${isOut?'disabled':''}>FS</button>
+                <button class="tactic-btn t-FS ${rs===0?'active':''}" style="background: linear-gradient(to bottom, #34495e, #1a232e); border: 1px solid rgba(255,255,255,0.4); color:white; box-shadow: inset 0 0 5px rgba(255,255,255,0.1);" onclick="setTactic('${p}', 'FS')" ${isOut?'disabled':''}>FS</button>
             </div>
             <div style="display:flex; gap:5px; align-items:center; margin-top:5px;">
                 <input type="text" id="input-${p}" inputmode="numeric" pattern="[0-9]*" class="std-input score-input" data-player="${p}" style="height:35px; margin:0; text-align:center; font-size:12px; flex:1;" value="${rs===null?'':rs}" oninput="manualInput('${p}', this.value)" onkeydown="if(event.key==='Enter') { event.preventDefault(); this.blur(); }" ${isOut?'disabled':''}>
@@ -684,8 +727,8 @@ function validateEndBtn() {
 }
 
 function markOut(p) {
-    if(confirm(`Eject ${p} immediately?`)) {
-        state.eliminated[p]=true; state.totals[p]=240; state.roundScores[p]=240;
+    if(confirm(`Mark ${p} as OUT? They will be eligible for re-entry at the end of the round.`)) {
+        state.totals[p]=240; state.roundScores[p]=240;
         db.collection('eliteGames').doc(state.id).set(state);
     }
 }
@@ -900,10 +943,21 @@ function renderTVContent() {
     let activeCandidates = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
     let dealer = activeCandidates.length > 0 ? activeCandidates[(state.round - 1) % activeCandidates.length] : null;
 
+    const getTVAvatar = (pName) => {
+        const trimmedName = pName.trim();
+        const pData = playersDb.find(x => x.fullName && x.fullName.trim() === trimmedName);
+        if (pData?.photoURL) return pData.photoURL;
+        // Character set for "Superhuman" random assignment
+        const chars = ['adventurer', 'avataaars', 'big-ears', 'bottts', 'pixel-art', 'lorelei'];
+        const charType = chars[trimmedName.length % chars.length];
+        return `https://api.dicebear.com/7.x/${charType}/svg?seed=${encodeURIComponent(trimmedName)}`;
+    };
+
     let h = `<div class="tv-title">${state.name}</div>
-    <div style="text-align:center; font-size: 3vh; margin-bottom: 2vh; opacity: 0.8;">Round ${state.round}</div>
-    <table class="tv-table">
-        <tr><th style="width:50%;">Player</th><th style="text-align:center;">Round</th><th style="text-align:center;">Total</th></tr>`;
+    <div style="text-align:center; font-size: 6vh; margin-bottom: 3vh; color: var(--accent); font-weight: 900; letter-spacing: 2px;">ROUND ${state.round}</div>`;
+
+    h += `<table class="tv-table">
+        <tr><th style="width:75%;">Player</th><th style="text-align:center;">Score</th></tr>`;
 
     const sorted = [...state.players].sort((a, b) => {
         const aOut = state.eliminated[a] || state.totals[a] >= 240;
@@ -915,20 +969,26 @@ function renderTVContent() {
 
     sorted.forEach(p => {
         let isOut = state.eliminated[p] || state.totals[p] >= 240;
-        let rs = state.roundScores[p];
         let tot = state.totals[p] || 0;
+        let hasReEntered = state.reEntries && state.reEntries[p];
         
         h += `<tr style="${isOut ? 'opacity:0.2' : ''}">
-            <td>
-                ${p === dealer ? '<span class="tv-badge" style="background:var(--warning); color:#000; padding:2px 8px; border-radius:4px; margin-right:15px;">D</span>' : ''}
-                ${p}
+            <td style="display: flex; align-items: center; border-bottom: 1px solid #222;">
+                <img src="${getTVAvatar(p)}" style="width: 9vh; height: 9vh; border-radius: 50%; object-fit: cover; border: 3px solid ${p === dealer ? 'var(--warning)' : 'var(--accent)'}; margin-right: 3vh; background: #333;">
+                <div style="display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center;">
+                        ${p === dealer ? '<span class="tv-badge" style="background:var(--warning); color:#000; padding:1px 10px; border-radius:4px; margin-right:15px; font-size: 2vh; font-weight:900; line-height:1.2;">D</span>' : ''}
+                        <span style="font-size: 4.5vh;">${p}</span>
+                        ${hasReEntered ? '<span class="tv-badge" style="background:var(--warning); color:#000; padding:1px 8px; border-radius:4px; margin-left:15px; font-size: 2vh; font-weight:900; line-height:1.2;">RE</span>' : ''}
+                    </div>
+                </div>
             </td>
-            <td style="text-align:center; color:var(--accent);">${isOut ? '-' : (rs === null ? '' : rs)}</td>
-            <td style="text-align:center; color:var(--warning);">${tot}</td>
+            <td style="text-align:center; color:var(--warning); border-bottom: 1px solid #222; font-size: 6vh;">${tot}</td>
         </tr>`;
     });
 
     h += `</table>`;
+
     if (state.winner) {
         h = `<div style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
                 <div class="tv-title" style="font-size: 8vh; margin-bottom: 5vh;">🏆 WINNER 🏆</div>
