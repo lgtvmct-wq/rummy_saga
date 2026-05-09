@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v49.0</title>
+<title>Elite Rummy Circle - v51.0</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -125,7 +125,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v49.0</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v51.0</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -186,11 +186,11 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
         <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
         <div style="margin-bottom: 20px;">
-            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v49.0 - Precise Daily Reset</b>
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v51.0 - Scheduled Reset Update</b>
             <ul style="padding-left: 20px; list-style: disc; opacity: 0.9; font-size: 13px; line-height: 1.6;">
-                <li>Standardized daily house-keeping: All active sessions are reset at 01:52 AM daily.</li>
-                <li>Ensured all players are transitioned to 'Offline' status in the player list upon logout.</li>
-                <li>Fixed text visibility issues on iOS by forcing high-contrast black text in inputs.</li>
+                <li>Updated scheduled daily session reset time to 07:07 AM Gulf Time (GST).</li>
+                <li>Improved logout precision for backgrounded devices.</li>
+                <li>Ensured consistency in developer attribution across the UI.</li>
                 <li>Developer: Elite IT</li>
             </ul>
         </div>
@@ -210,14 +210,15 @@
       <button class="navBtn" style="background:var(--warning); color:#000;" onclick="viewMyProfile()">My Stats</button>
       <button class="navBtn" style="background:var(--danger);" onclick="handleLogout()">Logout</button>
     </div>
-    <div style="margin-top:auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);">
-        <div onclick="showReleaseNotes()" style="font-size: 11px; color: var(--accent); font-weight: bold; cursor: pointer; text-decoration: underline;">v49.0</div>
+    <div style="margin-top:auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); display:none;">
+        <div onclick="showReleaseNotes()" style="font-size: 11px; color: var(--accent); font-weight: bold; cursor: pointer; text-decoration: underline;">v51.0</div>
         <div style="font-size: 9px; opacity: 0.4;">Developer: Elite IT</div>
     </div>
   </div>
   <div class="main-pane" id="mainPane"></div>
   <div style="position: fixed; bottom: 8px; right: 12px; z-index: 4000; text-align: right; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v49.0</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v51.0</div>
+      <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
 
@@ -241,29 +242,29 @@ let isPromptingReEntry = false;
 // --- AUTH ---
 function checkScheduledLogout() {
   if (!auth.currentUser) return;
-  const now = new Date();
-  const hour = now.getHours();
-  const min = now.getMinutes();
+  const dubaiTime = new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"});
+  const dubaiDate = new Date(dubaiTime);
+  const hour = dubaiDate.getHours();
+  const min = dubaiDate.getMinutes();
   
-  // Target: 01:52 AM daily local time
-  if (hour === 1 && min === 52) {
-    const todayStr = now.toDateString();
-    if (localStorage.getItem('lastLogoutTriggeredToday') !== todayStr) {
-      localStorage.setItem('lastLogoutTriggeredToday', todayStr);
-      console.log("Daily session reset triggered at 01:52 AM");
+  // Target: 07:07 AM Gulf Standard Time (GST) daily
+  if (hour === 7 && min === 7) {
+    const todayStr = dubaiDate.toDateString();
+    if (localStorage.getItem('lastLogoutTriggeredTodayGST') !== todayStr) {
+      localStorage.setItem('lastLogoutTriggeredTodayGST', todayStr);
+      console.log("Daily session reset triggered at 07:07 AM GST");
       handleLogout();
-      alert("Daily session reset (01:52 AM). Logging out...");
+      alert("Daily session reset (07:07 AM GST). Logging out...");
     }
   }
 }
-setInterval(checkScheduledLogout, 15000); // Check every 15 seconds for precision
+setInterval(checkScheduledLogout, 20000); // Check every 20 seconds
 
 auth.onAuthStateChanged(user => {
   if(user) {
-    // If they log in exactly during the reset minute, mark it as handled so they don't get kicked immediately
-    const now = new Date();
-    if (now.getHours() === 1 && now.getMinutes() === 52) {
-      localStorage.setItem('lastLogoutTriggeredToday', now.toDateString());
+    const nowInDubai = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}));
+    if (nowInDubai.getHours() === 7 && nowInDubai.getMinutes() === 7) {
+      localStorage.setItem('lastLogoutTriggeredTodayGST', nowInDubai.toDateString());
     }
     
     document.getElementById('authScreen').style.display='none';
@@ -502,10 +503,6 @@ function setTactic(p, type) {
     
     // Surgical UI update
     updateRoundScoresUI();
-    
-    // Maintain focus on the current player input to keep keypad active
-    const input = document.getElementById(`input-${p}`);
-    if (input) input.focus();
     
     db.collection('eliteGames').doc(state.id).update({ roundScores: state.roundScores });
 }
