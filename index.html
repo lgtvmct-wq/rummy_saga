@@ -264,7 +264,6 @@
     <div class="nav-section">
       <button id="navNewGame" class="navBtn" onclick="showScreen('newGame')">New Game</button>
       <button id="navContinue" class="navBtn" onclick="showScreen('continue')">Active</button>
-      <button id="navPlayers" class="navBtn" onclick="showScreen('players')">Players</button>
       <button id="navStats" class="navBtn" onclick="showScreen('stats')">Hall of Fame</button>
       <button id="navHistory" class="navBtn" onclick="showScreen('history')">History</button>
       <button id="navReports" class="navBtn" onclick="showScreen('reports')">Reports</button>
@@ -362,7 +361,7 @@ auth.onAuthStateChanged(async user => {
         } else {
             showScreen('newGame');
         }
-    } else if (screen && ['newGame', 'players', 'continue', 'history', 'reports'].includes(screen)) {
+    } else if (screen && ['newGame', 'continue', 'history', 'reports'].includes(screen)) {
         showScreen(screen);
     } else if(!currentScreen) {
         showScreen('newGame');
@@ -424,7 +423,7 @@ function showReleaseNotes() {
 function loadData() {
   db.collection('players').onSnapshot(snap => { 
     playersDb =[]; snap.forEach(doc => playersDb.push({id: doc.id, ...doc.data()})); 
-    if(currentScreen === 'players') showScreen('players');
+    if(currentScreen === 'stats') showScreen('stats');
   });
     db.collection('eliteGames').onSnapshot(snap => {
     savedGames =[]; snap.forEach(d => savedGames.push(d.data()));
@@ -488,7 +487,7 @@ function renderNewGame() {
         <button onclick="appendDT()" style="background:var(--warning); width:100%; color:#111; margin-bottom:15px;">🕒 Insert Date/Time</button>
         <div id="playerList"></div>
         <button class="navBtn" style="background:rgba(255,255,255,0.1); width:100%; border:1px dashed var(--glass-border);" onclick="addPlayerField()">+ Add Player</button>
-        <button class="actionBtn" onclick="startGame()">Start Random Game</button>
+        <button class="actionBtn" onclick="startGame()">Start Game (with Seat Cut)</button>
     </div>`;
 }
 
@@ -553,9 +552,10 @@ function renderActive(focusPlayer = null) {
       let dealerIndex = (state.round - 1) % roster.length;
       dealer = roster[dealerIndex];
       
-      // If the intended dealer is eliminated, find the previous active player (the "go back to X" request)
+      // The "Dealer Rule": If player Y (next to X) gets out, X repeats as dealer.
+      // We check if the intended dealer in roster order is eliminated.
       if (state.eliminated[dealer] || state.totals[dealer] >= 240) {
-          // Find the last active player before this index (circular)
+          // Rule: If next player in consecutive sequence is out, go back to previous active player (original rule)
           for (let i = 1; i <= roster.length; i++) {
               let prevIdx = (dealerIndex - i + roster.length) % roster.length;
               let prevP = roster[prevIdx];
@@ -1349,17 +1349,21 @@ function renderTVContent() {
     };
 
     const displayRound = Math.max(0, state.round - 1);
-    let h = `<div class="tv-title">
+    const playerCount = state.players.length;
+    const scale = playerCount > 5 ? Math.max(0.6, 1 - (playerCount - 5) * 0.08) : 1;
+    
+    let h = `<div class="tv-title" style="font-size: ${4 * scale}vh;">
         ${state.name}
         <span style="display:inline-flex; align-items:center; gap:1vh; vertical-align:middle; margin-left:3vh; background:rgba(0,0,0,0.3); padding:0.5vh 2vh; border-radius:4vh; border:1px solid rgba(231, 76, 60, 0.3);">
-            <span class="tv-live-dot"></span>
-            <span style="color:#e74c3c; font-size:2.4vh; font-weight:900; letter-spacing:2px;">LIVE</span>
+            <span class="tv-live-dot" style="width:${2.5 * scale}vh; height:${2.5 * scale}vh;"></span>
+            <span style="color:#e74c3c; font-size:${2.4 * scale}vh; font-weight:900; letter-spacing:2px;">LIVE</span>
         </span>
     </div>
-    <div style="text-align:center; font-size: 6vh; margin-bottom: 3vh; color: var(--accent); font-weight: 900; letter-spacing: 2px;">ROUND ${displayRound}</div>`;
+    <div style="text-align:center; font-size: ${6 * scale}vh; margin-bottom: 3vh; color: var(--accent); font-weight: 900; letter-spacing: 2px;">ROUND ${displayRound}</div>`;
 
-    h += `<table class="tv-table">
-        <tr><th style="width:75%;">Player</th><th style="text-align:center;">Score</th></tr>`;
+    h += `<div style="overflow:hidden; transform-origin: top center;">
+    <table class="tv-table">
+        <tr><th style="width:75%; font-size: ${2.5 * scale}vh;">Player</th><th style="text-align:center; font-size: ${2.5 * scale}vh;">Score</th></tr>`;
 
     const sortedPlayersTV = [...state.players].sort((a, b) => {
         const aOut = state.eliminated[a] || state.totals[a] >= 240;
@@ -1393,21 +1397,28 @@ function renderTVContent() {
         let hasReEntered = state.reEntries && state.reEntries[p];
         
         h += `<tr style="${isOut ? 'opacity:0.2' : ''}">
-            <td style="display: flex; align-items: center; border-bottom: 1px solid #222;">
-                <img src="${getTVAvatar(p)}" style="width: 9vh; height: 9vh; border-radius: 50%; object-fit: cover; border: 3px solid ${p === dealer ? 'var(--warning)' : 'var(--accent)'}; margin-right: 3vh; background: #333;">
+            <td style="display: flex; align-items: center; border-bottom: 1px solid #222; padding: ${2 * scale}vh 1vh;">
+                <img src="${getTVAvatar(p)}" style="width: ${9 * scale}vh; height: ${9 * scale}vh; border-radius: 50%; object-fit: cover; border: ${3 * scale}px solid ${p === dealer ? 'var(--warning)' : 'var(--accent)'}; margin-right: 3vh; background: #333;">
                 <div style="display: flex; flex-direction: column;">
                     <div style="display: flex; align-items: center;">
-                        ${p === dealer ? '<span class="tv-badge" style="background:var(--warning); color:#000; padding:1px 10px; border-radius:4px; margin-right:15px; font-size: 2vh; font-weight:900; line-height:1.2;">D</span>' : ''}
-                        <span style="font-size: 4.5vh;">${p}</span>
-                        ${hasReEntered ? '<span class="tv-badge" style="background:var(--warning); color:#000; padding:1px 8px; border-radius:4px; margin-left:15px; font-size: 2vh; font-weight:900; line-height:1.2;">RE</span>' : ''}
+                        ${p === dealer ? `<span class="tv-badge" style="background:var(--warning); color:#000; padding:1px 10px; border-radius:4px; margin-right:15px; font-size: ${2 * scale}vh; font-weight:900; line-height:1.2;">D</span>` : ''}
+                        <span style="font-size: ${4.5 * scale}vh;">${p}</span>
+                        ${hasReEntered ? `<span class="tv-badge" style="background:var(--warning); color:#000; padding:1px 8px; border-radius:4px; margin-left:15px; font-size: ${2 * scale}vh; font-weight:900; line-height:1.2;">RE</span>` : ''}
                     </div>
                 </div>
             </td>
-            <td style="text-align:center; color:var(--warning); border-bottom: 1px solid #222; font-size: 6vh;">${isOut ? 'OUT' : tot}</td>
+            <td style="text-align:center; color:var(--warning); border-bottom: 1px solid #222; font-size: ${6 * scale}vh; padding: ${2 * scale}vh 1vh;">${isOut ? 'OUT' : tot}</td>
         </tr>`;
     });
 
-    h += `</table>`;
+    h += `</table></div>`;
+
+    const pastPlayers = Object.keys(state.totals).filter(p => !state.players.includes(p) || state.eliminated[p] || state.totals[p] >= 240);
+    if (pastPlayers.length > 0) {
+        h += `<div style="margin-top: 3vh; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2vh; text-align: center; color: rgba(255,255,255,0.4); font-size: ${1.8 * scale}vh;">
+            <b style="color: var(--accent); opacity: 0.6;">PAST PLAYERS:</b> ${pastPlayers.join(' | ')}
+        </div>`;
+    }
 
     if (state.winner) {
         h = `<div style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
@@ -1501,7 +1512,11 @@ function renderStats() {
 
                 return `
                 <div onclick="viewProfile('${p.id}')" style="background: rgba(255,255,255,0.08); border-radius: 24px; padding: 20px; text-align: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
-                    <img src="${pPhoto}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid ${medalColor}; margin-bottom: 12px; background: #000;">
+                    <div style="position: absolute; top: 15px; left: 15px; display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.4); padding: 4px 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                        <span class="status-dot ${p.isOnline ? 'online-dot' : 'offline-dot'}" style="margin:0;"></span>
+                        <span style="font-size: 8px; font-weight: bold; color: ${p.isOnline ? '#2ecc71' : '#95a5a6'}; text-transform: uppercase;">${p.isOnline ? 'Online' : 'Offline'}</span>
+                    </div>
+                    <img src="${pPhoto}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid ${medalColor}; margin-bottom: 12px; background: #000; margin-top: 5px;">
                     <div style="font-size: 32px; font-weight: 800; color: #fff; line-height: 1;">${wins}</div>
                     <div style="font-size: 10px; opacity: 0.6; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">Wins Recorded</div>
                     
@@ -1512,21 +1527,6 @@ function renderStats() {
                 </div>`;
             }).join('')}
         </div>
-    `;
-}
-
-function renderPlayers() {
-    let listHTML = playersDb.map(p => {
-        const name = p.fullName || "Undefined Player";
-        return `<tr><td>
-            <span class="status-dot ${p.isOnline?'online-dot':'offline-dot'}"></span>
-            <span class="status-text">${p.isOnline?'Online':'Offline'}</span> | <b>${name}</b>
-        </td><td><button onclick="viewProfile('${p.id}')">Profile</button></td></tr>`
-    }).join('');
-
-    document.getElementById('mainPane').innerHTML = `
-        <h2>Registered Players</h2>
-        <table>${listHTML}</table>
     `;
 }
 
