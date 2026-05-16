@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v54.0</title>
+<title>Elite Rummy Circle - v58.0</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -110,6 +110,20 @@
   .tv-table td { font-size: 5vh; font-weight: bold; padding: 2vh 1vh; border-bottom: 1px solid #222; }
   .tv-title { font-size: 4vh; color: var(--accent); margin: 2vh 0; text-align: center; }
   .tv-badge { font-size: 2vh; vertical-align: middle; }
+  .tv-live-dot {
+    width: 2.5vh;
+    height: 2.5vh;
+    background-color: #e74c3c;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 15px #e74c3c;
+    animation: tv-blink 1.2s infinite;
+  }
+  @keyframes tv-blink {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+  }
   .tv-close { position: fixed; top: 10px; right: 10px; background: rgba(255,255,255,0.1); border-radius: 50%; width: 40px; height: 40px; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; }
   
   @media print {
@@ -168,7 +182,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v54.0</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v58.0</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -229,14 +243,12 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
         <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
         <div style="margin-bottom: 20px;">
-            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v54.0 - Evolution of Hall of Fame & Digital Certificates</b>
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v58.0 - TV Mode Precision & Live Feedback</b>
             <ul style="padding-left: 20px; list-style: disc; opacity: 0.9; font-size: 13px; line-height: 1.6;">
-                <li>Introduced "Hall of Fame" with real-time win tracking and rank progression.</li>
-                <li>Integrated jsPDF for secure, downloadable landscape Winner Certificates.</li>
-                <li>New Medal Brackets: Pro (3 Wins), Ultra Pro (6 Wins), Ultra Pro Max (10 Wins).</li>
-                <li>Added interactive medal overlays in player profiles with tactical info.</li>
-                <li>Streamlined automatic winner detection for faster round transitions.</li>
-                <li>Moved certificates to Reports to ensure integrity and clean history.</li>
+                <li>Enhanced TV Mode with a real-time blinking "LIVE" indicator.</li>
+                <li>Adjusted TV round tracking to display the most recently completed round.</li>
+                <li>Optimized mobile full-screen alerts for external display projection.</li>
+                <li>Refined background layering in digital certificates.</li>
                 <li>Developer: Elite IT</li>
             </ul>
         </div>
@@ -268,7 +280,7 @@
       <div id="tvContent"></div>
   </div>
   <div style="position: fixed; bottom: 8px; left: 12px; z-index: 4000; text-align: left; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v54.0</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v58.0</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
@@ -1129,76 +1141,127 @@ function viewCertificate(id) {
     if (!g || !g.winner) return alert("Certificate only available for finished games.");
     if (g.isAborted) return alert("Certificate not available for abandoned games.");
     
-    const doc = new jspdf.jsPDF({
+    let jsPDF;
+    try {
+        jsPDF = window.jspdf ? window.jspdf.jsPDF : (typeof jspdf !== 'undefined' ? jspdf.jsPDF : null);
+        if (!jsPDF) throw new Error("jsPDF not defined");
+    } catch (err) {
+        return alert("Error: PDF library (jsPDF) is not successfully loaded. Please check your internet connection.");
+    }
+    
+    // Create PDF in Landscape
+    const doc = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
         format: 'a4'
     });
 
-    const winnerName = g.winner.toUpperCase();
-    const date = g.endTime || g.startTime;
+    // Sanitized Data
+    const sanitizePDF = (s) => (s || "").replace(/[^\x20-\x7E\xA0-\xFF]/g, " ").trim();
+    const winnerName = sanitizePDF(g.winner).toUpperCase();
+    const gameName = sanitizePDF(g.name) || "Elite Game";
+    const dateStr = sanitizePDF(g.endTime || g.startTime || new Date().toLocaleString());
     
-    // Background
-    doc.setFillColor(244, 241, 234);
+    // Background: Rich Parchment
+    doc.setFillColor(252, 250, 242);
     doc.rect(0, 0, 297, 210, 'F');
 
-    // Outer Border
-    doc.setDrawColor(197, 160, 89);
-    doc.setLineWidth(5);
-    doc.rect(10, 10, 277, 190);
+    // Watermark (Drawn in background layer)
+    doc.setTextColor(235, 235, 235);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(100);
+    doc.text("ELITE", 148.5, 165, { align: "center", angle: 0 });
 
-    // Inner Border
+    // Ornamental Borders (Gold & Black)
+    doc.setDrawColor(165, 124, 0); // Golden Rod
+    doc.setLineWidth(4);
+    doc.rect(8, 8, 281, 194); // Outer most
+
+    doc.setDrawColor(30, 30, 30); // Charcoal Black
     doc.setLineWidth(0.5);
-    doc.rect(15, 15, 267, 180);
+    doc.rect(13, 13, 271, 184); // Inner line 1
+    doc.rect(15, 15, 267, 180); // Inner line 2
 
-    // Header
-    doc.setTextColor(197, 160, 89);
+    // Header: Elegant Display Font (using helvetica fallback)
+    doc.setTextColor(20, 20, 20);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(40);
-    doc.text("CERTIFICATE OF VICTORY", 148.5, 50, { align: "center" });
+    doc.setFontSize(48);
+    doc.text("CERTIFICATE OF TRIUMPH", 148.5, 52, { align: "center" });
 
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "normal");
-    doc.text("ELITE RUMMY CIRCLE CHAMPIONSHIP", 148.5, 60, { align: "center" });
-
-    // Body
-    doc.setTextColor(60, 60, 60);
+    doc.setTextColor(165, 124, 0);
     doc.setFontSize(18);
-    doc.text("This certifies that", 148.5, 85, { align: "center" });
-
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(36);
     doc.setFont("helvetica", "bold");
-    doc.text(winnerName, 148.5, 105, { align: "center" });
-    doc.setLineWidth(1);
-    doc.line(70, 110, 227, 110);
+    doc.text("ELITE RUMMY CIRCLE CHAMPIONSHIP", 148.5, 63, { align: "center" });
 
-    doc.setTextColor(60, 60, 60);
-    doc.setFontSize(14);
+    // Decorative Separator
+    doc.setDrawColor(165, 124, 0);
+    doc.setLineWidth(0.8);
+    doc.line(90, 70, 207, 70);
+
+    // Salutation
+    doc.setTextColor(70, 70, 70);
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(20);
+    doc.text("This official commendation is awarded to", 148.5, 90, { align: "center" });
+
+    // Winner Name: Center Piece
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(52);
+    doc.setFont("helvetica", "bold");
+    doc.text(winnerName, 148.5, 115, { align: "center" });
+    
+    // Name Underline
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(1.2);
+    doc.line(50, 120, 247, 120);
+
+    // Detailed Achievement Text
+    doc.setTextColor(50, 50, 50);
+    doc.setFontSize(16);
     doc.setFont("helvetica", "normal");
-    const desc = `has emerged Triumphant in the game of ${g.name}, demonstrating exceptional tactical skill and mental prowess.`;
-    const splitDesc = doc.splitTextToSize(desc, 200);
-    doc.text(splitDesc, 148.5, 125, { align: "center" });
+    const achievementLine1 = `for emerging victorious in the game of "${gameName}"`;
+    const achievementLine2 = `demonstrating exceptional mental discipline and tactical excellence.`;
+    
+    doc.text(achievementLine1, 148.5, 138, { align: "center" });
+    doc.text(achievementLine2, 148.5, 148, { align: "center" });
 
-    // Footer
-    doc.setFontSize(12);
-    doc.text(date, 70, 165, { align: "center" });
-    doc.line(45, 160, 95, 160);
-    doc.text("Awarded Date", 70, 172, { align: "center" });
+    // Footer: Signatures & Verification
+    doc.setFontSize(14);
+    doc.setTextColor(30, 30, 30);
+    
+    // Date Section (Left)
+    doc.text(dateStr, 75, 175, { align: "center" });
+    doc.setDrawColor(100, 100, 100);
+    doc.setLineWidth(0.5);
+    doc.line(45, 170, 105, 170);
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text("AWARD DATE", 75, 182, { align: "center" });
 
-    doc.text("S. A. R.", 227, 165, { align: "center" });
-    doc.line(202, 160, 252, 160);
-    doc.text("Elite Rummy Commissioner", 227, 172, { align: "center" });
+    // Commissioner Section (Right)
+    doc.setFontSize(14);
+    doc.text("S. A. R.", 222, 175, { align: "center" });
+    doc.line(192, 170, 252, 170);
+    doc.setFontSize(11);
+    doc.text("ELITE RUMMY COMMISSIONER", 222, 182, { align: "center" });
 
-    // Seal
-    doc.setFillColor(197, 160, 89);
-    doc.circle(255, 45, 20, 'F');
+    // Official Seal (Top Right)
+    doc.setFillColor(31, 58, 147); // Dark Academic Blue
+    doc.circle(260, 40, 18, 'F');
+    doc.setDrawColor(165, 124, 0);
+    doc.setLineWidth(1.5);
+    doc.circle(260, 40, 16);
+    
     doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
-    doc.text("ELITE", 255, 43, { align: "center" });
-    doc.text("WINNER", 255, 48, { align: "center" });
-
-    doc.save(`Elite_Certificate_${winnerName.replace(/\s/g, '_')}.pdf`);
+    doc.text("AUTHENTIC", 260, 38, { align: "center" });
+    doc.text("ELITE", 260, 42, { align: "center" });
+    doc.text("WINNER", 260, 46, { align: "center" });
+    
+    // Final Save with sanitized filename
+    const safeName = winnerName.replace(/[^a-z0-9]/gi, '_');
+    doc.save(`Elite_Certificate_${safeName}.pdf`);
 }
 
 function viewMyProfile() { if(auth.currentUser) viewProfile(auth.currentUser.uid); }
@@ -1243,7 +1306,7 @@ function showMedalInfo() {
 function toggleFullScreen() {
     if (window.innerWidth < 900) {
         // Mobile: Open in new tab with fullscreen mode
-        alert("Full Screen mode is optimized for External Screen projection.");
+        alert("For Viewing on Large Display");
         window.open('?fullscreen=' + state.id, '_blank');
     } else {
         // TV/Desktop: Toggle local overlay and browser fullscreen
@@ -1283,8 +1346,14 @@ function renderTVContent() {
         return `https://api.dicebear.com/7.x/${charType}/svg?seed=${encodeURIComponent(trimmedName)}`;
     };
 
-    const displayRound = state.round > 1 ? state.round - 1 : state.round;
-    let h = `<div class="tv-title">${state.name}</div>
+    const displayRound = Math.max(0, state.round - 1);
+    let h = `<div class="tv-title">
+        ${state.name}
+        <span style="display:inline-flex; align-items:center; gap:1vh; vertical-align:middle; margin-left:3vh; background:rgba(0,0,0,0.3); padding:0.5vh 2vh; border-radius:4vh; border:1px solid rgba(231, 76, 60, 0.3);">
+            <span class="tv-live-dot"></span>
+            <span style="color:#e74c3c; font-size:2.4vh; font-weight:900; letter-spacing:2px;">LIVE</span>
+        </span>
+    </div>
     <div style="text-align:center; font-size: 6vh; margin-bottom: 3vh; color: var(--accent); font-weight: 900; letter-spacing: 2px;">ROUND ${displayRound}</div>`;
 
     h += `<table class="tv-table">
@@ -1510,12 +1579,12 @@ function renderHistory() {
     let older = fin.slice(5);
 
     h += `<div style="margin-bottom: 25px;">
-            <div style="font-size: 14px; color: var(--accent); margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Latest 5 Matches</div>
+            <div style="font-size: 14px; color: var(--accent); margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Latest 5 Games</div>
             ${latest.map(renderHistoryItem).join('')}
           </div>`;
 
     if (older.length > 0) {
-        h += `<div style="font-size: 14px; color: var(--accent); margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Match Archive</div>`;
+        h += `<div style="font-size: 14px; color: var(--accent); margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Game Archive</div>`;
         
         // Grouping: { year: { month: [games] } }
         let archive = {};
