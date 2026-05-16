@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v70.0</title>
+<title>Elite Rummy Circle - v77.0</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" sizes="152x152" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
@@ -190,7 +190,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v70.0</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v77.0</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -251,6 +251,43 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
         <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
         <div style="margin-bottom: 20px;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v77.0 - Re-entry Data Persistence & Fallback</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Enhanced Reporting:</b> Added logic to retroactively calculate and display "Busted" totals for past games where data was not explicitly stored.<br>
+                • <b>Clearer Labels:</b> Re-entry rows now explicitly show "Busted: [Score]" and "Re-entered at [Points]".<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v76.0 - Re-entry Detail Optimization</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Clearer Re-entry Flow:</b> Reports now explicitly display the "Busted" total (e.g., 275) above the re-entry adjustment (e.g., 9) for better round-by-round auditing.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v75.0 - Re-entry Score Formatting</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Refined Re-entry Display:</b> The Reports table now shows the "busted" total score prominently above the re-entry adjustment for clearer tracking.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v74.0 - Re-entry Busted Score Tracking</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Busted Score Visibility:</b> Reports and certificates now show the actual score (e.g., 275) that exceeded the limit before revealing the re-entry adjustment.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v73.0 - Enhanced Re-entry Tracking</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Detailed Re-entry Logs:</b> Reports and certificates now display the score at which a player re-entered the game (e.g., RE @ 180).<br>
+                • <b>Round Count:</b> The current round number is now visible in both the game title and the "Next Round" button.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v72.0 - Reports Table Fix</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Complete Round History:</b> Fixed an issue where the reports table and PDF only showed a subset of rounds. All recorded rounds are now displayed.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v71.0 - Re-entry Rule Correction</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Highest + 1 Rule:</b> Re-entry score is now strictly calculated as the highest survivor's score plus one.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v70.0 - Scoreboard Persistence & Manual Termination</b>
             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
                 • <b>Persistent Scoreboard:</b> Main and TV screens now retain full table views after game completion.<br>
@@ -340,7 +377,7 @@
       <div id="tvContent"></div>
   </div>
   <div style="position: fixed; bottom: 8px; left: 12px; z-index: 4000; text-align: left; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v70.0</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v77.0</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
@@ -990,7 +1027,7 @@ async function nextRound() {
         let tactics = state.roundTactics ? {...state.roundTactics} : {};
         let allParticipants = Array.from(new Set([...state.players, ...Object.keys(scores)]));
         
-        let entry = { round: state.round, players: allParticipants, scores: scores, tactics: tactics, totals: {}, reentries: {} };
+        let entry = { round: state.round, players: allParticipants, scores: scores, tactics: tactics, totals: {}, reentries: {}, bustedTotals: {} };
         
         // Ensure all roundScores have a value before proceeding
         for (let p of state.players) {
@@ -1017,6 +1054,7 @@ async function nextRound() {
                     n = (parseInt(val) === 0 ? 0 : (parseInt(val) || 0));
                     if (state.totals[p] === undefined) state.totals[p] = n;
                     else state.totals[p] += n;
+                    if (state.totals[p] >= 240) entry.bustedTotals[p] = state.totals[p];
                 }
 
                 let tactic = tactics[p];
@@ -1034,13 +1072,11 @@ async function nextRound() {
         let activeSurvivors = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]);
         let reEntryQueue = [];
         
-        // Calculate re-entry score: second highest survivor score + 1
+        // Calculate re-entry score: highest survivor score + 1
         let entryScore = 175;
-        if (activeSurvivors.length >= 2) {
-            let sortedScores = activeSurvivors.map(p => state.totals[p]).sort((a, b) => b - a);
-            entryScore = sortedScores[1] + 1; // Second highest
-        } else if (activeSurvivors.length === 1) {
-            entryScore = state.totals[activeSurvivors[0]] + 1; // Highest (only one)
+        if (activeSurvivors.length > 0) {
+            let maxScore = Math.max(...activeSurvivors.map(p => state.totals[p]));
+            entryScore = maxScore + 1;
         }
         if (entryScore > 240) entryScore = 240;
 
@@ -1883,6 +1919,8 @@ function viewTableReport(id) {
     // Helper to get first name
     const getFirstName = (fullName) => fullName.split(' ')[0];
 
+    const allPlayerNames = Array.from(new Set([...(g.startingPlayers || []), ...Object.keys(g.totals)]));
+
     let h = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h3 style="margin:0;">Report View</h3>
@@ -1902,50 +1940,38 @@ function viewTableReport(id) {
                 <thead>
                     <tr style="background:#f1f8f4;">
                         <th style="width:50px; color:#27ae60; border: 1px solid #ddd; padding:12px 8px; text-align: center;">Rnd</th>
-                        ${g.players.map(p => `<th style="color:#27ae60; border: 1px solid #ddd; padding:12px 8px; text-align: center;">${getFirstName(p)}</th>`).join('')}
+                        ${allPlayerNames.map(p => `<th style="color:#27ae60; border: 1px solid #ddd; padding:12px 8px; text-align: center;">${getFirstName(p)}</th>`).join('')}
                     </tr>
                 </thead>
                 <tbody style="color: #333;">
     `;
 
-    // Filter out rows where NO one has a score OR rounds that occur after a winner is already determined
-    // Also remove rounds where an OUT player erroneously played twice.
-    let winnerFoundInHistory = false;
-    let prevTotals = {};
+    // Filter out rounds that have at least one score
     const validHistory = g.history.filter(r => {
-        if (winnerFoundInHistory) return false;
-        
-        const hasScore = Object.values(r.scores).some(v => v !== null && v !== undefined && v !== "");
-        if (!hasScore) return false;
-
-        // Check if an OUT player played (error detection)
-        const outPlayerPlayed = g.players.some(p => {
-            const wasOut = prevTotals[p] !== undefined && prevTotals[p] >= 240;
-            const hasCurrentScore = r.scores[p] !== null && r.scores[p] !== undefined && r.scores[p] !== "";
-            return wasOut && hasCurrentScore;
-        });
-        if (outPlayerPlayed) return false;
-
-        // Check if this round resulted in a single survivor
-        const survivors = g.players.filter(p => (r.totals[p] || 0) < 240);
-        if (survivors.length <= 1) {
-            winnerFoundInHistory = true;
-        }
-        prevTotals = {...r.totals};
-        return true;
+        return Object.values(r.scores).some(v => v !== null && v !== undefined && v !== "");
     });
 
-    validHistory.forEach(r => {
+    validHistory.forEach((r, idx) => {
         h += `<tr>
             <td style="color:#27ae60; font-weight:bold; padding:12px 8px; border: 1px solid #ddd; text-align: center;">${r.round}</td>
-            ${g.players.map(p => {
+            ${allPlayerNames.map(p => {
                 let s = r.scores[p];
                 let t = r.totals[p];
-                let re = (r.reentries && r.reentries[p]);
+                let re = (r.reentries && r.reentries[p] !== undefined) ? r.reentries[p] : null;
+                let busted = (r.bustedTotals && r.bustedTotals[p] !== undefined) ? r.bustedTotals[p] : null;
+                
+                // Fallback for older games without bustedTotals field
+                if (re !== null && busted === null && idx > 0) {
+                    const prevT = validHistory[idx - 1].totals[p] || 0;
+                    const scoreVal = (s === 'S') ? 0 : (parseInt(s) || 0);
+                    if (prevT + scoreVal >= 240) {
+                        busted = prevT + scoreVal;
+                    }
+                }
                 
                 // Detection if player had not joined yet
                 let notJoined = (t === undefined);
-                let isOut = (t >= 240 && !re);
+                let isOut = (t >= 240 && re === null);
                 
                 let val = "";
                 let subVal = "";
@@ -1955,20 +1981,26 @@ function viewTableReport(id) {
                     subVal = ""; // No total shown
                 } else if (isOut) {
                     val = `<span style="color:#e74c3c; font-weight:bold;">OUT</span>`;
-                    subVal = `<div style="font-size:10px; opacity:0.7; color:#666;">Total: ${t}</div>`;
+                    subVal = `<div style="font-size:11px; color:#e74c3c; font-weight:bold;">Total: ${t}</div>`;
                 } else {
                     if (s === 'S') val = `<span style="color:#27ae60; font-weight:bold;">Show</span>`;
-                    else if (re) val = `<span style="color:#f39c12; font-weight:bold;">${s}</span>`;
+                    else if (re !== null) val = `<span style="color:#f39c12; font-weight:bold;">${s}</span>`;
                     else val = (s !== null && s !== undefined) ? `<span style="color:#111; font-weight:500;">${s}</span>` : '-';
                     
-                    let totStyle = re ? `color:#f39c12; font-weight:bold;` : `opacity:0.9; color:#444;`;
-                    subVal = `<div style="font-size:10px; ${totStyle}">Total: ${t}</div>`;
+                    if (re !== null && busted !== null) {
+                        subVal = `<div style="font-size:11px; color:#e01111; font-weight:bold;">Busted: ${busted}</div>`;
+                        subVal += `<div style="font-size:11px; color:#f39c12; font-weight:bold; margin-top:2px;">Re-entered at ${re}</div>`;
+                    } else if (re !== null) {
+                        subVal = `<div style="font-size:11px; color:#f39c12; font-weight:bold;">Total: ${t}</div>`;
+                        subVal += `<div style="font-size:10px; color:#f39c12; font-weight:bold; margin-top:2px;">RE-ENTERED @ ${re}</div>`;
+                    } else {
+                        subVal = `<div style="font-size:10px; opacity:0.9; color:#444;">Total: ${t}</div>`;
+                    }
                 }
 
                 return `<td style="padding:12px 8px; border: 1px solid #ddd; text-align: center;">
-                    <div>${val}</div>
+                    <div style="font-size:14px; font-weight:600;">${val}</div>
                     ${subVal}
-                    ${re ? '<div style="font-size:9px; color:#f39c12; font-weight:bold;">[RE-ENTERED]</div>' : ''}
                 </td>`;
             }).join('')}
         </tr>`;
@@ -1979,7 +2011,7 @@ function viewTableReport(id) {
     h += `
                 <tr style="background:#f8f9fa;">
                     <td style="color:#f39c12; font-weight:bold; padding:15px 8px; border: 1px solid #ddd; text-align: center;">TOTAL</td>
-                    ${g.players.map(p => {
+                    ${allPlayerNames.map(p => {
                         let isWinner = g.winner && (g.winner === p || g.winner.split(' & ').includes(p));
                         const t = reportTotals[p] !== undefined ? reportTotals[p] : (g.totals[p] || 0);
                         return `<td style="color:#f39c12; font-weight:bold; padding:15px 8px; border: 1px solid #ddd; text-align: center;">
@@ -2014,38 +2046,36 @@ function genPDF(id) {
         doc.setTextColor(0, 0, 0);
     }
 
-    let winnerFoundInHistory = false;
-    let prevPdfTotals = {};
     const sigHistory = g.history.filter(r => {
-        if (winnerFoundInHistory) return false;
-        const hasScore = Object.values(r.scores).some(v => v !== null && v !== undefined && v !== "");
-        if (!hasScore) return false;
-        
-        const outPlayerPlayed = g.players.some(p => {
-            const wasOut = prevPdfTotals[p] !== undefined && prevPdfTotals[p] >= 240;
-            const hasCurrentScore = r.scores[p] !== null && r.scores[p] !== undefined && r.scores[p] !== "";
-            return wasOut && hasCurrentScore;
-        });
-        if (outPlayerPlayed) return false;
-
-        const survivors = g.players.filter(p => (r.totals[p] || 0) < 240);
-        if (survivors.length <= 1) winnerFoundInHistory = true;
-        prevPdfTotals = {...r.totals};
-        return true;
+        return Object.values(r.scores).some(v => v !== null && v !== undefined && v !== "");
     });
     
-    const headNames = g.players.map(p => getFirstName(p));
+    const allPdfPlayers = Array.from(new Set([...(g.startingPlayers || []), ...Object.keys(g.totals)]));
+    const headNames = allPdfPlayers.map(p => getFirstName(p));
     const pdfTotals = sigHistory.length > 0 ? sigHistory[sigHistory.length - 1].totals : g.totals;
 
-    const body = sigHistory.map(r => [
+    const body = sigHistory.map((r, idx) => [
         r.round, 
-        ...g.players.map(p => {
+        ...allPdfPlayers.map(p => {
             let s = r.scores[p];
             let t = r.totals[p];
+            let re = (r.reentries && r.reentries[p] !== undefined) ? r.reentries[p] : null;
+            let busted = (r.bustedTotals && r.bustedTotals[p] !== undefined) ? r.bustedTotals[p] : null;
+            
+            // Fallback for older games
+            if (re !== null && busted === null && idx > 0) {
+                const prevT = sigHistory[idx-1].totals[p] || 0;
+                const scoreVal = (s === 'S') ? 0 : (parseInt(s) || 0);
+                if (prevT + scoreVal >= 240) busted = prevT + scoreVal;
+            }
+
             let tactic = (r.tactics && r.tactics[p]) ? r.tactics[p] : null;
             if (t === undefined) return 'Not Played';
-            if (t >= 240) return 'OUT';
-            if (r.reentries && r.reentries[p]) return `${s} (RE)`;
+            if (t >= 240 && re === null) return `OUT (Total: ${t})`;
+            if (re !== null) {
+                let bustedStr = busted !== null ? ` (Busted: ${busted})` : "";
+                return `${s} (RE@${re}${bustedStr})`;
+            }
             
             let val = s;
             if (s === 'S') val = 0;
@@ -2055,7 +2085,7 @@ function genPDF(id) {
         })
     ]);
     
-    body.push(['TOTAL', ...g.players.map(p => {
+    body.push(['TOTAL', ...allPdfPlayers.map(p => {
         let isWinner = g.winner && (g.winner === p || g.winner.split(' & ').includes(p));
         const t = pdfTotals[p] !== undefined ? pdfTotals[p] : (g.totals[p] || 0);
         return t + (isWinner ? ' (Winner)' : '');
@@ -2068,7 +2098,7 @@ function genPDF(id) {
         didParseCell: function(data) {
             if (data.row.index < sigHistory.length) {
                 const round = sigHistory[data.row.index];
-                const player = g.players[data.column.index - 1]; // -1 because first col is 'Rnd'
+                const player = allPdfPlayers[data.column.index - 1]; // -1 because first col is 'Rnd'
                 if (round && round.reentries && round.reentries[player]) {
                     data.cell.styles.textColor = [243, 156, 18]; // --warning color
                 }
