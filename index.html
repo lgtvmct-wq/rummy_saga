@@ -1601,7 +1601,7 @@ async function endGameManually(id) {
         if (state && state.id === id) {
             state = null;
         }
-        showScreen('newGame');
+        showScreen('continue');
     } catch (err) {
         console.error("EndGame error:", err);
         alert("Failed to terminate game.");
