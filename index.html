@@ -7,8 +7,12 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v61.0</title>
+<title>Elite Rummy Circle - v62.0</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
+<link rel="apple-touch-icon" sizes="152x152" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
+<link rel="apple-touch-icon" sizes="167x167" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -186,7 +190,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v61.0</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v62.0</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -243,37 +247,16 @@
     </div>
 </div>
 
-<div id="installModal" class="modal-overlay">
-    <div class="modal-card" style="text-align: left; max-width: 400px;">
-        <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Install App</h2>
-        <div style="margin-bottom: 20px; line-height: 1.6; font-size: 14px;">
-            <p>You can install <b>Elite Rummy Circle</b> as a native app on your mobile device:</p>
-            <div style="background: rgba(46, 204, 113, 0.1); padding: 15px; border-radius: 8px; border: 1px solid #2ecc71; margin-bottom: 15px;">
-                <b style="color: #2ecc71;">For iOS (iPhone/iPad):</b>
-                <ol style="margin-top: 5px; padding-left: 20px;">
-                    <li>Open this URL in <b>Safari</b>.</li>
-                    <li>Tap the <b>Share</b> button (square with arrow).</li>
-                    <li>Scroll down and select <b>"Add to Home Screen"</b>.</li>
-                </ol>
-            </div>
-            <div style="background: rgba(52, 152, 219, 0.1); padding: 15px; border-radius: 8px; border: 1px solid #3498db;">
-                <b style="color: #3498db;">For Android:</b>
-                <ol style="margin-top: 5px; padding-left: 20px;">
-                    <li>Open this URL in <b>Chrome</b>.</li>
-                    <li>Tap the <b>Menu</b> (three dots) icon.</li>
-                    <li>Select <b>"Install App"</b> or <b>"Add to Home Screen"</b>.</li>
-                </ol>
-            </div>
-            <p style="font-size: 11px; opacity: 0.6; margin-top: 15px;">Once added, the app will appear on your home screen and open in full-screen mode without the browser address bar.</p>
-        </div>
-        <button class="actionBtn" onclick="document.getElementById('installModal').style.display='none'">Got it!</button>
-    </div>
-</div>
-
 <div id="releaseNotesModal" class="modal-overlay">
     <div class="modal-card" style="text-align: left; max-width: 400px;">
         <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
         <div style="margin-bottom: 20px;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v62.0 - Optimized Home Screen Icon</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Enhanced Icon Support:</b> Added specific apple-touch-icon tags to ensure the app icon appears correctly when saved to home screen on iOS.<br>
+                • <b>UI Clean-up:</b> Removed the manual "Install" button to keep the interface focused.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v61.0 - PWA Mobile App Support</b>
             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
                 • <b>Native Mobile Experience:</b> Enabled Progressive Web App (PWA) support. You can now use "Add to Home Screen" on iPhone/Android for a full 100% fullscreen app experience.<br>
@@ -313,7 +296,6 @@
       <button id="navStats" class="navBtn" onclick="showScreen('stats')">Hall of Fame</button>
       <button id="navHistory" class="navBtn" onclick="showScreen('history')">History</button>
       <button id="navReports" class="navBtn" onclick="showScreen('reports')">Reports</button>
-      <button class="navBtn" style="background:#2ecc71; color:#000;" onclick="showInstallInfo()">📱 Install App</button>
       <button class="navBtn" style="background:var(--warning); color:#000;" onclick="viewMyProfile()">My Stats</button>
       <button class="navBtn" style="background:var(--danger);" onclick="handleLogout()">Logout</button>
     </div>
@@ -328,7 +310,7 @@
       <div id="tvContent"></div>
   </div>
   <div style="position: fixed; bottom: 8px; left: 12px; z-index: 4000; text-align: left; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v61.0</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v62.0</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
@@ -475,10 +457,6 @@ function toggleAuthView(v) {
 
 function showReleaseNotes() {
     document.getElementById('releaseNotesModal').style.display = 'flex';
-}
-
-function showInstallInfo() {
-    document.getElementById('installModal').style.display = 'flex';
 }
 
 // --- DATA LISTENER ---
