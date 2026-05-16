@@ -632,19 +632,12 @@ function renderActive(focusPlayer = null) {
   }
 
   let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px; flex-wrap:wrap;">
-    <h3 style="margin:0; flex:1; color:${state.winner?'var(--warning)':'inherit'}">${state.winner ? 'GAME OVER' : state.name}</h3>
+    <h3 style="margin:0; flex:1; color:${state.winner?'var(--warning)':'inherit'}">${state.winner ? 'GAME OVER' : state.name + ' - Round ' + state.round}</h3>
     <div style="display:flex; gap:5px;">
         <button onclick="toggleFullScreen()" class="pause-btn" style="background: linear-gradient(to bottom, var(--accent), #1e8449); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 0 10px rgba(39, 174, 96, 0.3); width:80px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;">Full Screen</button>
         <button onclick="state=null; showScreen('newGame')" class="pause-btn" style="width:80px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;">${state.winner?'Home':'Pause'}</button>
     </div>
   </div>`;
-
-  if (state.winner) {
-      h += `<div style="text-align:center; padding:10px 0; margin-bottom:10px; background:rgba(255,255,255,0.05); border-radius:8px; border:1px dashed var(--warning);">
-            <div style="font-size:12px; opacity:0.8; margin-bottom:2px;">🏆 WINNER 🏆</div>
-            <div style="font-size:24px; color:var(--warning); font-weight:900; text-shadow: 0 0 10px rgba(241, 196, 15, 0.3);">${state.winner}</div>
-          </div>`;
-  }
 
   const pastPlayers = Object.keys(state.totals).filter(p => !state.players.includes(p) || state.eliminated[p] || state.totals[p] >= 240);
 
@@ -692,12 +685,15 @@ function renderActive(focusPlayer = null) {
           const isNotOut = !state.eliminated[p] && (state.totals[p] || 0) < 240;
           return isNotOut && state.roundScores[p] !== null;
       });
-      h += `<button id="endBtn" class="actionBtn" style="margin-top:15px;" onclick="nextRound()">Next Round</button>
+      h += `<button id="endBtn" class="actionBtn" style="margin-top:15px;" onclick="nextRound()">Next Round (${state.round + 1})</button>
             <div style="display:flex; gap:8px; margin-top:8px;">
                 <button class="actionBtn" style="background:${isRoundInProgress?'#333':'#555'}; height:45px; font-size:12px; margin:0; flex:1; opacity:${isRoundInProgress?0.5:1};" onclick="openMidGame()">+ Add Player Mid-Game</button>
             </div>`;
   } else {
-      // Game over state handled above the table
+      h += `<div style="text-align:center; padding:10px 0; margin-top:15px; margin-bottom:10px; background:rgba(255,255,255,0.05); border-radius:8px; border:1px dashed var(--warning);">
+            <div style="font-size:12px; opacity:0.8; margin-bottom:2px;">🏆 WINNER 🏆</div>
+            <div style="font-size:24px; color:var(--warning); font-weight:900; text-shadow: 0 0 10px rgba(241, 196, 15, 0.3);">${state.winner}</div>
+          </div>`;
   }
 
   const shownPast = pastPlayers.slice(0, 10);
@@ -1096,6 +1092,22 @@ function processReEntryQueue(queue, entry, allParticipants) {
             }
             
             let { player, score } = queue.shift();
+            
+            if (score >= 240) {
+                document.getElementById('reentryText').innerHTML = `<b style="color:var(--danger)">No points available to Re-entry</b><br><b>${player}</b> reached <b>${state.totals[player]}</b> and is eliminated.`;
+                document.getElementById('reentryModal').style.display = 'flex';
+                document.getElementById('btnReentryYes').style.display = 'none';
+                document.getElementById('btnReentryNo').innerText = 'Dismiss';
+                document.getElementById('btnReentryNo').onclick = () => {
+                    state.eliminated[player] = true;
+                    document.getElementById('reentryModal').style.display = 'none';
+                    document.getElementById('btnReentryYes').style.display = 'flex'; // Reset for next
+                    document.getElementById('btnReentryNo').innerText = 'Leave'; // Reset
+                    next();
+                };
+                return;
+            }
+            
             document.getElementById('reentryText').innerHTML = `<b>${player}</b> reached <b>${state.totals[player]}</b>.<br>Re-enter at <b>${score}</b>?`;
             document.getElementById('reentryModal').style.display = 'flex';
             
