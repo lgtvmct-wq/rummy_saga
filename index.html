@@ -7,8 +7,12 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v60.0</title>
+<title>Elite Rummy Circle - v61.0</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Elite Rummy">
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -182,7 +186,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v60.0</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v61.0</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -243,6 +247,12 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
         <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
         <div style="margin-bottom: 20px;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v61.0 - PWA Mobile App Support</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Native Mobile Experience:</b> Enabled Progressive Web App (PWA) support. You can now use "Add to Home Screen" on iPhone/Android for a full 100% fullscreen app experience.<br>
+                • <b>App Manifest:</b> Configured splash screens and standalone display mode for professional branding.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v60.0 - Professional Scoreboard & Dealer Logic</b>
             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
                 • <b>Professional TV Scoreboard:</b> Re-engineered for high-impact viewing. Dynamic scaling ensures all players fit one screen (no scrolling) with enhanced typography and "Past Players" history.<br>
@@ -290,12 +300,23 @@
       <div id="tvContent"></div>
   </div>
   <div style="position: fixed; bottom: 8px; left: 12px; z-index: 4000; text-align: left; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v60.0</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v61.0</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
 
 <script>
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('SW Registered!', reg);
+    }).catch(err => {
+      console.log('SW Registration failed', err);
+    });
+  });
+}
+
 // --- FIREBASE INIT ---
 const firebaseConfig = {
   apiKey: "AIzaSyCo_G5Vo7OkUsK-tUXVQKCkeTn_IHw9vB0",
