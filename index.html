@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v59.0</title>
+<title>Elite Rummy Circle - v60.0</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -182,7 +182,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v59.0</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v60.0</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -243,6 +243,15 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
         <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
         <div style="margin-bottom: 20px;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v60.0 - Professional Scoreboard & Dealer Logic</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Professional TV Scoreboard:</b> Re-engineered for high-impact viewing. Dynamic scaling ensures all players fit one screen (no scrolling) with enhanced typography and "Past Players" history.<br>
+                • <b>Advanced Dealer Transfer Rule:</b> Implemented specific rotation logic where if the next consecutive player is out, the current dealer repeats.<br>
+                • <b>Hall of Fame Integration:</b> Consolidated Registered Players into Hall of Fame. Added real-time Online/Offline status lights.<br>
+                • <b>Start Game (with Seat Cut):</b> Renamed and updated start logic for clearer game initiation.<br>
+                • <b>Past Player Display:</b> Added to TV mode to track players who have left the active game.
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v59.0 - UX Safety & Terminal Precision</b>
             <ul style="padding-left: 20px; list-style: disc; opacity: 0.9; font-size: 13px; line-height: 1.6;">
                 <li>Relocated "OUT" button to the left of the score input to prevent accidental clicks on mobile.</li>
@@ -281,7 +290,7 @@
       <div id="tvContent"></div>
   </div>
   <div style="position: fixed; bottom: 8px; left: 12px; z-index: 4000; text-align: left; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v59.0</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v60.0</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
@@ -549,17 +558,15 @@ function renderActive(focusPlayer = null) {
   let dealer = null;
   if (activePlayers.length > 0) {
       let roster = state.startingPlayers || state.players;
-      let dealerIndex = (state.round - 1) % roster.length;
-      dealer = roster[dealerIndex];
+      let dIdx = (state.round - 1) % roster.length;
+      dealer = roster[dIdx];
       
-      // The "Dealer Rule": If player Y (next to X) gets out, X repeats as dealer.
-      // We check if the intended dealer in roster order is eliminated.
-      if (state.eliminated[dealer] || state.totals[dealer] >= 240) {
-          // Rule: If next player in consecutive sequence is out, go back to previous active player (original rule)
+      // The "Dealer Rule": If player Y (next in rotation) is OUT, the previous active player (X) repeats.
+      if (state.eliminated[dealer] || (state.totals[dealer] || 0) >= 240) {
           for (let i = 1; i <= roster.length; i++) {
-              let prevIdx = (dealerIndex - i + roster.length) % roster.length;
+              let prevIdx = (dIdx - i + roster.length) % roster.length;
               let prevP = roster[prevIdx];
-              if (!state.eliminated[prevP] && state.totals[prevP] < 240 && state.players.includes(prevP)) {
+              if (!state.eliminated[prevP] && (state.totals[prevP] || 0) < 240 && state.players.includes(prevP)) {
                   dealer = prevP;
                   break;
               }
@@ -1352,46 +1359,52 @@ function renderTVContent() {
     const playerCount = state.players.length;
     
     // Dynamic Height Calculation to fit 100vh precisely
-    const headerHeightPxPercent = 25; // 25vh for Titles and Spacing
+    const headerHeightPxPercent = 20; // Titles take roughly 20vh
     const availableHeightForTable = 100 - headerHeightPxPercent;
-    // Each row shouldn't exceed 12vh but must contract to fit all players
-    const rowHeightVh = Math.min(12, availableHeightForTable / Math.max(1, playerCount));
-    const scaleFactor = rowHeightVh / 12;
+    
+    // Each row shouldn't exceed 14vh but must contract to fit all players
+    const rowHeightVh = Math.min(14, availableHeightForTable / Math.max(1, playerCount + 1)); // +1 for header
+    const scaleFactor = rowHeightVh / 14;
 
-    let h = `<div class=\"tv-title\" style=\"font-size: ${4 * scaleFactor}vh; margin: ${1 * scaleFactor}vh 0;\">
+    let h = `<div class=\"tv-title\" style=\"font-size: ${5 * scaleFactor}vh; margin: ${2 * scaleFactor}vh 0; letter-spacing: 2px;\">
         ${state.name}
-        <span style=\"display:inline-flex; align-items:center; gap:1vh; vertical-align:middle; margin-left:3vh; background:rgba(0,0,0,0.3); padding:0.5vh 2vh; border-radius:4vh; border:1px solid rgba(231, 76, 60, 0.3);\">
-            <span class=\"tv-live-dot\" style=\"width:${2.5 * scaleFactor}vh; height:${2.5 * scaleFactor}vh;\"></span>
-            <span style=\"color:#e74c3c; font-size:${2.4 * scaleFactor}vh; font-weight:900; letter-spacing:2px;\">LIVE</span>
+        <span style=\"display:inline-flex; align-items:center; gap:1vh; vertical-align:middle; margin-left:4vh; background:rgba(0,0,0,0.5); padding:1vh 3vh; border-radius:5vh; border:2px solid rgba(231, 76, 60, 0.5);\">
+            <span class=\"tv-live-dot\" style=\"width:${3 * scaleFactor}vh; height:${3 * scaleFactor}vh;\"></span>
+            <span style=\"color:#e74c3c; font-size:${3 * scaleFactor}vh; font-weight:900; letter-spacing:3px;\">LIVE</span>
         </span>
     </div>
-    <div style=\"text-align:center; font-size: ${6 * scaleFactor}vh; margin-bottom: ${2 * scaleFactor}vh; color: var(--accent); font-weight: 900; letter-spacing: 2px;\">ROUND ${displayRound}</div>`;
+    <div style=\"text-align:center; font-size: ${7 * scaleFactor}vh; margin-bottom: ${3 * scaleFactor}vh; color: var(--accent); font-weight: 950; letter-spacing: 5px; text-transform: uppercase;\">ROUND ${displayRound}</div>`;
 
-    h += `<div style=\"flex: 1; overflow: hidden;\">
-    <table class=\"tv-table\">
-        <tr><th style=\"width:75%; font-size: ${2.5 * scaleFactor}vh; padding: 1vh;\">Player</th><th style=\"text-align:center; font-size: ${2.5 * scaleFactor}vh; padding: 1vh;\">Score</th></tr>`;
+    h += `<div style=\"flex: 1; overflow: hidden; display:flex; flex-direction:column; padding: 0 2vw;\">
+    <table class=\"tv-table\" style=\"border-collapse: separate; border-spacing: 0 ${scaleFactor}vh;\">
+        <thead>
+            <tr style=\"background: rgba(255,255,255,0.05);\">
+                <th style=\"width:75%; font-size: ${2.8 * scaleFactor}vh; padding: ${1.5 * scaleFactor}vh 2vh; text-align:left; border-radius: 1vh 0 0 1vh; opacity: 0.6;\">PLAYER</th>
+                <th style=\"text-align:center; font-size: ${2.8 * scaleFactor}vh; padding: ${1.5 * scaleFactor}vh 2vh; border-radius: 0 1vh 1vh 0; opacity: 0.6;\">SCORE</th>
+            </tr>
+        </thead>
+        <tbody>`;
     
     const sortedPlayersTV = [...state.players].sort((a, b) => {
-        const aOut = state.eliminated[a] || state.totals[a] >= 240;
-        const bOut = state.eliminated[b] || state.totals[b] >= 240;
+        const aOut = state.eliminated[a] || (state.totals[a] || 0) >= 240;
+        const bOut = state.eliminated[b] || (state.totals[b] || 0) >= 240;
         if (aOut && !bOut) return 1;
         if (!aOut && bOut) return -1;
         return 0;
     });
 
-    let activePlayersForDealer = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
+    let activePlayersForDealer = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < 240);
     let dealer = null;
     if (activePlayersForDealer.length > 0) {
         let roster = state.startingPlayers || state.players;
-        let dealerIndex = (state.round - 1) % roster.length;
-        dealer = roster[dealerIndex];
-        if (state.eliminated[dealer] || state.totals[dealer] >= 240) {
+        let dIdx = (state.round - 1) % roster.length;
+        dealer = roster[dIdx];
+        if (state.eliminated[dealer] || (state.totals[dealer] || 0) >= 240) {
             for (let i = 1; i <= roster.length; i++) {
-                let prevIdx = (dealerIndex - i + roster.length) % roster.length;
+                let prevIdx = (dIdx - i + roster.length) % roster.length;
                 let prevP = roster[prevIdx];
-                if (!state.eliminated[prevP] && state.totals[prevP] < 240 && state.players.includes(prevP)) {
-                    dealer = prevP;
-                    break;
+                if (!state.eliminated[prevP] && (state.totals[prevP] || 0) < 240 && state.players.includes(prevP)) {
+                    dealer = prevP; break;
                 }
             }
         }
@@ -1401,23 +1414,24 @@ function renderTVContent() {
         let isOut = state.eliminated[p] || state.totals[p] >= 240;
         let tot = state.totals[p] || 0;
         let hasReEntered = state.reEntries && state.reEntries[p];
+        let isDealer = (p === dealer);
         
-        h += `<tr style=\"${isOut ? 'opacity:0.2' : ''}\">
-            <td style=\"display: flex; align-items: center; border-bottom: 1px solid #222; padding: ${1 * scaleFactor}vh 1vh;\">
-                <img src=\"${getTVAvatar(p)}\" style=\"width: ${9 * scaleFactor}vh; height: ${9 * scaleFactor}vh; border-radius: 50%; object-fit: cover; border: ${3 * scaleFactor}px solid ${p === dealer ? 'var(--warning)' : 'var(--accent)'}; margin-right: 3vh; background: #333;\">
-                <div style=\"display: flex; flex-direction: column;\">
-                    <div style=\"display: flex; align-items: center;\">
-                        ${p === dealer ? `<span class=\"tv-badge\" style=\"background:var(--warning); color:#000; padding:1px 10px; border-radius:4px; margin-right:15px; font-size: ${2 * scaleFactor}vh; font-weight:900; line-height:1.2;\">D</span>` : ''}
-                        <span style=\"font-size: ${4.5 * scaleFactor}vh; line-height: 1;\">${p}</span>
-                        ${hasReEntered ? `<span class=\"tv-badge\" style=\"background:var(--warning); color:#000; padding:1px 8px; border-radius:4px; margin-left:15px; font-size: ${2 * scaleFactor}vh; font-weight:900; line-height:1.2;\">RE</span>` : ''}
-                    </div>
+        h += `<tr style=\"${isOut ? 'opacity:0.2' : ''}; background: rgba(255,255,255,${isDealer ? '0.15' : '0.03'}); transition: 0.3s;\">
+            <td style=\"display: flex; align-items: center; padding: ${1.5 * scaleFactor}vh 2vh; border-radius: 1vh 0 0 1vh;\">
+                <div style=\"position:relative;\">
+                    <img src=\"${getTVAvatar(p)}\" style=\"width: ${10 * scaleFactor}vh; height: ${10 * scaleFactor}vh; border-radius: 50%; object-fit: cover; border: ${3 * scaleFactor}px solid ${isDealer ? 'var(--warning)' : 'rgba(255,255,255,0.1)'}; background: #222;\">
+                    ${isDealer ? `<div style=\"position:absolute; bottom:-1vh; left:50%; transform:translateX(-50%); background:var(--warning); color:#000; font-size:${1.8 * scaleFactor}vh; font-weight:950; padding:0 ${scaleFactor}vh; border-radius:0.5vh; box-shadow:0 0 10px rgba(0,0,0,0.5);\">DEALER</div>` : ''}
+                </div>
+                <div style=\"margin-left: 3vh; display: flex; align-items: center; gap: 2vh;\">
+                    <span style=\"font-size: ${5 * scaleFactor}vh; font-weight: 700; color: #fff;\">${p}</span>
+                    ${hasReEntered ? `<span style=\"background:rgba(241, 196, 15, 0.2); color:var(--warning); padding:0.2vh 1vh; border:1px solid var(--warning); border-radius:0.5vh; font-size: ${1.8 * scaleFactor}vh; font-weight:900;\">RE-ENTRY</span>` : ''}
                 </div>
             </td>
-            <td style=\"text-align:center; color:var(--warning); border-bottom: 1px solid #222; font-size: ${6 * scaleFactor}vh; padding: 0 1vh;\">${isOut ? 'OUT' : tot}</td>
+            <td style=\"text-align:center; color:${isOut ? '#777' : 'var(--warning)'}; font-size: ${7 * scaleFactor}vh; font-weight: 900; padding: 0 2vh; border-radius: 0 1vh 1vh 0; font-family: monospace;\">${isOut ? 'OUT' : tot}</td>
         </tr>`;
     });
 
-    h += `</table></div>`;
+    h += `</tbody></table></div>`;
 
     const pastPlayers = Object.keys(state.totals).filter(p => !state.players.includes(p) || state.eliminated[p] || state.totals[p] >= 240);
     if (pastPlayers.length > 0) {
