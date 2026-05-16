@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v58.0</title>
+<title>Elite Rummy Circle - v59.0</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -182,7 +182,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v58.0</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v59.0</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -243,12 +243,14 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
         <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
         <div style="margin-bottom: 20px;">
-            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v58.0 - TV Mode Precision & Live Feedback</b>
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v59.0 - UX Safety & Terminal Precision</b>
             <ul style="padding-left: 20px; list-style: disc; opacity: 0.9; font-size: 13px; line-height: 1.6;">
-                <li>Enhanced TV Mode with a real-time blinking "LIVE" indicator.</li>
-                <li>Adjusted TV round tracking to display the most recently completed round.</li>
-                <li>Optimized mobile full-screen alerts for external display projection.</li>
-                <li>Refined background layering in digital certificates.</li>
+                <li>Relocated "OUT" button to the left of the score input to prevent accidental clicks on mobile.</li>
+                <li>Introduced "Hall of Fame" with real-time win tracking and rank progression.</li>
+                <li>New Medal Brackets: Pro (3 Wins), Ultra Pro (6 Wins), Ultra Pro Max (10 Wins).</li>
+                <li>Redesigned TV Mode with a blinking red "LIVE" indicator and heritage round tracking.</li>
+                <li>Hardened Certification Engine with background layering and character encoding safety.</li>
+                <li>Adopted "Game" terminology platform-wide for professional consistency.</li>
                 <li>Developer: Elite IT</li>
             </ul>
         </div>
@@ -280,7 +282,7 @@
       <div id="tvContent"></div>
   </div>
   <div style="position: fixed; bottom: 8px; left: 12px; z-index: 4000; text-align: left; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v58.0</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v59.0</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
@@ -596,9 +598,9 @@ function renderActive(focusPlayer = null) {
                 <button class="tactic-btn t-MD ${rs===40?'active':''}" style="background:#8e44ad; color:white;" onclick="setTactic('${p}', 'MD')" ${isOut || state.winner?'disabled':''}>MD</button>
                 <button class="tactic-btn t-FC ${rs===80?'active':''}" style="background:var(--danger); color:white;" onclick="setTactic('${p}', 'FC')" ${isOut || state.winner?'disabled':''}>FC</button>
                 <button class="tactic-btn t-FS ${rs===0?'active':''}" style="background: linear-gradient(to bottom, #34495e, #1a232e); border: 1px solid rgba(255,255,255,0.4); color:white;" onclick="setTactic('${p}', 'FS')" ${isOut || state.winner?'disabled':''}>FS</button>
-                <button class="tactic-btn t-OUT" style="background:var(--danger); color:white;" onclick="markOut('${p}')" ${state.winner?'disabled':''}>OUT</button>
             </div>
             <div style="display:flex; gap:5px; align-items:center; margin-top:5px;">
+                <button class="tactic-btn t-OUT" style="background:var(--danger); color:white; width: 45px; flex-shrink: 0;" onclick="markOut('${p}')" ${state.winner?'disabled':''}>OUT</button>
                 <input type="text" id="input-${p}" inputmode="numeric" pattern="[0-9]*" class="std-input score-input" data-player="${p}" style="height:35px; margin:0; text-align:center; font-size:12px; flex:1;" value="${isOut?'OUT':(rs===null?'':rs)}" oninput="manualInput('${p}', this.value)" onkeydown="if(event.key==='Enter') { event.preventDefault(); this.blur(); }" ${isOut || isPendingOut || isS || state.winner?'disabled':''}>
             </div>
         </td>
