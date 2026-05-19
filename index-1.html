@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v62.0</title>
+<title>Elite Rummy Circle - v85.0</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" sizes="152x152" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
@@ -100,39 +100,90 @@
     display: none; 
     position: fixed; 
     inset: 0; 
-    background-color: #000;
-    background-image: 
-      radial-gradient(circle at center, rgba(30, 30, 40, 0.9) 0%, #000 100%),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 800 800' opacity='0.03'%3E%3Cg fill='%23ffffff'%3E%3Cpath d='M400 150 L450 300 L400 350 L350 300 Z'/%3E%3Cpath d='M150 400 L300 450 L350 400 L300 350 Z'/%3E%3Cpath d='M650 400 L500 450 L450 400 L500 350 Z'/%3E%3Cpath d='M400 650 L450 500 L400 450 L350 500 Z'/%3E%3C/g%3E%3C/svg%3E");
-    background-size: cover, 400px 400px;
-    background-position: center;
-    background-repeat: no-repeat, repeat;
+    background: #000; 
     z-index: 6000; 
     flex-direction: column; 
-    padding: 2vh 5vw; 
-    overflow: hidden; 
-    text-shadow: 0 4px 15px rgba(0,0,0,1);
+    padding: 3vh 5vw; 
+    overflow-y: auto; 
+    font-family: 'Inter', sans-serif;
   }
-  .tv-table { width: 100%; border-collapse: separate; border-spacing: 0 1vh; }
-  .tv-table th { font-size: 2.5vh; color: var(--accent); border-bottom: 2px solid #333; padding: 2vh 1vh; }
-  .tv-table td { font-size: 5vh; font-weight: bold; padding: 2vh 1vh; border-bottom: 1px solid #222; }
-  .tv-title { font-size: 4vh; color: var(--accent); margin: 2vh 0; text-align: center; }
-  .tv-badge { font-size: 2vh; vertical-align: middle; }
-  .tv-live-dot {
-    width: 2.5vh;
-    height: 2.5vh;
-    background-color: #e74c3c;
-    border-radius: 50%;
-    display: inline-block;
-    box-shadow: 0 0 15px #e74c3c;
-    animation: tv-blink 1.2s infinite;
+  
+  .tv-table { width: 100%; border-collapse: collapse; }
+  .tv-table th { 
+    color: var(--accent); 
+    font-size: 2.2vh; 
+    padding: 1.5vh; 
+    text-align: left; 
+    border-bottom: 2px solid rgba(255,255,255,0.1); 
+    text-transform: uppercase; 
+    letter-spacing: 2px;
   }
+  .tv-table td { 
+    padding: 2.2vh 1.5vh; 
+    border-bottom: 1px solid rgba(255,255,255,0.05); 
+    font-size: 4.5vh; 
+    color: #fff; 
+    vertical-align: middle; 
+  }
+  .tv-table tr.is-out { opacity: 0.3; }
+  .tv-table .score-val { 
+    color: var(--warning); 
+    font-weight: 900; 
+    font-size: 6vh; 
+    font-family: 'JetBrains Mono', monospace; 
+  }
+  .tv-table .dealer-badge { 
+    background: var(--warning); 
+    color: #000; 
+    font-size: 1.8vh; 
+    padding: 2px 10px; 
+    border-radius: 4px; 
+    font-weight: 900; 
+    margin-left: 15px;
+    text-transform: uppercase;
+  }
+  .tv-table .avatar-tv { 
+    width: 7vh; 
+    height: 7vh; 
+    border-radius: 50%; 
+    border: 2px solid var(--accent); 
+    margin-right: 20px; 
+    object-fit: cover; 
+  }
+
   @keyframes tv-blink {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.9); }
-    100% { opacity: 1; transform: scale(1); }
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
   }
-  .tv-close { position: fixed; top: 10px; right: 10px; background: rgba(255,255,255,0.1); border-radius: 50%; width: 40px; height: 40px; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; }
+
+  @keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); transform: scale(1); }
+    70% { box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); transform: scale(1.02); }
+    100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); transform: scale(1); }
+  }
+
+  .tv-close { 
+    position: fixed; 
+    bottom: 30px; 
+    right: 30px; 
+    background: var(--danger); 
+    border-radius: 50px; 
+    padding: 10px 25px;
+    color: white; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 16px; 
+    font-weight: bold;
+    cursor: pointer; 
+    transition: opacity 0.5s, transform 0.2s;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 7000;
+  }
+  .tv-close.visible { opacity: 1; pointer-events: auto; }
+  .tv-close:hover { opacity: 1; transform: scale(1.05); }
   
   @media print {
     #fullscreenOverlay { display: none !important; }
@@ -190,7 +241,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v62.0</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v85.0</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -251,6 +302,122 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
         <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
         <div style="margin-bottom: 20px;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v85.0 - Deleted Games Archive</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Soft Delete:</b> Deleting active or completed games now safely moves them to a restorable "Deleted Games" folder instead of permanent immediate erasure.<br>
+                • <b>Recovery Systems:</b> Replaced immediate DB deletions with stateful recovery switches, allowing admins to view, restore, or permanently remove deleted games from a central repository.<br>
+                • <b>Seamless Filters:</b> Deleted matches are automatically filtered and excluded from the active lobbies, Hall of Fame win ratios, and PDF reporting pages.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v84.0 - TV Heartbeat Protection</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Match Protection:</b> Dedicated view-only layouts (TV Broadcast Screens) now emit active Firestore heartbeat signals, securely preventing remote game terminations on other admin devices.<br>
+                • <b>Stealth TV Scorecard:</b> Completely deactivated the fullscreen close button on dedicated view-only devices while preserving motion-responsive controls for administrators.<br>
+                • <b>Full Sizing Harness:</b> Perfected cross-platform rendering for all desktop and mobile browsers.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v83.0 - Intelligent Scaling & UI</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Smart Fit:</b> Scoreboard now automatically adjusts font sizes and row heights based on player count to fill the screen perfectly.<br>
+                • <b>Hidden Controls:</b> TV Mode close button is now invisible by default, appearing only on movement for a cleaner "broadcast" look.<br>
+                • <b>Enhanced Clarity:</b> Optimized spacing and proportions for high-distance viewing on large displays.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v82.0 - Report Uniformity & Classic TV</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Uniform Reports:</b> Standardized date formatting extended to all PDF certificates, report lists, and table views.<br>
+                • <b>Retroactive Polish:</b> Older games in the history list now display the standardized date format.<br>
+                • <b>Classic TV Mode:</b> Reverted to the absolute initial high-performance table layout, removing specialized card animations for maximum clarity.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v81.0 - Cross-Platform Date Logic</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Uniform Formatting:</b> Standardized all date and time stamps to the DD-MM-YY TIME (AM/PM) format across all devices.<br>
+                • <b>Enhanced Parsing:</b> Improved date handling to ensure consistent output on Android, iOS, and PC.<br>
+                • <b>Certificate Accuracy:</b> Ensuring certificates and reports reflect the new standardized time format.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v80.0 - Match Security & Classic Scale</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Match Protection:</b> The "End Game" button is now automatically locked if someone is actively managing the match elsewhere.<br>
+                • <b>Live Indicators:</b> Flashing "Live Match" status in the game manager to prevent accidental terminations.<br>
+                • <b>v77 Scale Restored:</b> Reverted the TV scoreboard to the high-visibility card-based scale for better viewing at a distance.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v78.0 - Classic TV Scoreboard</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Refined UI:</b> Restored the classic table-based scoreboard for maximum clarity and performance.<br>
+                • <b>Clean Display:</b> Simplified the TV mode interface to focus on core game data.<br>
+                • <b>High Visibility:</b> Optimized font sizes and contrast for large screen viewing.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v77.0 - Re-entry Data Persistence & Fallback</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Enhanced Reporting:</b> Added logic to retroactively calculate and display "Busted" totals for past games where data was not explicitly stored.<br>
+                • <b>Clearer Labels:</b> Re-entry rows now explicitly show "Busted: [Score]" and "Re-entered at [Points]".<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v76.0 - Re-entry Detail Optimization</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Clearer Re-entry Flow:</b> Reports now explicitly display the "Busted" total (e.g., 275) above the re-entry adjustment (e.g., 9) for better round-by-round auditing.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v75.0 - Re-entry Score Formatting</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Refined Re-entry Display:</b> The Reports table now shows the "busted" total score prominently above the re-entry adjustment for clearer tracking.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v74.0 - Re-entry Busted Score Tracking</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Busted Score Visibility:</b> Reports and certificates now show the actual score (e.g., 275) that exceeded the limit before revealing the re-entry adjustment.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v73.0 - Enhanced Re-entry Tracking</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Detailed Re-entry Logs:</b> Reports and certificates now display the score at which a player re-entered the game (e.g., RE @ 180).<br>
+                • <b>Round Count:</b> The current round number is now visible in both the game title and the "Next Round" button.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v72.0 - Reports Table Fix</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Complete Round History:</b> Fixed an issue where the reports table and PDF only showed a subset of rounds. All recorded rounds are now displayed.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v71.0 - Re-entry Rule Correction</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Highest + 1 Rule:</b> Re-entry score is now strictly calculated as the highest survivor's score plus one.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v70.0 - Scoreboard Persistence & Manual Termination</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Persistent Scoreboard:</b> Main and TV screens now retain full table views after game completion.<br>
+                • <b>Manual Game End:</b> Automatic termination is disabled; games now require a manual "Next Round" confirmation to conclude, allowing for score corrections.<br>
+                • <b>Enhanced Validation:</b> Stricter checks for missing scores and improved re-entry stability.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v66.0 - Persistent Main Scoreboard & Final Results</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Persistent Scoreboard:</b> Main screen now retains the full player table after game completion instead of showing a simple winner card.<br>
+                • <b>Final Result Display:</b> Inputs are deactivated and automatically populated with final total scores, providing a clear post-game summary.<br>
+                • <b>Enhanced Winner Announcement:</b> The winner is prominently displayed above the final scoreboard for a celebratory finish.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v65.0 - Persistent TV Scoreboard</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Persistent Game-Over State:</b> The TV Scoreboard now remains active even after a game ends, replacing the round indicator with a prominent "GAME OVER" and Winner announcement.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v64.0 - Dynamic Re-entry Scoring</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Refined Re-entry Math:</b> Players now re-enter with the second-highest survivor's score plus one (capped at 240). If only one survivor remains, it defaults to their score plus one.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v63.0 - Unified Re-entry & Elimination Guard</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Enhanced Re-entry logic:</b> Fixed a critical bug where re-entry prompts were skipped if everyone reached 240+ simultaneously. Now correctly triggers one (and only one) re-entry opportunity for players reaching the limit via points.<br>
+                • <b>Automatic Winner Check:</b> Refined the winner detection to wait for all re-entry decisions before closing a game.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v62.0 - Optimized Home Screen Icon</b>
             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
                 • <b>Enhanced Icon Support:</b> Added specific apple-touch-icon tags to ensure the app icon appears correctly when saved to home screen on iOS.<br>
@@ -306,11 +473,11 @@
   </div>
   <div class="main-pane" id="mainPane"></div>
   <div id="fullscreenOverlay">
-      <div class="tv-close" onclick="closeFullScreen()">✕</div>
       <div id="tvContent"></div>
+      <div class="tv-close" id="tvCloseBtn" onclick="closeFullScreen()">Close</div>
   </div>
   <div style="position: fixed; bottom: 8px; left: 12px; z-index: 4000; text-align: left; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v62.0</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v85.0</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
@@ -500,6 +667,7 @@ function showScreen(s) {
   // Update Hash for URL Persistence
   if (s === 'activeGame' && state) {
       window.location.hash = 'activeGame:' + state.id;
+      startHeartbeat();
   } else {
       window.location.hash = s;
   }
@@ -531,7 +699,7 @@ function renderNewGame() {
     </div>`;
 }
 
-function appendDT() { document.getElementById('gName').value += " " + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+function appendDT() { document.getElementById('gName').value += " " + formatEliteDate(new Date()); }
 
 function addPlayerField() {
   const selected = Array.from(document.querySelectorAll('#playerList select')).map(s => s.value);
@@ -549,15 +717,25 @@ function addPlayerField() {
 
 function formatEliteDate(dateObj) {
     if (!dateObj) return '-';
-    const d = (dateObj instanceof Date) ? dateObj : new Date(dateObj);
-    if (isNaN(d.getTime())) return '-';
+    let d;
+    if (dateObj instanceof Date) {
+        d = dateObj;
+    } else {
+        d = new Date(dateObj);
+        if (isNaN(d.getTime())) return dateObj; 
+    }
     
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yy = String(d.getFullYear()).slice(-2);
     
-    return `${day}${month}${year}, ${time}`;
+    let hours = d.getHours();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    
+    return `${dd}-${mm}-${yy} ${hours}:${minutes} ${ampm}`;
 }
 
 function startGame() {
@@ -567,7 +745,7 @@ function startGame() {
   state = {
     id: Date.now().toString(), name: document.getElementById('gName').value || "Game",
     startTime: formatEliteDate(new Date()), players: pList, startingPlayers: [...pList], totals: {}, roundScores: {}, roundTactics: {}, lastDropRound: {},
-    eliminated: {}, reEntries: {}, actionStats: {}, round: 1, history: [], winner: null
+    eliminated: {}, reEntries: {}, actionStats: {}, round: 1, history: [], winner: null, endTime: null
   };
   pList.forEach(p => { state.totals[p]=0; state.roundScores[p]=null; state.roundTactics[p]=null; state.lastDropRound[p]=-1; state.actionStats[p]={shows:0,fcs:0,drops:0,mds:0}; });
   db.collection('eliteGames').doc(state.id).set(state);
@@ -577,17 +755,13 @@ function startGame() {
 function renderActive(focusPlayer = null) {
   if(!state) return;
   
-  let activePlayers = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
+  let activeInRound = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
   
-  // Automatic winner check
-  if (!state.winner && activePlayers.length === 1 && state.round > 1) {
-      state.winner = activePlayers[0];
-      state.endTime = formatEliteDate(new Date());
-      db.collection('eliteGames').doc(state.id).set(state);
-  }
+  // Determine who to render: survivors or everyone from the last round if game is over
+  let activePlayers = state.winner ? state.players : activeInRound;
 
   let dealer = null;
-  if (activePlayers.length > 0) {
+  if (!state.winner && activeInRound.length > 0) {
       let roster = state.startingPlayers || state.players;
       let dIdx = (state.round - 1) % roster.length;
       dealer = roster[dIdx];
@@ -606,7 +780,7 @@ function renderActive(focusPlayer = null) {
   }
 
   let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px; flex-wrap:wrap;">
-    <h3 style="margin:0; flex:1;">${state.name}</h3>
+    <h3 style="margin:0; flex:1; color:${state.winner?'var(--warning)':'inherit'}">${state.winner ? 'GAME OVER' : state.name + ' - Round ' + state.round}</h3>
     <div style="display:flex; gap:5px;">
         <button onclick="toggleFullScreen()" class="pause-btn" style="background: linear-gradient(to bottom, var(--accent), #1e8449); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 0 10px rgba(39, 174, 96, 0.3); width:80px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;">Full Screen</button>
         <button onclick="state=null; showScreen('newGame')" class="pause-btn" style="width:80px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;">${state.winner?'Home':'Pause'}</button>
@@ -639,7 +813,7 @@ function renderActive(focusPlayer = null) {
             </div>
             <div style="display:flex; gap:5px; align-items:center; margin-top:5px;">
                 <button class="tactic-btn t-OUT" style="background:var(--danger); color:white; flex:none; width:35px; height:32px; padding:0; font-size:9px; font-weight:900;" onclick="markOut('${p}')" ${state.winner?'disabled':''}>OUT</button>
-                <input type="text" id="input-${p}" inputmode="numeric" pattern="[0-9]*" class="std-input score-input" data-player="${p}" style="height:32px; margin:0; text-align:center; font-size:12px; flex:1;" value="${isOut?'OUT':(rs===null?'':rs)}" oninput="manualInput('${p}', this.value)" onkeydown="if(event.key==='Enter') { event.preventDefault(); this.blur(); }" ${isOut || isPendingOut || isS || state.winner?'disabled':''}>
+                <input type="text" id="input-${p}" inputmode="numeric" pattern="[0-9]*" class="std-input score-input" data-player="${p}" style="height:32px; margin:0; text-align:center; font-size:12px; flex:1; background:${(isOut || isPendingOut || isS || state.winner) ? '#e0e0e0' : '#fff'}; color:${(isOut || isPendingOut || isS || state.winner) ? '#888' : '#000'}; font-weight:${(isOut || isPendingOut || state.winner) ? 'bold' : '600'};" value="${state.winner ? (state.totals[p] || 0) : (isOut?'OUT':(rs===null?'':rs))}" oninput="manualInput('${p}', this.value)" onkeydown="if(event.key==='Enter') { event.preventDefault(); this.blur(); }" ${isOut || isPendingOut || isS || state.winner?'disabled':''}>
             </div>
         </td>
         <td><b style="color:var(--warning)">${(isOut || isPendingOut) ? 'OUT' : state.totals[p]}</b></td>
@@ -659,12 +833,15 @@ function renderActive(focusPlayer = null) {
           const isNotOut = !state.eliminated[p] && (state.totals[p] || 0) < 240;
           return isNotOut && state.roundScores[p] !== null;
       });
-      h += `<button id="endBtn" class="actionBtn" style="margin-top:15px;" onclick="nextRound()">Next Round</button>
+      h += `<button id="endBtn" class="actionBtn" style="margin-top:15px;" onclick="nextRound()">Next Round (${state.round + 1})</button>
             <div style="display:flex; gap:8px; margin-top:8px;">
                 <button class="actionBtn" style="background:${isRoundInProgress?'#333':'#555'}; height:45px; font-size:12px; margin:0; flex:1; opacity:${isRoundInProgress?0.5:1};" onclick="openMidGame()">+ Add Player Mid-Game</button>
             </div>`;
   } else {
-      h += `<div style="text-align:center; padding:15px;"><h2 style="color:var(--accent); margin:0;">Winner: ${state.winner}</h2></div>`;
+      h += `<div style="text-align:center; padding:10px 0; margin-top:15px; margin-bottom:10px; background:rgba(255,255,255,0.05); border-radius:8px; border:1px dashed var(--warning);">
+            <div style="font-size:12px; opacity:0.8; margin-bottom:2px;">🏆 WINNER 🏆</div>
+            <div style="font-size:24px; color:var(--warning); font-weight:900; text-shadow: 0 0 10px rgba(241, 196, 15, 0.3);">${state.winner}</div>
+          </div>`;
   }
 
   const shownPast = pastPlayers.slice(0, 10);
@@ -752,13 +929,11 @@ function setTactic(p, type) {
     state.roundScores[p] = v;
     state.roundTactics[p] = tactic;
     
-    if (!checkAutomaticWinner()) {
-        updateRoundScoresUI();
-        db.collection('eliteGames').doc(state.id).update({ 
-            roundScores: state.roundScores,
-            roundTactics: state.roundTactics
-        });
-    }
+    updateRoundScoresUI();
+    db.collection('eliteGames').doc(state.id).update({ 
+        roundScores: state.roundScores,
+        roundTactics: state.roundTactics
+    });
 }
 
 function manualInput(p, val) {
@@ -789,15 +964,13 @@ function manualInput(p, val) {
     state.roundScores[p] = v;
     state.roundTactics[p] = null; // Clear tactic highlight on manual input
     
-    if (!checkAutomaticWinner()) {
-        updateRoundScoresUI();
-        const el = document.getElementById(`input-${p}`);
-        if (el) el.focus();
-        db.collection('eliteGames').doc(state.id).update({ 
-            roundScores: state.roundScores,
-            roundTactics: state.roundTactics
-        });
-    }
+    updateRoundScoresUI();
+    const el = document.getElementById(`input-${p}`);
+    if (el) el.focus();
+    db.collection('eliteGames').doc(state.id).update({ 
+        roundScores: state.roundScores,
+        roundTactics: state.roundTactics
+    });
 }
 
 function updateRoundScoresUI() {
@@ -895,14 +1068,22 @@ function focusNext(p) {
 
 function validateEndBtn() {
     if(!state) return;
-    // Active players include those under 240 and not eliminated
-    let active = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < 240);
+    // Participants in the current round (under 240 and not eliminated at start)
+    let participants = state.players.filter(p => !state.eliminated[p]);
     
-    // Exactly one player MUST be marked with 'S' (Winner)
-    let shows = active.filter(p => state.roundScores[p] === 'S');
+    // Calculate potential survivors based on entered scores
+    let survivors = participants.filter(p => {
+        let rs = state.roundScores[p];
+        if (rs === 'OUT') return false;
+        if (rs === 'S') return true;
+        let n = parseInt(rs) || 0;
+        return ((state.totals[p] || 0) + n) < 240;
+    });
     
-    // Ensure ALL active players have some score entered
-    let allEntered = active.every(p => {
+    let shows = participants.filter(p => state.roundScores[p] === 'S');
+    
+    // Ensure ALL active participants have some score entered
+    let allEntered = participants.every(p => {
         const val = state.roundScores[p];
         if (val === 'S' || val === 'OUT') return true;
         if (typeof val === 'number' && !isNaN(val)) return true;
@@ -911,7 +1092,12 @@ function validateEndBtn() {
 
     const btn = document.getElementById('endBtn');
     if(btn) { 
-        const isReady = (shows.length === 1 && allEntered);
+        // If survivors exist, one must be 'S'. If all out, all must have scores.
+        let isReady = allEntered;
+        if (survivors.length > 0) {
+            isReady = isReady && (shows.length === 1);
+        }
+        
         btn.disabled = !isReady; 
         if (isReady) {
             btn.style.background = "#27ae60"; 
@@ -929,28 +1115,6 @@ function validateEndBtn() {
     }
 }
 
-function checkAutomaticWinner() {
-    if (!state || state.winner) return false;
-    let activeInRound = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
-    let survivors = activeInRound.filter(p => state.roundScores[p] !== 'OUT');
-    survivors = survivors.filter(p => {
-        let rs = state.roundScores[p];
-        if (rs === 'OUT') return false;
-        if (rs === 'S') return true;
-        let n = parseInt(rs) || 0;
-        return (state.totals[p] + n) < 240;
-    });
-    if (survivors.length === 1) {
-        state.winner = survivors[0];
-        state.endTime = formatEliteDate(new Date());
-        state.roundScores[survivors[0]] = state.roundScores[survivors[0]] || 'S';
-        db.collection('eliteGames').doc(state.id).set(state);
-        renderActive();
-        return true;
-    }
-    return false;
-}
-
 function markOut(p) {
     if(!state || state.winner) return;
     if (state.roundScores[p] === 'OUT') {
@@ -962,29 +1126,29 @@ function markOut(p) {
             state.roundTactics[p] = 'OUT';
         }
     }
-    if (!checkAutomaticWinner()) {
-        updateRoundScoresUI();
-        db.collection('eliteGames').doc(state.id).set(state);
-    }
+    updateRoundScoresUI();
+    db.collection('eliteGames').doc(state.id).set(state);
 }
 
 async function nextRound() {
-    if(!state || isPromptingReEntry) return;
+    if(!state || state.winner || isPromptingReEntry) return;
     isPromptingReEntry = true;
-    let showNotified = false;
     try {
         let scores = {...state.roundScores};
         let tactics = state.roundTactics ? {...state.roundTactics} : {};
         let allParticipants = Array.from(new Set([...state.players, ...Object.keys(scores)]));
-        let entry = { round: state.round, players: allParticipants, scores: scores, tactics: tactics, totals: {}, reentries: {} };
+        
+        let entry = { round: state.round, players: allParticipants, scores: scores, tactics: tactics, totals: {}, reentries: {}, bustedTotals: {} };
         
         // Ensure all roundScores have a value before proceeding
-        state.players.forEach(p => {
-            if (state.roundScores[p] === null && !state.eliminated[p] && state.totals[p] < 240) {
-                 // Should be blocked by UI but just in case
-                 throw new Error(`Score missing for ${p}`);
+        for (let p of state.players) {
+            const sc = state.roundScores[p];
+            if ((sc === undefined || sc === null || sc === "") && !state.eliminated[p] && (state.totals[p] || 0) < 240) {
+                 alert(`Score missing for ${p}. Please enter a score or mark as OUT.`);
+                 isPromptingReEntry = false;
+                 return;
             }
-        });
+        }
 
         // 1. Calculate totals for all participants
         allParticipants.forEach(p => {
@@ -1001,6 +1165,7 @@ async function nextRound() {
                     n = (parseInt(val) === 0 ? 0 : (parseInt(val) || 0));
                     if (state.totals[p] === undefined) state.totals[p] = n;
                     else state.totals[p] += n;
+                    if (state.totals[p] >= 240) entry.bustedTotals[p] = state.totals[p];
                 }
 
                 let tactic = tactics[p];
@@ -1014,74 +1179,103 @@ async function nextRound() {
             }
         });
 
-        // 2. Check for survivors
+        // 2. Process Re-entries
         let activeSurvivors = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]);
+        let reEntryQueue = [];
         
-        if (activeSurvivors.length === 0) {
-            // Sudden death/Draw logic
-            let allInRound = state.players.filter(p => !state.eliminated[p]);
-            let minScore = Math.min(...allInRound.map(p => state.totals[p]));
-            let winners = allInRound.filter(p => state.totals[p] === minScore);
-            state.winner = (winners.length > 1 ? winners.join(' & ') : winners[0]);
-            state.endTime = formatEliteDate(new Date());
-            state.players.forEach(p => { entry.totals[p] = state.totals[p]; });
-            state.history.push(entry);
-        } else {
-            // 3. Process Re-entries using Modal
-            let reEntryQueue = [];
-            let entryScore = Math.max(...activeSurvivors.map(p => state.totals[p])) + 1;
-            
-            for(let p of state.players) {
-                const alreadyReEntered = state.reEntries && state.reEntries[p];
-                if(state.totals[p] >= 240 && !state.eliminated[p] && !alreadyReEntered) {
+        // Calculate re-entry score: highest survivor score + 1
+        let entryScore = 175;
+        if (activeSurvivors.length > 0) {
+            let maxScore = Math.max(...activeSurvivors.map(p => state.totals[p]));
+            entryScore = maxScore + 1;
+        }
+        if (entryScore > 240) entryScore = 240;
+
+        for(let p of state.players) {
+            const alreadyReEntered = state.reEntries && state.reEntries[p];
+            // Only players who reached 240+ via scores (not manually marked OUT) get a chance
+            if(state.totals[p] >= 240 && !state.eliminated[p]) {
+                if(!alreadyReEntered) {
                     reEntryQueue.push({player: p, score: entryScore});
-                } else if (state.totals[p] >= 240 && !state.eliminated[p] && alreadyReEntered) {
-                    // No second chance
-                    state.eliminated[p] = true;
+                } else {
+                    state.eliminated[p] = true; // No second chance
                 }
             }
-
-            if(reEntryQueue.length > 0) {
-                processReEntryQueue(reEntryQueue, entry, allParticipants);
-            } else {
-                finalizeRound(entry, allParticipants);
-            }
-            return;
         }
-        
-        await db.collection('eliteGames').doc(state.id).set(state);
+
+        if(reEntryQueue.length > 0) {
+            await processReEntryQueue(reEntryQueue, entry, allParticipants);
+        } else {
+            // Check if game should continue or end
+            let nextSurvivors = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
+            if (nextSurvivors.length === 0) {
+                // Everyone is eliminated or over 240 - Game Ends!
+                let allInRound = state.players.filter(p => !state.eliminated[p] || state.totals[p] >= 240);
+                let minScore = Math.min(...allInRound.map(p => state.totals[p]));
+                let winners = allInRound.filter(p => state.totals[p] === minScore);
+                state.winner = (winners.length > 1 ? winners.join(' & ') : winners[0]) || "Tie";
+                state.endTime = formatEliteDate(new Date());
+                allParticipants.forEach(p => { entry.totals[p] = state.totals[p] || 0; });
+                state.history.push(entry);
+                await db.collection('eliteGames').doc(state.id).set(state);
+            } else {
+                await finalizeRound(entry, allParticipants);
+            }
+        }
     } catch (e) {
         console.error("Round transition error:", e);
     } finally {
         isPromptingReEntry = false;
+        renderActive();
     }
-    renderActive();
 }
 
 function processReEntryQueue(queue, entry, allParticipants) {
-    if (queue.length === 0) {
-        finalizeRound(entry, allParticipants);
-        return;
-    }
-    
-    let { player, score } = queue.shift();
-    document.getElementById('reentryText').innerHTML = `<b>${player}</b> reached <b>${state.totals[player]}</b>.<br>Re-enter at <b>${score}</b>?`;
-    document.getElementById('reentryModal').style.display = 'flex';
-    
-    document.getElementById('btnReentryYes').onclick = () => {
-        state.reEntries[player] = true;
-        state.totals[player] = score;
-        entry.reentries[player] = score;
-        document.getElementById('reentryModal').style.display = 'none';
-        processReEntryQueue(queue, entry, allParticipants);
-    };
-    
-    document.getElementById('btnReentryNo').onclick = () => {
-        state.eliminated[player] = true;
-        document.getElementById('reentryModal').style.display = 'none';
-        processReEntryQueue(queue, entry, allParticipants);
-    };
+    return new Promise((resolve) => {
+        const next = () => {
+            if (queue.length === 0) {
+                finalizeRound(entry, allParticipants).then(resolve);
+                return;
+            }
+            
+            let { player, score } = queue.shift();
+            
+            if (score >= 240) {
+                document.getElementById('reentryText').innerHTML = `<b style="color:var(--danger)">No points available to Re-entry</b><br><b>${player}</b> reached <b>${state.totals[player]}</b> and is eliminated.`;
+                document.getElementById('reentryModal').style.display = 'flex';
+                document.getElementById('btnReentryYes').style.display = 'none';
+                document.getElementById('btnReentryNo').innerText = 'Dismiss';
+                document.getElementById('btnReentryNo').onclick = () => {
+                    state.eliminated[player] = true;
+                    document.getElementById('reentryModal').style.display = 'none';
+                    document.getElementById('btnReentryYes').style.display = 'flex'; // Reset for next
+                    document.getElementById('btnReentryNo').innerText = 'Leave'; // Reset
+                    next();
+                };
+                return;
+            }
+            
+            document.getElementById('reentryText').innerHTML = `<b>${player}</b> reached <b>${state.totals[player]}</b>.<br>Re-enter at <b>${score}</b>?`;
+            document.getElementById('reentryModal').style.display = 'flex';
+            
+            document.getElementById('btnReentryYes').onclick = () => {
+                state.reEntries[player] = true;
+                state.totals[player] = score;
+                entry.reentries[player] = score;
+                document.getElementById('reentryModal').style.display = 'none';
+                next();
+            };
+            
+            document.getElementById('btnReentryNo').onclick = () => {
+                state.eliminated[player] = true;
+                document.getElementById('reentryModal').style.display = 'none';
+                next();
+            };
+        };
+        next();
+    });
 }
+
 
 function getFirstName(name) {
     if (!name) return "";
@@ -1089,28 +1283,34 @@ function getFirstName(name) {
 }
 
 async function finalizeRound(entry, allParticipants) {
-    allParticipants.forEach(p => { entry.totals[p] = state.totals[p]; });
+    allParticipants.forEach(p => { entry.totals[p] = (state.totals[p] !== undefined) ? state.totals[p] : 0; });
     state.history.push(entry);
     state.round++; 
     
     // Players who are now eliminated or over 240 must be removed from the active roster for the next round
-    state.players = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
+    state.players = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < 240);
 
     state.players.forEach(p => {
         state.roundScores[p] = null;
         if(state.roundTactics) state.roundTactics[p] = null;
     });
 
-    let currentSurvivors = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
+    let currentSurvivors = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < 240);
     if (currentSurvivors.length === 1) {
         state.winner = currentSurvivors[0];
         state.endTime = formatEliteDate(new Date());
     } else if (currentSurvivors.length === 0) {
         // Tie-break if everyone somehow got out (sudden death handler)
-        let minScore = Math.min(...allParticipants.map(p => state.totals[p]));
-        let winners = allParticipants.filter(p => state.totals[p] === minScore);
-        state.winner = (winners.length > 1 ? winners.join(' & ') : winners[0]);
-        state.endTime = formatEliteDate(new Date());
+        let participantsInLastRound = allParticipants.filter(p => state.totals[p] !== undefined);
+        if (participantsInLastRound.length > 0) {
+            let minScore = Math.min(...participantsInLastRound.map(p => state.totals[p]));
+            let winners = participantsInLastRound.filter(p => state.totals[p] === minScore);
+            state.winner = (winners.length > 1 ? winners.join(' & ') : winners[0]) || "Tie";
+            state.endTime = formatEliteDate(new Date());
+        } else {
+            state.winner = "No Winner";
+            state.endTime = formatEliteDate(new Date());
+        }
     }
     
     await db.collection('eliteGames').doc(state.id).set(state);
@@ -1123,7 +1323,7 @@ async function finalizeRound(entry, allParticipants) {
 function viewProfile(uid) {
     const p = playersDb.find(x => x.id === uid); if(!p) return;
     const name = p.fullName || `Elite-ID: ${p.id.substring(0,8)}`;
-    let games = savedGames.filter(g => g.winner && g.players.includes(name) && !g.isAborted);
+    let games = savedGames.filter(g => g.winner && g.players.includes(name) && !g.isAborted && !g.isDeleted);
     let wins = games.filter(g => g.winner === name).length;
     let s=0, fc=0, d=0, md=0;
     games.forEach(g => { if(g.actionStats && g.actionStats[name]){ s+=g.actionStats[name].shows; fc+=g.actionStats[name].fcs; d+=g.actionStats[name].drops; md+=g.actionStats[name].mds; } });
@@ -1200,7 +1400,7 @@ function viewCertificate(id) {
     const sanitizePDF = (s) => (s || "").replace(/[^\x20-\x7E\xA0-\xFF]/g, " ").trim();
     const winnerName = sanitizePDF(g.winner).toUpperCase();
     const gameName = sanitizePDF(g.name) || "Elite Game";
-    const dateStr = sanitizePDF(g.endTime || g.startTime || new Date().toLocaleString());
+    const dateStr = sanitizePDF(g.endTime || g.startTime || formatEliteDate(new Date()));
     
     // Background: Rich Parchment
     doc.setFillColor(252, 250, 242);
@@ -1320,6 +1520,9 @@ async function saveProfile() {
     viewMyProfile();
 }
 
+/**
+ * SCOREBOARD ANIMATOR (Disabled)
+ */
 function handlePhotoUpload(event) {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -1342,6 +1545,21 @@ function handlePhotoUpload(event) {
 function showMedalInfo() {
     alert("Elite Medal Brackets:\n\n🏅 PRO: 3 Wins\n🏆 ULTRA PRO: 6 Wins\n👑 ULTRA PRO MAX: 10 Wins");
 }
+
+let tvCloseTimer = null;
+function handleTVMouseMove() {
+    const overlay = document.getElementById('fullscreenOverlay');
+    if (!overlay || overlay.style.display !== 'flex') return;
+    const btn = document.getElementById('tvCloseBtn');
+    if (!btn) return;
+    btn.classList.add('visible');
+    if (tvCloseTimer) clearTimeout(tvCloseTimer);
+    tvCloseTimer = setTimeout(() => {
+        btn.classList.remove('visible');
+    }, 3000);
+}
+document.addEventListener('mousemove', handleTVMouseMove);
+document.addEventListener('touchstart', handleTVMouseMove);
 
 function toggleFullScreen() {
     if (window.innerWidth < 900) {
@@ -1369,63 +1587,88 @@ function showTVViewOnly() {
     document.getElementById('mainApp').style.display = 'none';
     document.getElementById('authScreen').style.display = 'none';
     document.getElementById('fullscreenOverlay').style.display = 'flex';
-    document.querySelector('.tv-close').style.display = 'none'; // No close button in view-only mode
+    const closeBtn = document.getElementById('tvCloseBtn');
+    if (closeBtn) closeBtn.style.display = 'none'; // Absolutely no close button in view-only mode
     renderTVContent();
+    startHeartbeat();
+}
+
+let heartbeatTimer = null;
+function startHeartbeat() {
+    if (heartbeatTimer) return;
+    heartbeatTimer = setInterval(async () => {
+        const overlay = document.getElementById('fullscreenOverlay');
+        const isOverlayVisible = overlay && overlay.style.display === 'flex';
+        if ((currentScreen === 'activeGame' || isOverlayVisible) && state && state.id) {
+            try {
+                await db.collection('eliteGames').doc(state.id).update({
+                    lastActivity: Date.now()
+                });
+            } catch (e) {
+                console.error("Heartbeat Error:", e);
+            }
+        } else {
+            clearInterval(heartbeatTimer);
+            heartbeatTimer = null;
+        }
+    }, 5000);
 }
 
 function renderTVContent() {
     if (!state) return;
-
-    const getTVAvatar = (pName) => {
-        const trimmedName = pName.trim();
-        const pData = playersDb.find(x => x.fullName && x.fullName.trim() === trimmedName);
-        if (pData?.photoURL) return pData.photoURL;
-        // Character set for "Superhuman" random assignment
-        const chars = ['adventurer', 'avataaars', 'big-ears', 'bottts', 'pixel-art', 'lorelei'];
-        const charType = chars[trimmedName.length % chars.length];
-        return `https://api.dicebear.com/7.x/${charType}/svg?seed=${encodeURIComponent(trimmedName)}`;
-    };
-
+    
+    const isGameOver = !!state.winner;
     const displayRound = Math.max(0, state.round - 1);
     const playerCount = state.players.length;
     
-    // Dynamic Height Calculation to fit 100vh precisely
-    const headerHeightPxPercent = 20; // Titles take roughly 20vh
-    const availableHeightForTable = 100 - headerHeightPxPercent;
+    // Past Players - parsed first so we can gauge screen budget
+    const past = Object.keys(state.totals).filter(p => !state.players.includes(p));
     
-    // Each row shouldn't exceed 14vh but must contract to fit all players
-    const rowHeightVh = Math.min(14, availableHeightForTable / Math.max(1, playerCount + 1)); // +1 for header
-    const scaleFactor = rowHeightVh / 14;
-
-    let h = `<div class=\"tv-title\" style=\"font-size: ${5 * scaleFactor}vh; margin: ${2 * scaleFactor}vh 0; letter-spacing: 2px;\">
-        ${state.name}
-        <span style=\"display:inline-flex; align-items:center; gap:1vh; vertical-align:middle; margin-left:4vh; background:rgba(0,0,0,0.5); padding:1vh 3vh; border-radius:5vh; border:2px solid rgba(231, 76, 60, 0.5);\">
-            <span class=\"tv-live-dot\" style=\"width:${3 * scaleFactor}vh; height:${3 * scaleFactor}vh;\"></span>
-            <span style=\"color:#e74c3c; font-size:${3 * scaleFactor}vh; font-weight:900; letter-spacing:3px;\">LIVE</span>
-        </span>
-    </div>
-    <div style=\"text-align:center; font-size: ${7 * scaleFactor}vh; margin-bottom: ${3 * scaleFactor}vh; color: var(--accent); font-weight: 950; letter-spacing: 5px; text-transform: uppercase;\">ROUND ${displayRound}</div>`;
-
-    h += `<div style=\"flex: 1; overflow: hidden; display:flex; flex-direction:column; padding: 0 2vw;\">
-    <table class=\"tv-table\" style=\"border-collapse: separate; border-spacing: 0 ${scaleFactor}vh;\">
-        <thead>
-            <tr style=\"background: rgba(255,255,255,0.05);\">
-                <th style=\"width:75%; font-size: ${2.8 * scaleFactor}vh; padding: ${1.5 * scaleFactor}vh 2vh; text-align:left; border-radius: 1vh 0 0 1vh; opacity: 0.6;\">PLAYER</th>
-                <th style=\"text-align:center; font-size: ${2.8 * scaleFactor}vh; padding: ${1.5 * scaleFactor}vh 2vh; border-radius: 0 1vh 1vh 0; opacity: 0.6;\">SCORE</th>
-            </tr>
-        </thead>
-        <tbody>`;
+    // High-precision dynamic vertical viewport budget (out of 100vh)
+    const availableBudget = past.length > 0 ? 66 : 78;
+    const rowBudget = availableBudget / (playerCount + 1);
     
+    // Continuously scale spacing, typography, padding and margins based on row budget
+    const baseFontSize = Math.min(5.5, Math.max(1.8, rowBudget * 0.44)) + 'vh';
+    const rowPadding = Math.min(3.8, Math.max(0.6, rowBudget * 0.28)) + 'vh';
+    const headerFontSize = Math.min(7.0, Math.max(3.5, rowBudget * 0.44 * 1.3)) + 'vh';
+    const rankWidth = '10%';
+
+    const getTVAvatar = (pName) => {
+        const pData = playersDb.find(x => x.fullName === pName);
+        if (pData?.photoURL) return pData.photoURL;
+        return `https://ui-avatars.com/api/?name=${encodeURIComponent(pName)}&background=2c3e50&color=fff&size=200`;
+    };
+
+    let h = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 2.5vh; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 1.5vh;">
+            <h1 style="font-size: ${headerFontSize}; margin:0; color: #fff; font-weight: 800;">${state.name}</h1>
+            <div style="font-size: calc(${headerFontSize} * 0.6); font-weight: bold; color: var(--danger); display:flex; align-items:center; gap:15px;">
+                <span style="width:calc(${headerFontSize} * 0.3); height:calc(${headerFontSize} * 0.3); background:red; border-radius:50%; box-shadow: 0 0 15px red; animation: tv-blink 1.5s infinite;"></span>
+                ${isGameOver ? 'FINAL RESULTS' : 'ROUND ' + displayRound}
+            </div>
+        </div>
+        <table class="tv-table">
+            <thead>
+                <tr>
+                    <th style="width: ${rankWidth}; font-size: calc(${baseFontSize} * 0.5);">Pos</th>
+                    <th style="font-size: calc(${baseFontSize} * 0.5);">Player</th>
+                    <th style="width: 20%; text-align:right; font-size: calc(${baseFontSize} * 0.5);">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
     const sortedPlayersTV = [...state.players].sort((a, b) => {
         const aOut = state.eliminated[a] || (state.totals[a] || 0) >= 240;
         const bOut = state.eliminated[b] || (state.totals[b] || 0) >= 240;
         if (aOut && !bOut) return 1;
         if (!aOut && bOut) return -1;
-        return 0;
+        return (state.totals[a] || 0) - (state.totals[b] || 0); 
     });
 
-    let activePlayersForDealer = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < 240);
     let dealer = null;
+    let activePlayersForDealer = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < 240);
     if (activePlayersForDealer.length > 0) {
         let roster = state.startingPlayers || state.players;
         let dIdx = (state.round - 1) % roster.length;
@@ -1441,43 +1684,42 @@ function renderTVContent() {
         }
     }
 
-    sortedPlayersTV.forEach(p => {
-        let isOut = state.eliminated[p] || state.totals[p] >= 240;
-        let tot = state.totals[p] || 0;
-        let hasReEntered = state.reEntries && state.reEntries[p];
-        let isDealer = (p === dealer);
-        
-        h += `<tr style=\"${isOut ? 'opacity:0.2' : ''}; background: rgba(255,255,255,${isDealer ? '0.15' : '0.03'}); transition: 0.3s;\">
-            <td style=\"display: flex; align-items: center; padding: ${1.5 * scaleFactor}vh 2vh; border-radius: 1vh 0 0 1vh;\">
-                <div style=\"position:relative;\">
-                    <img src=\"${getTVAvatar(p)}\" style=\"width: ${10 * scaleFactor}vh; height: ${10 * scaleFactor}vh; border-radius: 50%; object-fit: cover; border: ${3 * scaleFactor}px solid ${isDealer ? 'var(--warning)' : 'rgba(255,255,255,0.1)'}; background: #222;\">
-                    ${isDealer ? `<div style=\"position:absolute; bottom:-1vh; left:50%; transform:translateX(-50%); background:var(--warning); color:#000; font-size:${1.8 * scaleFactor}vh; font-weight:950; padding:0 ${scaleFactor}vh; border-radius:0.5vh; box-shadow:0 0 10px rgba(0,0,0,0.5);\">DEALER</div>` : ''}
-                </div>
-                <div style=\"margin-left: 3vh; display: flex; align-items: center; gap: 2vh;\">
-                    <span style=\"font-size: ${5 * scaleFactor}vh; font-weight: 700; color: #fff;\">${p}</span>
-                    ${hasReEntered ? `<span style=\"background:rgba(241, 196, 15, 0.2); color:var(--warning); padding:0.2vh 1vh; border:1px solid var(--warning); border-radius:0.5vh; font-size: ${1.8 * scaleFactor}vh; font-weight:900;\">RE-ENTRY</span>` : ''}
-                </div>
-            </td>
-            <td style=\"text-align:center; color:${isOut ? '#777' : 'var(--warning)'}; font-size: ${7 * scaleFactor}vh; font-weight: 900; padding: 0 2vh; border-radius: 0 1vh 1vh 0; font-family: monospace;\">${isOut ? 'OUT' : tot}</td>
-        </tr>`;
+    sortedPlayersTV.forEach((p, index) => {
+        const isOut = state.eliminated[p] || (state.totals[p] || 0) >= 240;
+        const score = state.totals[p] || 0;
+
+        h += `
+            <tr class="${isOut ? 'is-out' : ''}">
+                <td style="color:rgba(255,255,255,0.3); font-weight:bold; font-size: calc(${baseFontSize} * 0.8);">${index + 1}</td>
+                <td style="padding: ${rowPadding} 1.5vh;">
+                    <div style="display:flex; align-items:center;">
+                        <img src="${getTVAvatar(p)}" class="avatar-tv" style="width: calc(${baseFontSize} * 1.8); height: calc(${baseFontSize} * 1.8); margin-right: 2vh;">
+                        <span style="font-weight:bold; font-size: ${baseFontSize};">${p}</span>
+                        ${p === dealer ? `<span class="dealer-badge" style="font-size: calc(${baseFontSize} * 0.4); padding: 2px 10px; margin-left: 2vh;">Dealer</span>` : ''}
+                    </div>
+                </td>
+                <td style="text-align:right;"><span class="score-val" style="font-size: calc(${baseFontSize} * 1.5);">${score}</span></td>
+            </tr>
+        `;
     });
 
-    h += `</tbody></table></div>`;
+    h += `</tbody></table>`;
 
-    const pastPlayers = Object.keys(state.totals).filter(p => !state.players.includes(p) || state.eliminated[p] || state.totals[p] >= 240);
-    if (pastPlayers.length > 0) {
-        h += `<div style=\"margin-top: 1vh; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1vh; text-align: center; color: rgba(255,255,255,0.4); font-size: ${1.8 * scaleFactor}vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;\">
-            <b style=\"color: var(--accent); opacity: 0.6;\">PAST PLAYERS:</b> ${pastPlayers.join(' | ')}
+    // Past Players
+    if (past.length > 0) {
+        h += `
+        <div style="margin-top: 5vh; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 2vh;">
+            <div style="font-size: 2vh; opacity: 0.4; text-transform: uppercase; margin-bottom: 1.5vh; letter-spacing: 2px;">Past Participants</div>
+            <div style="display:flex; gap: 3vh; flex-wrap: wrap;">
+                ${past.map(p => `
+                    <div style="font-size: 2.5vh; opacity: 0.6; background: rgba(255,255,255,0.05); padding: 8px 20px; border-radius: 8px;">
+                        ${p}: <span style="color:var(--warning); font-weight:bold;">${state.totals[p]}</span>
+                    </div>
+                `).join('')}
+            </div>
         </div>`;
     }
 
-    if (state.winner) {
-        h = `<div style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
-                <div class="tv-title" style="font-size: 8vh; margin-bottom: 5vh;">🏆 WINNER 🏆</div>
-                <div style="font-size: 15vh; color: var(--accent); font-weight: 900;">${state.winner}</div>
-                <div style="font-size: 4vh; margin-top: 5vh; opacity:0.6;">${state.name} Completed</div>
-             </div>`;
-    }
     document.getElementById('tvContent').innerHTML = h;
 }
 
@@ -1527,6 +1769,8 @@ async function confirmAddMidGame() {
     state.roundScores[name] = null; 
     if(!state.roundTactics) state.roundTactics = {};
     state.roundTactics[name] = null;
+    if(!state.lastDropRound) state.lastDropRound = {};
+    if(state.lastDropRound[name] === undefined) state.lastDropRound[name] = -1;
     if(!state.actionStats[name]) state.actionStats[name] = {shows:0,fcs:0,drops:0,mds:0};
     
     await db.collection('eliteGames').doc(state.id).set(state);
@@ -1537,7 +1781,7 @@ async function confirmAddMidGame() {
 function renderStats() {
     let sortedPlayers = playersDb.map(p => {
         const name = p.fullName;
-        const games = savedGames.filter(g => g.winner && g.players.includes(name) && !g.isAborted);
+        const games = savedGames.filter(g => g.winner && g.players.includes(name) && !g.isAborted && !g.isDeleted);
         const wins = games.filter(g => g.winner === name).length;
         return { ...p, wins, totalGames: games.length };
     }).sort((a, b) => b.wins - a.wins);
@@ -1582,15 +1826,30 @@ function renderStats() {
 }
 
 function renderContinue() {
-    let act = savedGames.filter(g => !g.winner);
-    document.getElementById('mainPane').innerHTML = `<h2>Active Games</h2>` + (act.map(g => `
-        <div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-            <div style="flex:1; min-width:120px;"><b>${g.name}</b></div>
-            <div style="display:flex; gap:8px;">
-                <button onclick="resume('${g.id}')" style="background:var(--accent);">Resume</button>
-                <button onclick="endGameManually('${g.id}')" style="background:var(--danger); font-size:11px;">End Game</button>
+    let act = savedGames.filter(g => !g.winner && !g.isDeleted);
+    const now = Date.now();
+    document.getElementById('mainPane').innerHTML = `<h2>Manage Matches</h2>` + (act.map(g => {
+        const isLive = (now - (g.lastActivity || 0)) < 15000;
+        return `
+        <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border-left: 5px solid ${isLive ? 'var(--danger)' : 'var(--accent)'}; position:relative;">
+            <div style="flex:1; min-width:150px;">
+                <div style="font-size:18px; font-weight:bold;">${g.name}</div>
+                ${isLive ? `
+                    <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+                        <span style="width:10px; height:10px; background:red; border-radius:50%; box-shadow: 0 0 10px red; animation: tv-blink 1.5s infinite;"></span>
+                        <span style="font-size:11px; color:#e74c3c; font-weight:900; letter-spacing:1px; text-transform:uppercase;">Live Match in Progress</span>
+                    </div>` : ''}
             </div>
-        </div>`).join('') || `<p style="opacity:0.6; font-size:14px;">No active games.</p>`);
+            <div style="display:flex; gap:10px; align-items:center;">
+                ${isLive ? `
+                    <button onclick="resume('${g.id}')" style="background:var(--danger); animation: pulse-red 2s infinite; font-weight:950; font-size:14px; padding: 12px 25px; border:none; text-transform:uppercase; letter-spacing:1px;">Resume</button>
+                ` : `
+                    <button onclick="resume('${g.id}')" style="background:var(--accent); font-weight:bold; padding: 10px 20px;">Resume</button>
+                    <button onclick="endGameManually('${g.id}')" style="background:rgba(255,255,255,0.05); color:var(--danger); border:1px solid var(--danger); font-size:11px; font-weight:900; text-transform:uppercase; height:35px; border-radius:8px;">End Game</button>
+                `}
+            </div>
+        </div>`;
+    }).join('') || `<p style="opacity:0.6; font-size:14px;">No active matches found.</p>`);
 }
 function resume(id) { state=savedGames.find(g => g.id === id); if(state) showScreen('activeGame'); }
 
@@ -1619,60 +1878,77 @@ async function endGameManually(id) {
 }
 
 function renderHistory() {
-    let fin = savedGames.filter(g => g.winner).sort((a,b) => parseInt(b.id) - parseInt(a.id));
+    let fin = savedGames.filter(g => g.winner && !g.isDeleted).sort((a,b) => parseInt(b.id) - parseInt(a.id));
+    let deletedGames = savedGames.filter(g => g.isDeleted).sort((a,b) => parseInt(b.id) - parseInt(a.id));
     let h = `<h2>Game History</h2>`;
     
     if (fin.length === 0) {
-        h += `<p style="opacity:0.6; font-size:14px;">No game history found.</p>`;
-        document.getElementById('mainPane').innerHTML = h;
-        return;
+        h += `<p style="opacity:0.6; font-size:14px; margin-bottom: 25px;">No active game history found.</p>`;
+    } else {
+        let latest = fin.slice(0, 5);
+        let older = fin.slice(5);
+
+        h += `<div style="margin-bottom: 25px;">
+                <div style="font-size: 14px; color: var(--accent); margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Latest 5 Games</div>
+                ${latest.map(renderHistoryItem).join('')}
+              </div>`;
+
+        if (older.length > 0) {
+            h += `<div style="font-size: 14px; color: var(--accent); margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Game Archive</div>`;
+            
+            // Grouping: { year: { month: [games] } }
+            let archive = {};
+            older.forEach(g => {
+                const d = new Date(parseInt(g.id));
+                const year = d.getFullYear();
+                const month = d.toLocaleString('default', { month: 'long' });
+                if (!archive[year]) archive[year] = {};
+                if (!archive[year][month]) archive[year][month] = [];
+                archive[year][month].push(g);
+            });
+
+            const years = Object.keys(archive).sort((a,b) => b-a);
+            years.forEach(year => {
+                const months = archive[year];
+                const monthNames = ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"];
+                const sortedMonths = Object.keys(months).sort((a,b) => monthNames.indexOf(a) - monthNames.indexOf(b));
+                
+                // If we have data for many months or many years, show Year folder
+                if (years.length > 1 || sortedMonths.length >= 12) {
+                    h += `
+                    <div style="margin-bottom:12px; border:1px solid var(--glass-border); border-radius:8px; overflow:hidden; background: rgba(255,255,255,0.03);">
+                        <div onclick="toggleArchive('year-${year}')" style="padding:12px 15px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05);">
+                            <span style="font-weight:bold; color:var(--warning);">${year} Full Archive</span>
+                            <span id="icon-year-${year}" style="transition:0.3s">▼</span>
+                        </div>
+                        <div id="year-${year}" style="display:none; padding:10px;">
+                            ${renderMonthArchive(months, year, sortedMonths)}
+                        </div>
+                    </div>`;
+                } else {
+                    // Just Monthly Folders at top level for current year
+                    h += renderMonthArchive(months, year, sortedMonths);
+                }
+            });
+        }
     }
 
-    let latest = fin.slice(0, 5);
-    let older = fin.slice(5);
-
-    h += `<div style="margin-bottom: 25px;">
-            <div style="font-size: 14px; color: var(--accent); margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Latest 5 Games</div>
-            ${latest.map(renderHistoryItem).join('')}
-          </div>`;
-
-    if (older.length > 0) {
-        h += `<div style="font-size: 14px; color: var(--accent); margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Game Archive</div>`;
-        
-        // Grouping: { year: { month: [games] } }
-        let archive = {};
-        older.forEach(g => {
-            const d = new Date(parseInt(g.id));
-            const year = d.getFullYear();
-            const month = d.toLocaleString('default', { month: 'long' });
-            if (!archive[year]) archive[year] = {};
-            if (!archive[year][month]) archive[year][month] = [];
-            archive[year][month].push(g);
-        });
-
-        const years = Object.keys(archive).sort((a,b) => b-a);
-        years.forEach(year => {
-            const months = archive[year];
-            const monthNames = ["December", "November", "October", "September", "August", "July", "June", "May", "April", "March", "February", "January"];
-            const sortedMonths = Object.keys(months).sort((a,b) => monthNames.indexOf(a) - monthNames.indexOf(b));
-            
-            // If we have data for many months or many years, show Year folder
-            if (years.length > 1 || sortedMonths.length >= 12) {
-                h += `
-                <div style="margin-bottom:12px; border:1px solid var(--glass-border); border-radius:8px; overflow:hidden; background: rgba(255,255,255,0.03);">
-                    <div onclick="toggleArchive('year-${year}')" style="padding:12px 15px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05);">
-                        <span style="font-weight:bold; color:var(--warning);">${year} Full Archive</span>
-                        <span id="icon-year-${year}" style="transition:0.3s">▼</span>
-                    </div>
-                    <div id="year-${year}" style="display:none; padding:10px;">
-                        ${renderMonthArchive(months, year, sortedMonths)}
-                    </div>
-                </div>`;
-            } else {
-                // Just Monthly Folders at top level for current year
-                h += renderMonthArchive(months, year, sortedMonths);
-            }
-        });
+    // Collapsible Deleted Games Section at the bottom
+    if (deletedGames.length > 0) {
+        h += `
+        <div style="margin-top:30px; border-top: 1px dashed rgba(255,255,255,0.15); padding-top: 20px;">
+            <div style="margin-bottom:12px; border:1px solid var(--danger); border-radius:12px; overflow:hidden; background: rgba(231, 76, 60, 0.03); box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+                <div onclick="toggleArchive('deleted-archive')" style="padding:12px 15px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; background:rgba(231, 76, 60, 0.12); border-bottom: 1px solid rgba(231, 76, 60, 0.2);">
+                    <span style="font-weight:bold; color:var(--danger); display:flex; align-items:center; gap:8px;">
+                        <span>🗑️</span> Deleted Games (${deletedGames.length})
+                    </span>
+                    <span id="icon-deleted-archive" style="transition:0.3s; color:var(--danger)">▶</span>
+                </div>
+                <div id="deleted-archive" style="display:none; padding:15px 12px 5px 12px;">
+                    ${deletedGames.map(renderDeletedHistoryItem).join('')}
+                </div>
+            </div>
+        </div>`;
     }
 
     document.getElementById('mainPane').innerHTML = h;
@@ -1709,6 +1985,20 @@ function renderHistoryItem(g) {
     </div>`;
 }
 
+function renderDeletedHistoryItem(g) {
+    return `<div style="background:rgba(255,255,255,0.03); padding:12px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border: 1px solid rgba(255,255,255,0.01);">
+        <div style="flex:1;">
+            <div style="font-weight:bold; margin-bottom:4px; opacity:0.8;">${g.name} ${g.isAborted ? '<span style="color:var(--danger); font-size:9px; border:1px solid var(--danger); padding:1px 3px; border-radius:3px; margin-left:5px;">ABANDONED</span>' : ''}</div>
+            <div style="font-size:12px; opacity:0.6;">Winner: <span style="color:var(--accent);">${g.winner || 'Active'}</span></div>
+            <div style="font-size:10px; opacity:0.3; margin-top:2px;">${g.endTime || g.startTime}</div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+             <button onclick="restoreGame('${g.id}')" style="background:#27ae60; color:white; padding:5px 10px; font-size:11px; border:none; border-radius:4px; font-weight:bold;">Restore</button>
+             <button onclick="deletePermanently('${g.id}')" style="background:rgba(231, 76, 60, 0.2); color:var(--danger); border:1px solid var(--danger); padding:5px 10px; font-size:11px; border-radius:4px; font-weight:bold;">Delete Permanently</button>
+        </div>
+    </div>`;
+}
+
 function toggleArchive(id) {
     const el = document.getElementById(id);
     const icon = document.getElementById('icon-' + id);
@@ -1718,10 +2008,42 @@ function toggleArchive(id) {
         if (icon) icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
     }
 }
-function delGame(id) { if(confirm("Delete this game?")) db.collection('eliteGames').doc(id).delete(); }
+
+async function delGame(id) {
+    if(confirm("Move this game to Deleted Games?")) {
+        try {
+            await db.collection('eliteGames').doc(id).update({ isDeleted: true });
+        } catch (err) {
+            console.error("Error soft-deleting game", err);
+            alert("Failed to delete game.");
+        }
+    }
+}
+
+async function restoreGame(id) {
+    if(confirm("Restore this game back to History?")) {
+        try {
+            await db.collection('eliteGames').doc(id).update({ isDeleted: false });
+        } catch (err) {
+            console.error("Error restoring game", err);
+            alert("Failed to restore game.");
+        }
+    }
+}
+
+async function deletePermanently(id) {
+    if(confirm("Are you sure you want to permanently delete this game? This cannot be undone.")) {
+        try {
+            await db.collection('eliteGames').doc(id).delete();
+        } catch (err) {
+            console.error("Error permanently deleting game", err);
+            alert("Failed to delete game permanently.");
+        }
+    }
+}
 
 function renderReports() {
-    let fin = savedGames.filter(g => g.winner).sort((a,b) => parseInt(b.id) - parseInt(a.id));
+    let fin = savedGames.filter(g => g.winner && !g.isDeleted).sort((a,b) => parseInt(b.id) - parseInt(a.id));
     let h = `<h2>Game Reports</h2>`;
     
     if (fin.length === 0) {
@@ -1801,7 +2123,7 @@ function renderReportItem(g) {
     return `<div style="background:rgba(255,255,255,0.05); padding:12px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border: 1px solid rgba(255,255,255,0.03);">
         <div style="flex:1;">
             <div style="font-weight:bold; margin-bottom:4px; font-size:14px;">${g.name} ${g.isAborted ? '<span style="color:var(--danger); font-size:9px; border:1px solid var(--danger); padding:1px 3px; border-radius:3px; margin-left:5px;">ABANDONED</span>' : ''}</div>
-            <div style="font-size:11px; opacity:0.4;">${g.endTime || g.startTime}</div>
+            <div style="font-size:11px; opacity:0.4;">${formatEliteDate(g.endTime || g.startTime)}</div>
             <div style="font-size:11px; opacity:0.6; margin-top:2px;">Winner: <span style="color:var(--accent)">${g.winner}</span></div>
         </div>
         <div style="display:flex; flex-direction:column; gap:6px;">
@@ -1821,6 +2143,8 @@ function viewTableReport(id) {
     // Helper to get first name
     const getFirstName = (fullName) => fullName.split(' ')[0];
 
+    const allPlayerNames = Array.from(new Set([...(g.startingPlayers || []), ...Object.keys(g.totals)]));
+
     let h = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h3 style="margin:0;">Report View</h3>
@@ -1829,8 +2153,8 @@ function viewTableReport(id) {
         <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-bottom:15px; border:1px solid var(--glass-border);">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:13px;">
                 <div><span style="opacity:0.6">Game Name:</span><br><b>${g.name}</b></div>
-                <div><span style="opacity:0.6">Start Time:</span><br><b>${g.startTime || '-'}</b></div>
-                <div><span style="opacity:0.6">End Time:</span><br><b>${g.endTime || '-'}</b></div>
+                <div><span style="opacity:0.6">Start Time:</span><br><b>${formatEliteDate(g.startTime)}</b></div>
+                <div><span style="opacity:0.6">End Time:</span><br><b>${formatEliteDate(g.endTime)}</b></div>
                 <div><span style="opacity:0.6">Tournament Winner:</span><br><b style="color:var(--accent)">${getFirstName(g.winner || '')}</b></div>
             </div>
             ${g.isAborted ? '<div style="margin-top:10px; color:var(--danger); font-weight:bold; font-size:12px; text-align:center; padding:5px; background:rgba(231, 76, 60, 0.1); border-radius:4px;">GAME ABORTED</div>' : ''}
@@ -1840,50 +2164,38 @@ function viewTableReport(id) {
                 <thead>
                     <tr style="background:#f1f8f4;">
                         <th style="width:50px; color:#27ae60; border: 1px solid #ddd; padding:12px 8px; text-align: center;">Rnd</th>
-                        ${g.players.map(p => `<th style="color:#27ae60; border: 1px solid #ddd; padding:12px 8px; text-align: center;">${getFirstName(p)}</th>`).join('')}
+                        ${allPlayerNames.map(p => `<th style="color:#27ae60; border: 1px solid #ddd; padding:12px 8px; text-align: center;">${getFirstName(p)}</th>`).join('')}
                     </tr>
                 </thead>
                 <tbody style="color: #333;">
     `;
 
-    // Filter out rows where NO one has a score OR rounds that occur after a winner is already determined
-    // Also remove rounds where an OUT player erroneously played twice.
-    let winnerFoundInHistory = false;
-    let prevTotals = {};
+    // Filter out rounds that have at least one score
     const validHistory = g.history.filter(r => {
-        if (winnerFoundInHistory) return false;
-        
-        const hasScore = Object.values(r.scores).some(v => v !== null && v !== undefined && v !== "");
-        if (!hasScore) return false;
-
-        // Check if an OUT player played (error detection)
-        const outPlayerPlayed = g.players.some(p => {
-            const wasOut = prevTotals[p] !== undefined && prevTotals[p] >= 240;
-            const hasCurrentScore = r.scores[p] !== null && r.scores[p] !== undefined && r.scores[p] !== "";
-            return wasOut && hasCurrentScore;
-        });
-        if (outPlayerPlayed) return false;
-
-        // Check if this round resulted in a single survivor
-        const survivors = g.players.filter(p => (r.totals[p] || 0) < 240);
-        if (survivors.length <= 1) {
-            winnerFoundInHistory = true;
-        }
-        prevTotals = {...r.totals};
-        return true;
+        return Object.values(r.scores).some(v => v !== null && v !== undefined && v !== "");
     });
 
-    validHistory.forEach(r => {
+    validHistory.forEach((r, idx) => {
         h += `<tr>
             <td style="color:#27ae60; font-weight:bold; padding:12px 8px; border: 1px solid #ddd; text-align: center;">${r.round}</td>
-            ${g.players.map(p => {
+            ${allPlayerNames.map(p => {
                 let s = r.scores[p];
                 let t = r.totals[p];
-                let re = (r.reentries && r.reentries[p]);
+                let re = (r.reentries && r.reentries[p] !== undefined) ? r.reentries[p] : null;
+                let busted = (r.bustedTotals && r.bustedTotals[p] !== undefined) ? r.bustedTotals[p] : null;
+                
+                // Fallback for older games without bustedTotals field
+                if (re !== null && busted === null && idx > 0) {
+                    const prevT = validHistory[idx - 1].totals[p] || 0;
+                    const scoreVal = (s === 'S') ? 0 : (parseInt(s) || 0);
+                    if (prevT + scoreVal >= 240) {
+                        busted = prevT + scoreVal;
+                    }
+                }
                 
                 // Detection if player had not joined yet
                 let notJoined = (t === undefined);
-                let isOut = (t >= 240 && !re);
+                let isOut = (t >= 240 && re === null);
                 
                 let val = "";
                 let subVal = "";
@@ -1893,20 +2205,26 @@ function viewTableReport(id) {
                     subVal = ""; // No total shown
                 } else if (isOut) {
                     val = `<span style="color:#e74c3c; font-weight:bold;">OUT</span>`;
-                    subVal = `<div style="font-size:10px; opacity:0.7; color:#666;">Total: ${t}</div>`;
+                    subVal = `<div style="font-size:11px; color:#e74c3c; font-weight:bold;">Total: ${t}</div>`;
                 } else {
                     if (s === 'S') val = `<span style="color:#27ae60; font-weight:bold;">Show</span>`;
-                    else if (re) val = `<span style="color:#f39c12; font-weight:bold;">${s}</span>`;
+                    else if (re !== null) val = `<span style="color:#f39c12; font-weight:bold;">${s}</span>`;
                     else val = (s !== null && s !== undefined) ? `<span style="color:#111; font-weight:500;">${s}</span>` : '-';
                     
-                    let totStyle = re ? `color:#f39c12; font-weight:bold;` : `opacity:0.9; color:#444;`;
-                    subVal = `<div style="font-size:10px; ${totStyle}">Total: ${t}</div>`;
+                    if (re !== null && busted !== null) {
+                        subVal = `<div style="font-size:11px; color:#e01111; font-weight:bold;">Busted: ${busted}</div>`;
+                        subVal += `<div style="font-size:11px; color:#f39c12; font-weight:bold; margin-top:2px;">Re-entered at ${re}</div>`;
+                    } else if (re !== null) {
+                        subVal = `<div style="font-size:11px; color:#f39c12; font-weight:bold;">Total: ${t}</div>`;
+                        subVal += `<div style="font-size:10px; color:#f39c12; font-weight:bold; margin-top:2px;">RE-ENTERED @ ${re}</div>`;
+                    } else {
+                        subVal = `<div style="font-size:10px; opacity:0.9; color:#444;">Total: ${t}</div>`;
+                    }
                 }
 
                 return `<td style="padding:12px 8px; border: 1px solid #ddd; text-align: center;">
-                    <div>${val}</div>
+                    <div style="font-size:14px; font-weight:600;">${val}</div>
                     ${subVal}
-                    ${re ? '<div style="font-size:9px; color:#f39c12; font-weight:bold;">[RE-ENTERED]</div>' : ''}
                 </td>`;
             }).join('')}
         </tr>`;
@@ -1917,7 +2235,7 @@ function viewTableReport(id) {
     h += `
                 <tr style="background:#f8f9fa;">
                     <td style="color:#f39c12; font-weight:bold; padding:15px 8px; border: 1px solid #ddd; text-align: center;">TOTAL</td>
-                    ${g.players.map(p => {
+                    ${allPlayerNames.map(p => {
                         let isWinner = g.winner && (g.winner === p || g.winner.split(' & ').includes(p));
                         const t = reportTotals[p] !== undefined ? reportTotals[p] : (g.totals[p] || 0);
                         return `<td style="color:#f39c12; font-weight:bold; padding:15px 8px; border: 1px solid #ddd; text-align: center;">
@@ -1952,38 +2270,36 @@ function genPDF(id) {
         doc.setTextColor(0, 0, 0);
     }
 
-    let winnerFoundInHistory = false;
-    let prevPdfTotals = {};
     const sigHistory = g.history.filter(r => {
-        if (winnerFoundInHistory) return false;
-        const hasScore = Object.values(r.scores).some(v => v !== null && v !== undefined && v !== "");
-        if (!hasScore) return false;
-        
-        const outPlayerPlayed = g.players.some(p => {
-            const wasOut = prevPdfTotals[p] !== undefined && prevPdfTotals[p] >= 240;
-            const hasCurrentScore = r.scores[p] !== null && r.scores[p] !== undefined && r.scores[p] !== "";
-            return wasOut && hasCurrentScore;
-        });
-        if (outPlayerPlayed) return false;
-
-        const survivors = g.players.filter(p => (r.totals[p] || 0) < 240);
-        if (survivors.length <= 1) winnerFoundInHistory = true;
-        prevPdfTotals = {...r.totals};
-        return true;
+        return Object.values(r.scores).some(v => v !== null && v !== undefined && v !== "");
     });
     
-    const headNames = g.players.map(p => getFirstName(p));
+    const allPdfPlayers = Array.from(new Set([...(g.startingPlayers || []), ...Object.keys(g.totals)]));
+    const headNames = allPdfPlayers.map(p => getFirstName(p));
     const pdfTotals = sigHistory.length > 0 ? sigHistory[sigHistory.length - 1].totals : g.totals;
 
-    const body = sigHistory.map(r => [
+    const body = sigHistory.map((r, idx) => [
         r.round, 
-        ...g.players.map(p => {
+        ...allPdfPlayers.map(p => {
             let s = r.scores[p];
             let t = r.totals[p];
+            let re = (r.reentries && r.reentries[p] !== undefined) ? r.reentries[p] : null;
+            let busted = (r.bustedTotals && r.bustedTotals[p] !== undefined) ? r.bustedTotals[p] : null;
+            
+            // Fallback for older games
+            if (re !== null && busted === null && idx > 0) {
+                const prevT = sigHistory[idx-1].totals[p] || 0;
+                const scoreVal = (s === 'S') ? 0 : (parseInt(s) || 0);
+                if (prevT + scoreVal >= 240) busted = prevT + scoreVal;
+            }
+
             let tactic = (r.tactics && r.tactics[p]) ? r.tactics[p] : null;
             if (t === undefined) return 'Not Played';
-            if (t >= 240) return 'OUT';
-            if (r.reentries && r.reentries[p]) return `${s} (RE)`;
+            if (t >= 240 && re === null) return `OUT (Total: ${t})`;
+            if (re !== null) {
+                let bustedStr = busted !== null ? ` (Busted: ${busted})` : "";
+                return `${s} (RE@${re}${bustedStr})`;
+            }
             
             let val = s;
             if (s === 'S') val = 0;
@@ -1993,7 +2309,7 @@ function genPDF(id) {
         })
     ]);
     
-    body.push(['TOTAL', ...g.players.map(p => {
+    body.push(['TOTAL', ...allPdfPlayers.map(p => {
         let isWinner = g.winner && (g.winner === p || g.winner.split(' & ').includes(p));
         const t = pdfTotals[p] !== undefined ? pdfTotals[p] : (g.totals[p] || 0);
         return t + (isWinner ? ' (Winner)' : '');
@@ -2006,7 +2322,7 @@ function genPDF(id) {
         didParseCell: function(data) {
             if (data.row.index < sigHistory.length) {
                 const round = sigHistory[data.row.index];
-                const player = g.players[data.column.index - 1]; // -1 because first col is 'Rnd'
+                const player = allPdfPlayers[data.column.index - 1]; // -1 because first col is 'Rnd'
                 if (round && round.reentries && round.reentries[player]) {
                     data.cell.styles.textColor = [243, 156, 18]; // --warning color
                 }
