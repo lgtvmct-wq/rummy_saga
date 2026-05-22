@@ -1954,55 +1954,19 @@ function renderStats() {
 
 function renderContinue() {
     let act = savedGames.filter(g => !g.winner && !g.isDeleted);
-    const now = Date.now();
     document.getElementById('mainPane').innerHTML = `<h2>Manage Matches</h2>` + (act.map(g => {
-        const isLive = (now - (g.lastActivity || 0)) < 15000;
         return `
-        <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border-left: 5px solid ${isLive ? 'var(--danger)' : 'var(--accent)'}; position:relative;">
+        <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border-left: 5px solid var(--accent); position:relative;">
             <div style="flex:1; min-width:150px;">
                 <div style="font-size:18px; font-weight:bold;">${g.name}</div>
-                ${isLive ? `
-                    <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
-                        <span style="width:10px; height:10px; background:red; border-radius:50%; box-shadow: 0 0 10px red; animation: tv-blink 1.5s infinite;"></span>
-                        <span style="font-size:11px; color:#e74c3c; font-weight:900; letter-spacing:1px; text-transform:uppercase;">Live Match in Progress</span>
-                    </div>` : ''}
             </div>
             <div style="display:flex; gap:10px; align-items:center;">
-                ${isLive ? `
-                    <button onclick="resume('${g.id}')" style="background:var(--danger); animation: pulse-red 2s infinite; font-weight:950; font-size:14px; padding: 12px 25px; border:none; text-transform:uppercase; letter-spacing:1px;">Resume</button>
-                ` : `
-                    <button onclick="resume('${g.id}')" style="background:var(--accent); font-weight:bold; padding: 10px 20px;">Resume</button>
-                    <button onclick="endGameManually('${g.id}')" style="background:rgba(255,255,255,0.05); color:var(--danger); border:1px solid var(--danger); font-size:11px; font-weight:900; text-transform:uppercase; height:35px; border-radius:8px;">End Game</button>
-                `}
+                <button onclick="resume('${g.id}')" style="background:var(--accent); font-weight:bold; padding: 10px 20px;">Resume</button>
             </div>
         </div>`;
     }).join('') || `<p style="opacity:0.6; font-size:14px;">No active matches found.</p>`);
 }
 function resume(id) { state=savedGames.find(g => g.id === id); if(state) showScreen('activeGame'); }
-
-async function endGameManually(id) {
-    let g = (state && state.id === id) ? state : savedGames.find(x => x.id === id);
-    if(!g) return alert("Game not found.");
-    
-    if(!confirm(`Terminate this game?`)) return;
-
-    try {
-        const updateData = {
-            winner: 'Abandoned',
-            endTime: formatEliteDate(new Date()),
-            isAborted: true
-        };
-        await db.collection('eliteGames').doc(id).update(updateData);
-        
-        if (state && state.id === id) {
-            state = null;
-        }
-        showScreen('continue');
-    } catch (err) {
-        console.error("EndGame error:", err);
-        alert("Failed to terminate game.");
-    }
-}
 
 function renderHistory() {
     let fin = savedGames.filter(g => g.winner && !g.isDeleted).sort((a,b) => parseInt(b.id) - parseInt(a.id));
