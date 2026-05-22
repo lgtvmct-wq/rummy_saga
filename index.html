@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v86.0</title>
+<title>Elite Rummy Circle - v87.1</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" sizes="152x152" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
@@ -23,7 +23,6 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
 <style>
   :root {
@@ -189,21 +188,6 @@
   @media print {
     #fullscreenOverlay { display: none !important; }
   }
-
-  @keyframes glow-gold {
-    0% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.2), inset 0 0 20px rgba(212, 175, 55, 0.1); border-color: rgba(212, 175, 55, 0.5); }
-    100% { box-shadow: 0 0 45px rgba(212, 175, 55, 0.8), inset 0 0 30px rgba(212, 175, 55, 0.4); border-color: #d4af37; }
-  }
-  @keyframes pulse-crown {
-    0% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.4)); }
-    100% { transform: scale(1.15); filter: drop-shadow(0 0 25px rgba(212, 175, 55, 1)); }
-  }
-  .celebrate-card {
-    background: linear-gradient(135deg, rgba(26, 37, 47, 0.95), rgba(44, 62, 80, 0.98));
-    border: 3px solid #d4af37;
-    box-shadow: 0 0 45px rgba(212, 175, 55, 0.5);
-    animation: glow-gold 2.5s infinite alternate;
-  }
 </style>
 </head>
 <body>
@@ -273,7 +257,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v87.0</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v87.1</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -334,11 +318,18 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
         <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
         <div style="margin-bottom: 20px;">
-            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v87.0 - Championship Celebrations</b>
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v87.1 - Zero-Default Rule Fields</b>
             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
-                • <b>Winner Honors:</b> Implemented a gorgeous, distraction-free fullscreen celebration screen showcasing the Champion's crown, avatar, and name when a game is completed.<br>
-                • <b>Festive Confetti:</b> Added immersive, motion-responsive confetti bursts and gold glow styling when a winner is crowned.<br>
-                • <b>Simplified Active Lobbies:</b> Streamlined active match resumes with standard clean controllers and removed the Manual End option for pure league integrity.<br>
+                • <b>Refined Input States:</b> Configured the "Number of Re-entries allowed" numeric box to start at '0' consistently, matching the exit score behavior.<br>
+                • <b>Dynamic Re-entry Handling:</b> Seamlessly handles matches with zero allowed re-entries where players exit permanently upon busting.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v87.0 - Dynamic Custom Rulesets</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>Configurable Criteria:</b> Selection of Standard or Custom rulesets during new game setup.<br>
+                • <b>Flexible Exit Limit:</b> Instantly define the exact total score that will eliminate a player, complete with auto-wipe numeric fields.<br>
+                • <b>Multi Re-Entry Tuning:</b> Enforce custom re-entry counts with automatic multi-badge RE(x) counters tracking history back-to-back.<br>
+                • <b>Cohesive Syncing:</b> Fully calculated dynamic score entries and PDF metrics scaling to the custom boundaries perfectly.<br>
             </div>
             <hr style="margin: 10px 0; opacity: 0.2;">
             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v86.0 - Forgot Password Recovery</b>
@@ -523,7 +514,7 @@
       <div class="tv-close" id="tvCloseBtn" onclick="closeFullScreen()">Close</div>
   </div>
   <div style="position: fixed; bottom: 8px; left: 12px; z-index: 4000; text-align: left; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v87.0</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v87.1</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
@@ -555,6 +546,29 @@ const auth = firebase.auth();
 
 let playersDb =[], savedGames =[], state = null, currentScreen = '';
 let isPromptingReEntry = false;
+
+function getExitLimitFor(g) {
+    const target = g || state;
+    return (target && target.exitScoreLimit !== undefined) ? parseInt(target.exitScoreLimit) : 240;
+}
+function getMaxReEntriesFor(g) {
+    const target = g || state;
+    return (target && target.maxReEntries !== undefined) ? parseInt(target.maxReEntries) : 1;
+}
+function getPlayerReEntriesCount(p, targetState) {
+    const sObj = targetState || state;
+    if (!sObj || !sObj.reEntries) return 0;
+    const val = sObj.reEntries[p];
+    if (typeof val === 'number') return val;
+    if (val === true) return 1;
+    return 0;
+}
+function canPlayerReEnter(p, targetState) {
+    const sObj = targetState || state;
+    const currentCount = getPlayerReEntriesCount(p, sObj);
+    const maxVal = getMaxReEntriesFor(sObj);
+    return currentCount < maxVal;
+}
 
 // --- AUTH ---
 function checkScheduledLogout() {
@@ -708,8 +722,8 @@ function loadData() {
         if(s) {
             // Check if we need full render or just UI sync
             const isOutChanged = state.players.some(p => {
-                const wasOut = state.eliminated[p] || state.totals[p] >= 240;
-                const isOut = s.eliminated[p] || s.totals[p] >= 240;
+                const wasOut = state.eliminated[p] || state.totals[p] >= getExitLimitFor(state);
+                const isOut = s.eliminated[p] || s.totals[p] >= getExitLimitFor(s);
                 return wasOut !== isOut;
             });
             const needsFull = state.round !== s.round || state.winner !== s.winner || state.players.length !== s.players.length || isOutChanged;
@@ -732,7 +746,6 @@ function loadData() {
 
 // --- NAVIGATION ---
 function showScreen(s) {
-  stopCelebration();
   currentScreen = s;
   // Update Hash for URL Persistence
   if (s === 'activeGame' && state) {
@@ -757,14 +770,62 @@ function showScreen(s) {
 }
 
 // --- VIEWS ---
+function setRulesetMode(mode) {
+    const stdBtn = document.getElementById('ruleStandardBtn');
+    const custBtn = document.getElementById('ruleCustomBtn');
+    const customBlock = document.getElementById('customRulesBlock');
+    
+    if (mode === 'standard') {
+        if (stdBtn) {
+            stdBtn.style.background = 'var(--accent)';
+            stdBtn.classList.add('active-rule');
+        }
+        if (custBtn) {
+            custBtn.style.background = 'rgba(255,255,255,0.08)';
+            custBtn.classList.remove('active-rule');
+        }
+        if (customBlock) customBlock.style.display = 'none';
+    } else {
+        if (stdBtn) {
+            stdBtn.style.background = 'rgba(255,255,255,0.08)';
+            stdBtn.classList.remove('active-rule');
+        }
+        if (custBtn) {
+            custBtn.style.background = 'var(--accent)';
+            custBtn.classList.add('active-rule');
+        }
+        if (customBlock) customBlock.style.display = 'block';
+    }
+}
+
 function renderNewGame() {
   document.getElementById('mainPane').innerHTML = `
     <h2>New Game Setup</h2>
     <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px;">
         <input id="gName" class="std-input" placeholder="Enter Game Name">
         <button onclick="appendDT()" style="background:var(--warning); width:100%; color:#111; margin-bottom:15px;">🕒 Insert Date/Time</button>
+        
+        <div style="margin-bottom: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+            <label style="display:block; font-size:12px; font-weight:bold; color:var(--accent); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">Ruleset Selection</label>
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <button id="ruleStandardBtn" class="active-rule" onclick="setRulesetMode('standard')" style="flex:1; background:var(--accent); color:white; font-size:13px; font-weight:bold; height:38px; border:none; border-radius:6px; cursor:pointer; padding:0 8px;">Standard Game</button>
+                <button id="ruleCustomBtn" onclick="setRulesetMode('custom')" style="flex:1; background:rgba(255,255,255,0.08); color:white; font-size:13px; font-weight:bold; height:38px; border:none; border-radius:6px; cursor:pointer; padding:0 8px;">Custom Rules</button>
+            </div>
+            
+            <div id="customRulesBlock" style="display:none; background:rgba(255,255,255,0.03); padding:12px; border-radius:8px; border:1px solid var(--glass-border); margin-top:10px;">
+                <div style="margin-bottom: 12px;">
+                    <label style="display:block; font-size:11px; margin-bottom:5px; opacity:0.8; font-weight:600;">Exit Score (Total score that will exit a player):</label>
+                    <input id="exitScoreInput" type="text" inputmode="numeric" pattern="[0-9]*" class="std-input" value="0" style="margin-bottom:0; height:36px; padding:0 10px; font-size:13px;" onfocus="if(this.value==='0')this.value='';" onblur="if(this.value.trim()==='')this.value='0';">
+                </div>
+                <div>
+                    <label style="display:block; font-size:11px; margin-bottom:5px; opacity:0.8; font-weight:600;">Number of Re-entries allowed:</label>
+                    <input id="maxReentriesInput" type="text" inputmode="numeric" pattern="[0-9]*" class="std-input" value="0" style="margin-bottom:0; height:36px; padding:0 10px; font-size:13px;" onfocus="if(this.value==='0')this.value='';" onblur="if(this.value.trim()==='')this.value='0';">
+                </div>
+            </div>
+        </div>
+
         <div id="playerList"></div>
-        <button class="navBtn" style="background:rgba(255,255,255,0.1); width:100%; border:1px dashed var(--glass-border);" onclick="addPlayerField()">+ Add Player</button>
+        <button class="navBtn" style="background:rgba(255,255,255,0.1); width:100%; border:1px dashed var(--glass-border); margin-bottom:15px;" onclick="addPlayerField()">+ Add Player</button>
         <button class="actionBtn" onclick="startGame()">Start Game (with Seat Cut)</button>
     </div>`;
 }
@@ -812,10 +873,31 @@ function startGame() {
   let pList = Array.from(document.querySelectorAll('#playerList select')).map(s => s.value).filter(v => v !== "");
   if(pList.length < 2) return alert("Select at least 2 players");
   for(let i=pList.length-1; i>0; i--){ let j=Math.floor(Math.random()*(i+1)); [pList[i],pList[j]]=[pList[j],pList[i]]; }
+  
+  // Grab ruleset configurations
+  const isCustomMode = document.getElementById('ruleCustomBtn') && document.getElementById('ruleCustomBtn').classList.contains('active-rule');
+  const rulesetMode = isCustomMode ? 'custom' : 'standard';
+  let exitLimit = 240;
+  let maxRE = 1;
+
+  if (rulesetMode === 'custom') {
+      exitLimit = parseInt(document.getElementById('exitScoreInput').value);
+      maxRE = parseInt(document.getElementById('maxReentriesInput').value);
+      if (isNaN(exitLimit) || exitLimit <= 0) {
+          alert("Please enter a valid exit score limit greater than 0.");
+          return;
+      }
+      if (isNaN(maxRE) || maxRE < 0) {
+          alert("Please enter a valid number of re-entries (min 0).");
+          return;
+      }
+  }
+
   state = {
     id: Date.now().toString(), name: document.getElementById('gName').value || "Game",
     startTime: formatEliteDate(new Date()), players: pList, startingPlayers: [...pList], totals: {}, roundScores: {}, roundTactics: {}, lastDropRound: {},
-    eliminated: {}, reEntries: {}, actionStats: {}, round: 1, history: [], winner: null, endTime: null
+    eliminated: {}, reEntries: {}, actionStats: {}, round: 1, history: [], winner: null, endTime: null,
+    ruleset: rulesetMode, exitScoreLimit: exitLimit, maxReEntries: maxRE
   };
   pList.forEach(p => { state.totals[p]=0; state.roundScores[p]=null; state.roundTactics[p]=null; state.lastDropRound[p]=-1; state.actionStats[p]={shows:0,fcs:0,drops:0,mds:0}; });
   db.collection('eliteGames').doc(state.id).set(state);
@@ -825,7 +907,8 @@ function startGame() {
 function renderActive(focusPlayer = null) {
   if(!state) return;
   
-  let activeInRound = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
+  const exitLimit = getExitLimitFor(state);
+  let activeInRound = state.players.filter(p => !state.eliminated[p] && state.totals[p] < exitLimit);
   
   // Determine who to render: survivors or everyone from the last round if game is over
   let activePlayers = state.winner ? state.players : activeInRound;
@@ -837,11 +920,11 @@ function renderActive(focusPlayer = null) {
       dealer = roster[dIdx];
       
       // The "Dealer Rule": If player Y (next in rotation) is OUT, the previous active player (X) repeats.
-      if (state.eliminated[dealer] || (state.totals[dealer] || 0) >= 240) {
+      if (state.eliminated[dealer] || (state.totals[dealer] || 0) >= exitLimit) {
           for (let i = 1; i <= roster.length; i++) {
               let prevIdx = (dIdx - i + roster.length) % roster.length;
               let prevP = roster[prevIdx];
-              if (!state.eliminated[prevP] && (state.totals[prevP] || 0) < 240 && state.players.includes(prevP)) {
+              if (!state.eliminated[prevP] && (state.totals[prevP] || 0) < exitLimit && state.players.includes(prevP)) {
                   dealer = prevP;
                   break;
               }
@@ -857,13 +940,19 @@ function renderActive(focusPlayer = null) {
     </div>
   </div>`;
 
-  const pastPlayers = Object.keys(state.totals).filter(p => !state.players.includes(p) || state.eliminated[p] || state.totals[p] >= 240);
+  const pastPlayers = Object.keys(state.totals).filter(p => !state.players.includes(p) || state.eliminated[p] || state.totals[p] >= exitLimit);
 
   const renderPlayerRow = (p) => {
     let rs = state.roundScores[p];
-    let isOut = state.eliminated[p] || state.totals[p] >= 240;
+    let isOut = state.eliminated[p] || state.totals[p] >= exitLimit;
     let dLock = state.lastDropRound[p] === (state.round-1);
-    let hasReEntered = state.reEntries && state.reEntries[p];
+    
+    // Custom RE count checking
+    const reCount = getPlayerReEntriesCount(p, state);
+    let reLabel = '';
+    if (reCount > 1) reLabel = `RE (${reCount})`;
+    else if (reCount === 1) reLabel = 'RE';
+    
     let isPendingOut = (rs === 'OUT');
     let isS = (rs === 'S');
 
@@ -871,7 +960,7 @@ function renderActive(focusPlayer = null) {
         <td>
             ${p===dealer?'<span class="dealer-badge">D</span>':''} 
             <b>${p}</b>
-            ${hasReEntered ? '<span style="background:var(--warning); color:#000; padding:1px 4px; border-radius:3px; font-size:8px; margin-left:4px; font-weight:bold;">RE</span>' : ''}
+            ${reLabel ? `<span style="background:var(--warning); color:#000; padding:1px 4px; border-radius:3px; font-size:8px; margin-left:4px; font-weight:bold;">${reLabel}</span>` : ''}
         </td>
         <td>
             <div style="display:flex; gap:3px; flex-wrap:wrap;">
@@ -900,7 +989,7 @@ function renderActive(focusPlayer = null) {
 
   if(!state.winner) {
       const isRoundInProgress = Object.keys(state.roundScores).some(p => {
-          const isNotOut = !state.eliminated[p] && (state.totals[p] || 0) < 240;
+          const isNotOut = !state.eliminated[p] && (state.totals[p] || 0) < exitLimit;
           return isNotOut && state.roundScores[p] !== null;
       });
       h += `<button id="endBtn" class="actionBtn" style="margin-top:15px;" onclick="nextRound()">Next Round (${state.round + 1})</button>
@@ -917,7 +1006,11 @@ function renderActive(focusPlayer = null) {
   const shownPast = pastPlayers.slice(0, 10);
   if (pastPlayers.length > 0) {
       h += `<div style="margin-top:15px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; opacity:0.8;">
-            <b>Past:</b> ${pastPlayers.map(p => `${p}${state.reEntries && state.reEntries[p] ? ' (RE)' : ''} (${state.totals[p]})`).join(' | ')}
+            <b>Past:</b> ${pastPlayers.map(p => {
+                const reCount = getPlayerReEntriesCount(p, state);
+                const reSuf = reCount > 1 ? ` (RE:${reCount})` : (reCount === 1 ? ' (RE)' : '');
+                return `${p}${reSuf} (${state.totals[p]})`;
+            }).join(' | ')}
             </div>`;
   }
   
@@ -930,12 +1023,15 @@ function renderActive(focusPlayer = null) {
               <b style="color:var(--accent);">Round ${r.round}</b>: ${(r.players || state.players).map(p => {
                   let rs = r.scores[p] === undefined ? '-' : r.scores[p];
                   let tot = r.totals[p] !== undefined ? r.totals[p] : '-';
-                  let reSuf = (r.reentries && r.reentries[p]) ? ' (RE)' : '';
+                  
+                  // Handle custom multiple RE labels in round history too!
+                  const historicReCount = r.reentries && r.reentries[p] !== undefined ? 1 : 0; 
+                  let reSuf = historicReCount > 0 ? ' (RE)' : '';
                   let tactic = (r.tactics && r.tactics[p]) ? r.tactics[p] : null;
                   
                   let displayScore = tactic ? tactic : rs;
-                  if (rs === 'OUT' || tot >= 240) {
-                      return `${p}${reSuf}: <span style="color:var(--danger)">OUT (240)</span>`;
+                  if (rs === 'OUT' || tot >= exitLimit) {
+                      return `${p}${reSuf}: <span style="color:var(--danger)">OUT (${exitLimit})</span>`;
                   }
                   return `${p}${reSuf}: ${displayScore} (${tot})`;
               }).join(' | ')}
@@ -1051,7 +1147,7 @@ function updateRoundScoresUI() {
         const input = row.querySelector('.score-input');
         const buttons = row.querySelectorAll('.tactic-btn');
         
-        const isOut = state.eliminated[p] || (state.totals[p] || 0) >= 240;
+        const isOut = state.eliminated[p] || (state.totals[p] || 0) >= getExitLimitFor(state);
         const isS = (val === 'S');
         const isPendingOut = (val === 'OUT');
         
@@ -1211,9 +1307,10 @@ async function nextRound() {
         let entry = { round: state.round, players: allParticipants, scores: scores, tactics: tactics, totals: {}, reentries: {}, bustedTotals: {} };
         
         // Ensure all roundScores have a value before proceeding
+        const exitLimit = getExitLimitFor(state);
         for (let p of state.players) {
             const sc = state.roundScores[p];
-            if ((sc === undefined || sc === null || sc === "") && !state.eliminated[p] && (state.totals[p] || 0) < 240) {
+            if ((sc === undefined || sc === null || sc === "") && !state.eliminated[p] && (state.totals[p] || 0) < exitLimit) {
                  alert(`Score missing for ${p}. Please enter a score or mark as OUT.`);
                  isPromptingReEntry = false;
                  return;
@@ -1228,14 +1325,14 @@ async function nextRound() {
                 let n = 0;
                 if (val === 'S') n = 0;
                 else if (val === 'OUT') {
-                    state.totals[p] = 240;
+                    state.totals[p] = exitLimit;
                     state.eliminated[p] = true; // Mark as eliminated for next check
                     n = 0; 
                 } else {
                     n = (parseInt(val) === 0 ? 0 : (parseInt(val) || 0));
                     if (state.totals[p] === undefined) state.totals[p] = n;
                     else state.totals[p] += n;
-                    if (state.totals[p] >= 240) entry.bustedTotals[p] = state.totals[p];
+                    if (state.totals[p] >= exitLimit) entry.bustedTotals[p] = state.totals[p];
                 }
 
                 let tactic = tactics[p];
@@ -1250,22 +1347,22 @@ async function nextRound() {
         });
 
         // 2. Process Re-entries
-        let activeSurvivors = state.players.filter(p => state.totals[p] < 240 && !state.eliminated[p]);
+        let activeSurvivors = state.players.filter(p => state.totals[p] < exitLimit && !state.eliminated[p]);
         let reEntryQueue = [];
         
         // Calculate re-entry score: highest survivor score + 1
-        let entryScore = 175;
+        let entryScore = Math.round(exitLimit * 0.73);
         if (activeSurvivors.length > 0) {
             let maxScore = Math.max(...activeSurvivors.map(p => state.totals[p]));
             entryScore = maxScore + 1;
         }
-        if (entryScore > 240) entryScore = 240;
+        if (entryScore > exitLimit) entryScore = exitLimit;
 
         for(let p of state.players) {
-            const alreadyReEntered = state.reEntries && state.reEntries[p];
-            // Only players who reached 240+ via scores (not manually marked OUT) get a chance
-            if(state.totals[p] >= 240 && !state.eliminated[p]) {
-                if(!alreadyReEntered) {
+            const canReEnter = canPlayerReEnter(p, state);
+            // Only players who reached exitLimit+ via scores (not manually marked OUT) get a chance
+            if(state.totals[p] >= exitLimit && !state.eliminated[p]) {
+                if(canReEnter) {
                     reEntryQueue.push({player: p, score: entryScore});
                 } else {
                     state.eliminated[p] = true; // No second chance
@@ -1277,10 +1374,10 @@ async function nextRound() {
             await processReEntryQueue(reEntryQueue, entry, allParticipants);
         } else {
             // Check if game should continue or end
-            let nextSurvivors = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240);
+            let nextSurvivors = state.players.filter(p => !state.eliminated[p] && state.totals[p] < exitLimit);
             if (nextSurvivors.length === 0) {
-                // Everyone is eliminated or over 240 - Game Ends!
-                let allInRound = state.players.filter(p => !state.eliminated[p] || state.totals[p] >= 240);
+                // Everyone is eliminated or over exitLimit - Game Ends!
+                let allInRound = state.players.filter(p => !state.eliminated[p] || state.totals[p] >= exitLimit);
                 let minScore = Math.min(...allInRound.map(p => state.totals[p]));
                 let winners = allInRound.filter(p => state.totals[p] === minScore);
                 state.winner = (winners.length > 1 ? winners.join(' & ') : winners[0]) || "Tie";
@@ -1309,8 +1406,9 @@ function processReEntryQueue(queue, entry, allParticipants) {
             }
             
             let { player, score } = queue.shift();
+            const exitLimit = getExitLimitFor(state);
             
-            if (score >= 240) {
+            if (score >= exitLimit) {
                 document.getElementById('reentryText').innerHTML = `<b style="color:var(--danger)">No points available to Re-entry</b><br><b>${player}</b> reached <b>${state.totals[player]}</b> and is eliminated.`;
                 document.getElementById('reentryModal').style.display = 'flex';
                 document.getElementById('btnReentryYes').style.display = 'none';
@@ -1329,7 +1427,8 @@ function processReEntryQueue(queue, entry, allParticipants) {
             document.getElementById('reentryModal').style.display = 'flex';
             
             document.getElementById('btnReentryYes').onclick = () => {
-                state.reEntries[player] = true;
+                const currentCount = state.reEntries[player] ? (state.reEntries[player] === true ? 1 : state.reEntries[player]) : 0;
+                state.reEntries[player] = currentCount + 1;
                 state.totals[player] = score;
                 entry.reentries[player] = score;
                 document.getElementById('reentryModal').style.display = 'none';
@@ -1357,15 +1456,16 @@ async function finalizeRound(entry, allParticipants) {
     state.history.push(entry);
     state.round++; 
     
-    // Players who are now eliminated or over 240 must be removed from the active roster for the next round
-    state.players = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < 240);
+    const exitLimit = getExitLimitFor(state);
+    // Players who are now eliminated or over exitLimit must be removed from the active roster for the next round
+    state.players = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < exitLimit);
 
     state.players.forEach(p => {
         state.roundScores[p] = null;
         if(state.roundTactics) state.roundTactics[p] = null;
     });
 
-    let currentSurvivors = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < 240);
+    let currentSurvivors = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < exitLimit);
     if (currentSurvivors.length === 1) {
         state.winner = currentSurvivors[0];
         state.endTime = formatEliteDate(new Date());
@@ -1651,46 +1751,6 @@ function closeFullScreen() {
     if (document.exitFullscreen) {
         document.exitFullscreen().catch(e => console.log(e));
     }
-    stopCelebration();
-}
-
-let confettiInterval = null;
-function startCelebration() {
-    if (confettiInterval) return;
-    if (typeof confetti !== 'function') {
-        console.warn("confetti library not loaded yet");
-        return;
-    }
-    
-    // High-performance opening salvos
-    confetti({
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.6 }
-    });
-    
-    // Periodic loops of festive background bursts
-    confettiInterval = setInterval(() => {
-        confetti({
-            particleCount: 40,
-            angle: 60,
-            spread: 60,
-            origin: { x: 0, y: 0.8 }
-        });
-        confetti({
-            particleCount: 40,
-            angle: 120,
-            spread: 60,
-            origin: { x: 1, y: 0.8 }
-        });
-    }, 1500);
-}
-
-function stopCelebration() {
-    if (confettiInterval) {
-        clearInterval(confettiInterval);
-        confettiInterval = null;
-    }
 }
 
 function showTVViewOnly() {
@@ -1750,24 +1810,6 @@ function renderTVContent() {
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(pName)}&background=2c3e50&color=fff&size=200`;
     };
 
-    if (isGameOver) {
-        let h = `
-        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:85vh; text-align:center;">
-            <div class="celebrate-card" style="border-radius: 28px; padding: 6vh; max-width: 90%; min-width: 60%; border: 3px solid #d4af37;">
-                <div style="font-size: 14vh; line-height: 1; margin-bottom: 3vh; animation: pulse-crown 1.5s ease-in-out infinite alternate; display: inline-block;">👑</div>
-                <div style="font-size: 3.5vh; color: #d4af37; font-weight: 900; letter-spacing: 6px; text-transform: uppercase; margin-bottom: 2vh; text-shadow: 0 0 15px rgba(212,175,55,0.6);">CONGRATULATIONS CHAMPION</div>
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; margin: 3vh 0;">
-                    <img src="${getTVAvatar(state.winner)}" style="width: 20vh; height: 20vh; border-radius: 50%; border: 5px solid #d4af37; object-fit: cover; box-shadow: 0 0 40px rgba(212, 175, 55, 0.8);">
-                    <span style="font-size: 10vh; font-weight: 900; color: #fff; text-shadow: 0 0 25px rgba(255, 255, 255, 0.7);">${state.winner}</span>
-                </div>
-            </div>
-        </div>
-        `;
-        document.getElementById('tvContent').innerHTML = h;
-        startCelebration();
-        return;
-    }
-
     let h = `
         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 2.5vh; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 1.5vh;">
             <h1 style="font-size: ${headerFontSize}; margin:0; color: #fff; font-weight: 800;">${state.name}</h1>
@@ -1787,25 +1829,27 @@ function renderTVContent() {
             <tbody>
     `;
 
+    const exitLimit = getExitLimitFor(state);
+
     const sortedPlayersTV = [...state.players].sort((a, b) => {
-        const aOut = state.eliminated[a] || (state.totals[a] || 0) >= 240;
-        const bOut = state.eliminated[b] || (state.totals[b] || 0) >= 240;
+        const aOut = state.eliminated[a] || (state.totals[a] || 0) >= exitLimit;
+        const bOut = state.eliminated[b] || (state.totals[b] || 0) >= exitLimit;
         if (aOut && !bOut) return 1;
         if (!aOut && bOut) return -1;
         return (state.totals[a] || 0) - (state.totals[b] || 0); 
     });
 
     let dealer = null;
-    let activePlayersForDealer = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < 240);
+    let activePlayersForDealer = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < exitLimit);
     if (activePlayersForDealer.length > 0) {
         let roster = state.startingPlayers || state.players;
         let dIdx = (state.round - 1) % roster.length;
         dealer = roster[dIdx];
-        if (state.eliminated[dealer] || (state.totals[dealer] || 0) >= 240) {
+        if (state.eliminated[dealer] || (state.totals[dealer] || 0) >= exitLimit) {
             for (let i = 1; i <= roster.length; i++) {
                 let prevIdx = (dIdx - i + roster.length) % roster.length;
                 let prevP = roster[prevIdx];
-                if (!state.eliminated[prevP] && (state.totals[prevP] || 0) < 240 && state.players.includes(prevP)) {
+                if (!state.eliminated[prevP] && (state.totals[prevP] || 0) < exitLimit && state.players.includes(prevP)) {
                     dealer = prevP; break;
                 }
             }
@@ -1813,7 +1857,7 @@ function renderTVContent() {
     }
 
     sortedPlayersTV.forEach((p, index) => {
-        const isOut = state.eliminated[p] || (state.totals[p] || 0) >= 240;
+        const isOut = state.eliminated[p] || (state.totals[p] || 0) >= exitLimit;
         const score = state.totals[p] || 0;
 
         h += `
@@ -1849,18 +1893,13 @@ function renderTVContent() {
     }
 
     document.getElementById('tvContent').innerHTML = h;
-
-    if (isGameOver) {
-        startCelebration();
-    } else {
-        stopCelebration();
-    }
 }
 
 function openMidGame() {
     // Check if any round score is entered for active players
+    const exitLimit = getExitLimitFor(state);
     const isRoundInProgress = Object.keys(state.roundScores).some(p => {
-        const isNotOut = !state.eliminated[p] && (state.totals[p] || 0) < 240;
+        const isNotOut = !state.eliminated[p] && (state.totals[p] || 0) < exitLimit;
         return isNotOut && state.roundScores[p] !== null;
     });
     
@@ -1871,8 +1910,13 @@ function openMidGame() {
     let avail = playersDb.filter(p => {
         const name = p.fullName;
         const isCurrentlyIn = state.players.includes(name);
-        const hasUsedReEntryAlready = (state.reEntries && state.reEntries[name]);
-        return !isCurrentlyIn && !hasUsedReEntryAlready;
+        const canRE = canPlayerReEnter(name, state);
+        const wasIn = state.totals[name] !== undefined;
+        // If they were in, they can rejoin ONLY if they have re-entries left
+        if (wasIn) {
+            return !isCurrentlyIn && canRE;
+        }
+        return !isCurrentlyIn;
     });
     document.getElementById('midGameSelect').innerHTML = `<option value="">-- Select --</option>` + avail.map(p => {
         const inHistory = state.totals[p.fullName] !== undefined ? " (Re-Join)" : "";
@@ -1882,8 +1926,10 @@ function openMidGame() {
 }
 async function confirmAddMidGame() {
     let name = document.getElementById('midGameSelect').value; if(!name) return;
-    let act = state.players.filter(p => !state.eliminated[p] && state.totals[p] < 240).map(p => state.totals[p]);
+    const exitLimit = getExitLimitFor(state);
+    let act = state.players.filter(p => !state.eliminated[p] && state.totals[p] < exitLimit).map(p => state.totals[p]);
     let es = (act.length > 0 ? Math.max(...act) : 0) + 1;
+    if (es > exitLimit) es = exitLimit;
     
     const previouslyInGame = state.totals[name] !== undefined;
 
@@ -1893,7 +1939,8 @@ async function confirmAddMidGame() {
         state.eliminated[name] = false;
         if (previouslyInGame) {
             if(!state.reEntries) state.reEntries = {};
-            state.reEntries[name] = true; 
+            const currentCount = state.reEntries[name] ? (state.reEntries[name] === true ? 1 : state.reEntries[name]) : 0;
+            state.reEntries[name] = currentCount + 1; 
         }
     } else {
         state.totals[name] = es;
@@ -1961,19 +2008,55 @@ function renderStats() {
 
 function renderContinue() {
     let act = savedGames.filter(g => !g.winner && !g.isDeleted);
+    const now = Date.now();
     document.getElementById('mainPane').innerHTML = `<h2>Manage Matches</h2>` + (act.map(g => {
+        const isLive = (now - (g.lastActivity || 0)) < 15000;
         return `
-        <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border-left: 5px solid var(--accent); position:relative;">
+        <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border-left: 5px solid ${isLive ? 'var(--danger)' : 'var(--accent)'}; position:relative;">
             <div style="flex:1; min-width:150px;">
                 <div style="font-size:18px; font-weight:bold;">${g.name}</div>
+                ${isLive ? `
+                    <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+                        <span style="width:10px; height:10px; background:red; border-radius:50%; box-shadow: 0 0 10px red; animation: tv-blink 1.5s infinite;"></span>
+                        <span style="font-size:11px; color:#e74c3c; font-weight:900; letter-spacing:1px; text-transform:uppercase;">Live Match in Progress</span>
+                    </div>` : ''}
             </div>
             <div style="display:flex; gap:10px; align-items:center;">
-                <button onclick="resume('${g.id}')" style="background:var(--accent); font-weight:bold; padding: 10px 20px;">Resume</button>
+                ${isLive ? `
+                    <button onclick="resume('${g.id}')" style="background:var(--danger); animation: pulse-red 2s infinite; font-weight:950; font-size:14px; padding: 12px 25px; border:none; text-transform:uppercase; letter-spacing:1px;">Resume</button>
+                ` : `
+                    <button onclick="resume('${g.id}')" style="background:var(--accent); font-weight:bold; padding: 10px 20px;">Resume</button>
+                    <button onclick="endGameManually('${g.id}')" style="background:rgba(255,255,255,0.05); color:var(--danger); border:1px solid var(--danger); font-size:11px; font-weight:900; text-transform:uppercase; height:35px; border-radius:8px;">End Game</button>
+                `}
             </div>
         </div>`;
     }).join('') || `<p style="opacity:0.6; font-size:14px;">No active matches found.</p>`);
 }
 function resume(id) { state=savedGames.find(g => g.id === id); if(state) showScreen('activeGame'); }
+
+async function endGameManually(id) {
+    let g = (state && state.id === id) ? state : savedGames.find(x => x.id === id);
+    if(!g) return alert("Game not found.");
+    
+    if(!confirm(`Terminate this game?`)) return;
+
+    try {
+        const updateData = {
+            winner: 'Abandoned',
+            endTime: formatEliteDate(new Date()),
+            isAborted: true
+        };
+        await db.collection('eliteGames').doc(id).update(updateData);
+        
+        if (state && state.id === id) {
+            state = null;
+        }
+        showScreen('continue');
+    } catch (err) {
+        console.error("EndGame error:", err);
+        alert("Failed to terminate game.");
+    }
+}
 
 function renderHistory() {
     let fin = savedGames.filter(g => g.winner && !g.isDeleted).sort((a,b) => parseInt(b.id) - parseInt(a.id));
@@ -2282,18 +2365,19 @@ function viewTableReport(id) {
                 let re = (r.reentries && r.reentries[p] !== undefined) ? r.reentries[p] : null;
                 let busted = (r.bustedTotals && r.bustedTotals[p] !== undefined) ? r.bustedTotals[p] : null;
                 
+                const exitLimitVal = getExitLimitFor(g);
                 // Fallback for older games without bustedTotals field
                 if (re !== null && busted === null && idx > 0) {
                     const prevT = validHistory[idx - 1].totals[p] || 0;
                     const scoreVal = (s === 'S') ? 0 : (parseInt(s) || 0);
-                    if (prevT + scoreVal >= 240) {
+                    if (prevT + scoreVal >= exitLimitVal) {
                         busted = prevT + scoreVal;
                     }
                 }
                 
                 // Detection if player had not joined yet
                 let notJoined = (t === undefined);
-                let isOut = (t >= 240 && re === null);
+                let isOut = (t >= exitLimitVal && re === null);
                 
                 let val = "";
                 let subVal = "";
@@ -2384,16 +2468,17 @@ function genPDF(id) {
             let re = (r.reentries && r.reentries[p] !== undefined) ? r.reentries[p] : null;
             let busted = (r.bustedTotals && r.bustedTotals[p] !== undefined) ? r.bustedTotals[p] : null;
             
+            const exitLimitVal = getExitLimitFor(g);
             // Fallback for older games
             if (re !== null && busted === null && idx > 0) {
                 const prevT = sigHistory[idx-1].totals[p] || 0;
                 const scoreVal = (s === 'S') ? 0 : (parseInt(s) || 0);
-                if (prevT + scoreVal >= 240) busted = prevT + scoreVal;
+                if (prevT + scoreVal >= exitLimitVal) busted = prevT + scoreVal;
             }
 
             let tactic = (r.tactics && r.tactics[p]) ? r.tactics[p] : null;
             if (t === undefined) return 'Not Played';
-            if (t >= 240 && re === null) return `OUT (Total: ${t})`;
+            if (t >= exitLimitVal && re === null) return `OUT (Total: ${t})`;
             if (re !== null) {
                 let bustedStr = busted !== null ? ` (Busted: ${busted})` : "";
                 return `${s} (RE@${re}${bustedStr})`;
