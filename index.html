@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v87.1</title>
+<title>Elite Rummy Circle - v88.0</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" sizes="152x152" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
@@ -257,7 +257,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v87.1</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v88.0</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -316,8 +316,15 @@
 
 <div id="releaseNotesModal" class="modal-overlay">
     <div class="modal-card" style="text-align: left; max-width: 400px;">
-        <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
-        <div style="margin-bottom: 20px;">
+         <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
+         <div style="margin-bottom: 20px;">
+            <b style="color: var(--warning); display: block; margin-bottom: 5px;">v88.0 - Immersive Fullscreen & Adaptive Fitting</b>
+            <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                • <b>True Fullscreen API:</b> Fullscreen mode now opens in standard browser fullscreen without headers or search bars across all devices.<br>
+                • <b>Unified Display Auto-Fitting:</b> The entire scoreboard fits perfectly within 100vh of the display with no scrolling list container, automatically resizing names, row ratios, and avatars based on the number of players.<br>
+                • <b>Horizontal Past Participants:</b> Relocated inactive/busted players to single-line horizontal scrolls to preserve scoreboard space.<br>
+            </div>
+            <hr style="margin: 10px 0; opacity: 0.2;">
             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v87.1 - Zero-Default Rule Fields</b>
             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
                 • <b>Refined Input States:</b> Configured the "Number of Re-entries allowed" numeric box to start at '0' consistently, matching the exit score behavior.<br>
@@ -514,7 +521,7 @@
       <div class="tv-close" id="tvCloseBtn" onclick="closeFullScreen()">Close</div>
   </div>
   <div style="position: fixed; bottom: 8px; left: 12px; z-index: 4000; text-align: left; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v87.1</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v88.0</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
@@ -1731,25 +1738,42 @@ function handleTVMouseMove() {
 document.addEventListener('mousemove', handleTVMouseMove);
 document.addEventListener('touchstart', handleTVMouseMove);
 
+function onFullScreenChange() {
+    const isFs = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+    if (!isFs) {
+        const overlay = document.getElementById('fullscreenOverlay');
+        if (overlay) overlay.style.display = 'none';
+    }
+}
+document.addEventListener('fullscreenchange', onFullScreenChange);
+document.addEventListener('webkitfullscreenchange', onFullScreenChange);
+document.addEventListener('mozfullscreenchange', onFullScreenChange);
+document.addEventListener('MSFullscreenChange', onFullScreenChange);
+
 function toggleFullScreen() {
-    if (window.innerWidth < 900) {
-        // Mobile: Open in new tab with fullscreen mode
-        alert("For Viewing on Large Display");
-        window.open('?fullscreen=' + state.id, '_blank');
-    } else {
-        // TV/Desktop: Toggle local overlay and browser fullscreen
-        if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen().catch(e => console.log(e));
-        }
-        renderTVContent();
-        document.getElementById('fullscreenOverlay').style.display = 'flex';
+    const overlay = document.getElementById('fullscreenOverlay');
+    if (!overlay) return;
+    renderTVContent();
+    overlay.style.display = 'flex';
+    
+    const requestMethod = overlay.requestFullscreen || overlay.webkitRequestFullscreen || overlay.mozRequestFullScreen || overlay.msRequestFullscreen;
+    if (requestMethod) {
+        requestMethod.call(overlay).catch(e => {
+            console.log("Overlay fullscreen request failed, trying document.documentElement:", e);
+            const docReq = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen || document.documentElement.mozRequestFullScreen;
+            if (docReq) {
+                docReq.call(document.documentElement).catch(err => console.log("Doc fullscreen error:", err));
+            }
+        });
     }
 }
 
 function closeFullScreen() {
-    document.getElementById('fullscreenOverlay').style.display = 'none';
-    if (document.exitFullscreen) {
-        document.exitFullscreen().catch(e => console.log(e));
+    const overlay = document.getElementById('fullscreenOverlay');
+    if (overlay) overlay.style.display = 'none';
+    const exitMethod = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+    if (exitMethod) {
+        exitMethod.call(document).catch(e => console.log(e));
     }
 }
 
@@ -1787,22 +1811,35 @@ function startHeartbeat() {
 function renderTVContent() {
     if (!state) return;
     
+    // Auto-apply optimal vertical budget settings to the fullscreen overlay
+    const overlay = document.getElementById('fullscreenOverlay');
+    if (overlay) {
+        overlay.style.padding = '2vh 3vw';
+        overlay.style.overflow = 'hidden';
+    }
+
     const isGameOver = !!state.winner;
     const displayRound = Math.max(0, state.round - 1);
     const playerCount = state.players.length;
     
     // Past Players - parsed first so we can gauge screen budget
     const past = Object.keys(state.totals).filter(p => !state.players.includes(p));
+    const hasPast = past.length > 0;
     
-    // High-precision dynamic vertical viewport budget (out of 100vh)
-    const availableBudget = past.length > 0 ? 66 : 78;
-    const rowBudget = availableBudget / (playerCount + 1);
+    // Precise vertical height allocation out of 100vh:
+    // Overlay vertical padding = 4vh (2vh top and 2vh bottom)
+    // Header section takes height of about 8vh
+    // Past section takes about 8vh if present
+    const occupiedHeight = 4 + 8 + (hasPast ? 8 : 0);
+    const remainingHeight = 100 - occupiedHeight; // vertical budget for the table in vh
     
-    // Continuously scale spacing, typography, padding and margins based on row budget
-    const baseFontSize = Math.min(5.5, Math.max(1.8, rowBudget * 0.44)) + 'vh';
-    const rowPadding = Math.min(3.8, Math.max(0.6, rowBudget * 0.28)) + 'vh';
-    const headerFontSize = Math.min(7.0, Math.max(3.5, rowBudget * 0.44 * 1.3)) + 'vh';
-    const rankWidth = '10%';
+    // Table rows = 1 header row + N player rows
+    const maxRowHeightVh = remainingHeight / (playerCount + 1);
+    
+    // Fine-tune responsive sizes derived purely from the max single-row viewport budget
+    const baseFontSize = Math.min(5.0, Math.max(1.6, maxRowHeightVh * 0.42)) + 'vh';
+    const headerFontSize = Math.min(6.5, Math.max(3.0, maxRowHeightVh * 0.42 * 1.3)) + 'vh';
+    const rankWidth = '8%';
 
     const getTVAvatar = (pName) => {
         const pData = playersDb.find(x => x.fullName === pName);
@@ -1811,19 +1848,19 @@ function renderTVContent() {
     };
 
     let h = `
-        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 2.5vh; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 1.5vh;">
-            <h1 style="font-size: ${headerFontSize}; margin:0; color: #fff; font-weight: 800;">${state.name}</h1>
-            <div style="font-size: calc(${headerFontSize} * 0.6); font-weight: bold; color: var(--danger); display:flex; align-items:center; gap:15px;">
-                <span style="width:calc(${headerFontSize} * 0.3); height:calc(${headerFontSize} * 0.3); background:red; border-radius:50%; box-shadow: 0 0 15px red; animation: tv-blink 1.5s infinite;"></span>
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 1.5vh; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 1vh; height: 5.5vh;">
+            <h1 style="font-size: ${headerFontSize}; margin:0; color: #fff; font-weight: 800; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${state.name}</h1>
+            <div style="font-size: calc(${headerFontSize} * 0.6); font-weight: bold; color: var(--danger); display:flex; align-items:center; gap:12px; line-height:1.1;">
+                <span style="width:calc(${headerFontSize} * 0.25); height:calc(${headerFontSize} * 0.25); background:red; border-radius:50%; box-shadow: 0 0 12px red; animation: tv-blink 1.5s infinite;"></span>
                 ${isGameOver ? 'FINAL RESULTS' : 'ROUND ' + displayRound}
             </div>
         </div>
-        <table class="tv-table">
+        <table class="tv-table" style="height: ${remainingHeight - maxRowHeightVh}vh; table-layout: fixed;">
             <thead>
-                <tr>
-                    <th style="width: ${rankWidth}; font-size: calc(${baseFontSize} * 0.5);">Pos</th>
-                    <th style="font-size: calc(${baseFontSize} * 0.5);">Player</th>
-                    <th style="width: 20%; text-align:right; font-size: calc(${baseFontSize} * 0.5);">Total</th>
+                <tr style="height: ${maxRowHeightVh}vh;">
+                    <th style="width: ${rankWidth}; font-size: calc(${baseFontSize} * 0.5); padding: 0 1vh; height: ${maxRowHeightVh}vh; vertical-align: middle;">Pos</th>
+                    <th style="font-size: calc(${baseFontSize} * 0.5); padding: 0 1vh; height: ${maxRowHeightVh}vh; vertical-align: middle;">Player</th>
+                    <th style="width: 20%; text-align:right; font-size: calc(${baseFontSize} * 0.5); padding: 0 1vh; height: ${maxRowHeightVh}vh; vertical-align: middle;">Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -1861,30 +1898,30 @@ function renderTVContent() {
         const score = state.totals[p] || 0;
 
         h += `
-            <tr class="${isOut ? 'is-out' : ''}">
-                <td style="color:rgba(255,255,255,0.3); font-weight:bold; font-size: calc(${baseFontSize} * 0.8);">${index + 1}</td>
-                <td style="padding: ${rowPadding} 1.5vh;">
-                    <div style="display:flex; align-items:center;">
-                        <img src="${getTVAvatar(p)}" class="avatar-tv" style="width: calc(${baseFontSize} * 1.8); height: calc(${baseFontSize} * 1.8); margin-right: 2vh;">
-                        <span style="font-weight:bold; font-size: ${baseFontSize};">${p}</span>
-                        ${p === dealer ? `<span class="dealer-badge" style="font-size: calc(${baseFontSize} * 0.4); padding: 2px 10px; margin-left: 2vh;">Dealer</span>` : ''}
+            <tr class="${isOut ? 'is-out' : ''}" style="height: ${maxRowHeightVh}vh;">
+                <td style="color:rgba(255,255,255,0.3); font-weight:bold; font-size: calc(${baseFontSize} * 0.8); padding: 0 1vh; height: ${maxRowHeightVh}vh; vertical-align: middle;">${index + 1}</td>
+                <td style="padding: 0 1vh; height: ${maxRowHeightVh}vh; vertical-align: middle;">
+                    <div style="display:flex; align-items:center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <img src="${getTVAvatar(p)}" class="avatar-tv" style="width: calc(${baseFontSize} * 1.5); height: calc(${baseFontSize} * 1.55); margin-right: 1.5vh; border-radius: 50%; object-fit: cover;">
+                        <span style="font-weight:bold; font-size: ${baseFontSize}; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${p}</span>
+                        ${p === dealer ? `<span class="dealer-badge" style="font-size: calc(${baseFontSize} * 0.4); padding: 1px 1vh; margin-left: 1.5vh; line-height: 1; border-radius:3px;">Dealer</span>` : ''}
                     </div>
                 </td>
-                <td style="text-align:right;"><span class="score-val" style="font-size: calc(${baseFontSize} * 1.5);">${score}</span></td>
+                <td style="text-align:right; padding: 0 1vh; height: ${maxRowHeightVh}vh; vertical-align: middle;"><span class="score-val" style="font-size: calc(${baseFontSize} * 1.4); font-weight: 900; color: var(--warning);">${score}</span></td>
             </tr>
         `;
     });
 
     h += `</tbody></table>`;
 
-    // Past Players
+    // Past Players (Single scrolling row, never wraps or pushes layout out of 100vh bounds)
     if (past.length > 0) {
         h += `
-        <div style="margin-top: 5vh; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 2vh;">
-            <div style="font-size: 2vh; opacity: 0.4; text-transform: uppercase; margin-bottom: 1.5vh; letter-spacing: 2px;">Past Participants</div>
-            <div style="display:flex; gap: 3vh; flex-wrap: wrap;">
+        <div style="margin-top: 1vh; border-top: 1px dashed rgba(255,255,255,0.15); padding-top: 0.5vh; height: 6.5vh; overflow: hidden;">
+            <div style="font-size: 1.4vh; opacity: 0.4; text-transform: uppercase; margin-bottom: 0.4vh; letter-spacing: 2px; line-height: 1;">Past Participants</div>
+            <div style="display:flex; gap: 1.5vh; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 2px;">
                 ${past.map(p => `
-                    <div style="font-size: 2.5vh; opacity: 0.6; background: rgba(255,255,255,0.05); padding: 8px 20px; border-radius: 8px;">
+                    <div style="font-size: 1.6vh; opacity: 0.65; background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 6px; display: inline-block; flex-shrink: 0; line-height: 1.2;">
                         ${p}: <span style="color:var(--warning); font-weight:bold;">${state.totals[p]}</span>
                     </div>
                 `).join('')}
