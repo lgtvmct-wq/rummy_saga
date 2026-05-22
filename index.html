@@ -23,6 +23,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
 <style>
   :root {
@@ -187,6 +188,21 @@
   
   @media print {
     #fullscreenOverlay { display: none !important; }
+  }
+
+  @keyframes glow-gold {
+    0% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.2), inset 0 0 20px rgba(212, 175, 55, 0.1); border-color: rgba(212, 175, 55, 0.5); }
+    100% { box-shadow: 0 0 45px rgba(212, 175, 55, 0.8), inset 0 0 30px rgba(212, 175, 55, 0.4); border-color: #d4af37; }
+  }
+  @keyframes pulse-crown {
+    0% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.4)); }
+    100% { transform: scale(1.15); filter: drop-shadow(0 0 25px rgba(212, 175, 55, 1)); }
+  }
+  .celebrate-card {
+    background: linear-gradient(135deg, rgba(26, 37, 47, 0.95), rgba(44, 62, 80, 0.98));
+    border: 3px solid #d4af37;
+    box-shadow: 0 0 45px rgba(212, 175, 55, 0.5);
+    animation: glow-gold 2.5s infinite alternate;
   }
 </style>
 </head>
@@ -709,6 +725,7 @@ function loadData() {
 
 // --- NAVIGATION ---
 function showScreen(s) {
+  stopCelebration();
   currentScreen = s;
   // Update Hash for URL Persistence
   if (s === 'activeGame' && state) {
@@ -1627,6 +1644,46 @@ function closeFullScreen() {
     if (document.exitFullscreen) {
         document.exitFullscreen().catch(e => console.log(e));
     }
+    stopCelebration();
+}
+
+let confettiInterval = null;
+function startCelebration() {
+    if (confettiInterval) return;
+    if (typeof confetti !== 'function') {
+        console.warn("confetti library not loaded yet");
+        return;
+    }
+    
+    // High-performance opening salvos
+    confetti({
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 }
+    });
+    
+    // Periodic loops of festive background bursts
+    confettiInterval = setInterval(() => {
+        confetti({
+            particleCount: 40,
+            angle: 60,
+            spread: 60,
+            origin: { x: 0, y: 0.8 }
+        });
+        confetti({
+            particleCount: 40,
+            angle: 120,
+            spread: 60,
+            origin: { x: 1, y: 0.8 }
+        });
+    }, 1500);
+}
+
+function stopCelebration() {
+    if (confettiInterval) {
+        clearInterval(confettiInterval);
+        confettiInterval = null;
+    }
 }
 
 function showTVViewOnly() {
@@ -1685,6 +1742,24 @@ function renderTVContent() {
         if (pData?.photoURL) return pData.photoURL;
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(pName)}&background=2c3e50&color=fff&size=200`;
     };
+
+    if (isGameOver) {
+        let h = `
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:85vh; text-align:center;">
+            <div class="celebrate-card" style="border-radius: 28px; padding: 6vh; max-width: 90%; min-width: 60%; border: 3px solid #d4af37;">
+                <div style="font-size: 14vh; line-height: 1; margin-bottom: 3vh; animation: pulse-crown 1.5s ease-in-out infinite alternate; display: inline-block;">👑</div>
+                <div style="font-size: 3.5vh; color: #d4af37; font-weight: 900; letter-spacing: 6px; text-transform: uppercase; margin-bottom: 2vh; text-shadow: 0 0 15px rgba(212,175,55,0.6);">CONGRATULATIONS CHAMPION</div>
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; margin: 3vh 0;">
+                    <img src="${getTVAvatar(state.winner)}" style="width: 20vh; height: 20vh; border-radius: 50%; border: 5px solid #d4af37; object-fit: cover; box-shadow: 0 0 40px rgba(212, 175, 55, 0.8);">
+                    <span style="font-size: 10vh; font-weight: 900; color: #fff; text-shadow: 0 0 25px rgba(255, 255, 255, 0.7);">${state.winner}</span>
+                </div>
+            </div>
+        </div>
+        `;
+        document.getElementById('tvContent').innerHTML = h;
+        startCelebration();
+        return;
+    }
 
     let h = `
         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 2.5vh; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 1.5vh;">
@@ -1767,6 +1842,12 @@ function renderTVContent() {
     }
 
     document.getElementById('tvContent').innerHTML = h;
+
+    if (isGameOver) {
+        startCelebration();
+    } else {
+        stopCelebration();
+    }
 }
 
 function openMidGame() {
