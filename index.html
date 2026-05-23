@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v90.0</title>
+<title>Elite Rummy Circle - v90.3</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" sizes="152x152" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
@@ -183,7 +183,7 @@
     z-index: 7000;
   }
   .tv-close.visible { opacity: 1; pointer-events: auto; }
-  .tv-close:hover { opacity: 1; transform: scale(1.05); }
+  .tv-close.visible:hover { opacity: 1; transform: scale(1.05); }
 
   @keyframes float-avatar {
     0% { transform: translateY(0px) rotate(0deg); }
@@ -273,7 +273,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v90.0</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v90.3</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -350,6 +350,26 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
          <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
          <div style="margin-bottom: 20px;">
+             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v90.3 - Esports Arena Centering & Pure-Live Interface</b>
+             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                 • <b>Centered Champion Screen:</b> Re-engineered the TV championship view to align the Champion title, recipient photo, team name, and winning score card with absolute precision.<br>
+                 • <b>Active Cursor Close Action:</b> Programmed the TV exit button to stay entirely non-intrusive and become discoverable exclusively on cursor/touch active movement.<br>
+                 • <b>Refined LIVE Badge:</b> Tailored the tournament headers by adopting the concise, clean 'LIVE' badge instead of general descriptive labels.<br>
+             </div>
+             <hr style="margin: 10px 0; opacity: 0.2;">
+             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v90.2 - Arena-Grade Spacing & Ultra-Large Player avatars</b>
+             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                 • <b>Enormous Player Display Pictures:</b> Enriched player images with a massive 26% size enlargement, enhanced rings, and drop shadows matching their game state.<br>
+                 • <b>Dynamic High-Visibility Layout:</b> Completely redesigned the dynamic font system utilizing safe-max bounds for outstanding display clarity on high-resolution TV displays.<br>
+                 • <b>Responsive Row Compression:</b> Programmed row heights to smoothly scale from a luxurious 14.5vh for small matches down to 4.2vh to comfortably fit large tables on one screen without scrolling.<br>
+             </div>
+             <hr style="margin: 10px 0; opacity: 0.2;">
+             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v90.1 - Immersive TV Layout & High-Visibility Typography</b>
+             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                 • <b>High-Visibility Scoreboard:</b> Massive font enlargement for player rankings (POS), competitor names, and total round scores.<br>
+                 • <b>Cinema-Style Proportional Spacing:</b> Implemented beautiful proportional line heights and automatic vertical centering to eliminate large empty gaps when playing with smaller groups.<br>
+             </div>
+             <hr style="margin: 10px 0; opacity: 0.2;">
              <b style="color: var(--warning); display: block; margin-bottom: 5px;">v90.0 - Admin Control & Seat-Cut Alignment</b>
             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
                 • <b>Authorized Game Admins:</b> Designate an admin user during game setup who receives sole authority to rename games and edit round scores.<br>
@@ -553,7 +573,6 @@
       <button id="navStats" class="navBtn" onclick="showScreen('stats')">Hall of Fame</button>
       <button id="navHistory" class="navBtn" onclick="showScreen('history')">History</button>
       <button id="navReports" class="navBtn" onclick="showScreen('reports')">Reports</button>
-      <button class="navBtn" style="background:var(--warning); color:#000;" onclick="viewMyProfile()">My Stats</button>
       <button class="navBtn" style="background:var(--danger);" onclick="handleLogout()">Logout</button>
     </div>
     <div style="margin-top:auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); display:none;">
@@ -567,7 +586,7 @@
       <div class="tv-close" id="tvCloseBtn" onclick="closeFullScreen()">Close</div>
   </div>
   <div style="position: fixed; bottom: 8px; left: 12px; z-index: 4000; text-align: left; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v90.0</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v90.3</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
@@ -1906,6 +1925,13 @@ function toggleFullScreen() {
     renderTVContent();
     overlay.style.display = 'flex';
     
+    const closeBtn = document.getElementById('tvCloseBtn');
+    if (closeBtn) {
+        closeBtn.style.display = 'flex';
+        closeBtn.style.opacity = '';
+        closeBtn.style.pointerEvents = '';
+    }
+    
     const requestMethod = overlay.requestFullscreen || overlay.webkitRequestFullscreen || overlay.mozRequestFullScreen || overlay.msRequestFullscreen;
     if (requestMethod) {
         requestMethod.call(overlay).catch(e => {
@@ -1945,9 +1971,9 @@ function openHistoryScoreboard(id) {
         overlay.style.display = 'flex';
         const closeBtn = document.getElementById('tvCloseBtn');
         if (closeBtn) {
-            closeBtn.style.display = 'block';
-            closeBtn.style.opacity = '1';
-            closeBtn.style.pointerEvents = 'auto';
+            closeBtn.style.display = 'flex';
+            closeBtn.style.opacity = '';
+            closeBtn.style.pointerEvents = '';
         }
         renderTVContent();
     }
@@ -2236,14 +2262,15 @@ function startHeartbeat() {
 function renderTVContent() {
     if (!state) return;
     
+    const isGameOver = !!state.winner;
+    
     // Auto-apply optimal vertical budget settings to the fullscreen overlay
     const overlay = document.getElementById('fullscreenOverlay');
     if (overlay) {
-        overlay.style.padding = '1vh 3vw';
+        overlay.style.padding = isGameOver ? '0' : '2vh 3vw';
         overlay.style.overflow = 'hidden';
+        overlay.style.background = '#0a0d14'; // Premium deep-dark arena background
     }
-
-    const isGameOver = !!state.winner;
     const displayRound = Math.max(0, state.round - 1);
     const playerCount = state.players.length;
     
@@ -2251,23 +2278,31 @@ function renderTVContent() {
     const past = Object.keys(state.totals).filter(p => !state.players.includes(p));
     const hasPast = past.length > 0;
     
-    // Precise vertical height allocation out of 100vh:
-    // Overlay vertical padding = 2vh (1vh top and 1vh bottom)
-    // Header section takes height of about 4.5vh
-    // Past section takes about 5vh if present
-    const occupiedHeight = 2 + 4.5 + (hasPast ? 5 : 0);
+    // Modernized esports height budget out of 100vh:
+    // Overlay vertical padding budget = 4vh (2vh top and 2vh bottom)
+    // Header section takes height of about 11vh
+    // Past section takes about 6vh if present
+    const occupiedHeight = 4 + 11 + (hasPast ? 6 : 0);
     const remainingHeight = 100 - occupiedHeight; // vertical budget for the table in vh
     
-    // Make the header row height small and constant to save vertical space
-    const headerRowHeightVh = 3.5;
-    // Player rows height budget
-    const maxRowHeightVh = (remainingHeight - headerRowHeightVh) / playerCount;
+    // Constant header row height to save vertical space
+    const headerRowHeightVh = 5.0;
     
-    // Scale up the baseFontSize so player row scores are extremely high-visibility, maximizing their focus!
-    const baseFontSize = Math.min(5.5, Math.max(1.8, maxRowHeightVh * 0.48)) + 'vh';
-    const headerFontSize = Math.min(3.8, Math.max(2.0, maxRowHeightVh * 0.25)) + 'vh';
-    const rankWidth = '8%';
-
+    // Dynamic row calculation with premium bounds
+    let rowHeightVh = (remainingHeight - headerRowHeightVh) / playerCount;
+    
+    // Adjust spacing to perfectly fit the screen depending on player count
+    if (rowHeightVh > 12.0) {
+        rowHeightVh = 12.0; // Limit row height vertical sizing to keep it highly balanced
+    } else if (rowHeightVh < 4.5) {
+        rowHeightVh = 4.5;  // Beautiful downscale limit to accommodate high player quantities
+    }
+    
+    // Total table height calculation for vertical budget centering
+    const tableHeightVh = (rowHeightVh * playerCount) + headerRowHeightVh;
+    
+    // CSS layout settings
+    const rankWidth = '10%';
     const getTVAvatar = (pName) => {
         const pData = playersDb.find(x => x.fullName === pName);
         if (pData?.photoURL) return pData.photoURL;
@@ -2276,7 +2311,15 @@ function renderTVContent() {
 
     if (isGameOver) {
         let winnerName = state.winner;
-        let pScore = state.totals[winnerName] !== undefined ? state.totals[winnerName] : '';
+        let pScore = '';
+        if (state.totals[winnerName] !== undefined) {
+            pScore = state.totals[winnerName];
+        } else {
+            const firstWinner = winnerName.split(' & ')[0].trim();
+            if (state.totals[firstWinner] !== undefined) {
+                pScore = state.totals[firstWinner];
+            }
+        }
         
         let winnerAvatarHtml = '';
         if (winnerName && winnerName !== 'No Winner') {
@@ -2287,7 +2330,7 @@ function renderTVContent() {
                 const avatarUrl = getTVAvatar(trimmedName);
                 winnerAvatarHtml += `
                     <div style="position:relative; display:inline-block;">
-                        <img src="${avatarUrl}" style="width:24vh; height:24vh; border-radius:50%; border:6px solid #f1c40f; object-fit:cover; box-shadow: 0 0 50px rgba(241,196,15,0.7); background:#1a252f;" referrerPolicy="no-referrer">
+                        <img src="${avatarUrl}" style="width:26vh; height:26vh; border-radius:50%; border:6px solid #f1c40f; object-fit:cover; box-shadow: 0 0 50px rgba(241,196,15,0.7); background:#1a252f;" referrerPolicy="no-referrer">
                     </div>
                 `;
             });
@@ -2296,29 +2339,26 @@ function renderTVContent() {
 
         let h = `
             <canvas id="celebrationCanvas" style="position:absolute; inset:0; pointer-events:none; width:100%; height:100%; z-index:2;"></canvas>
-            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; text-align:center; position:relative; z-index:5; font-family:'Inter', sans-serif; overflow:hidden;">
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; width:100vw; text-align:center; position:relative; z-index:5; font-family:'Inter', sans-serif; overflow:hidden; box-sizing:border-box; background:#0a0d14;">
                 
-                <div style="animation: bounce-in 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); position:relative; z-index:10;">
-                    <div style="background: linear-gradient(135deg, #f1c40f, #f39c12); color:#000; font-weight:900; font-size:7.5vh; padding:2.2vh 9.5vh; border-radius:100px; text-transform:uppercase; letter-spacing:5px; box-shadow: 0px 15px 45px rgba(243,156,18,0.6); display:inline-block; margin-bottom:4.5vh; border:4px solid #fff;">
+                <div style="animation: bounce-in 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); position:relative; z-index:10; margin-bottom:4.5vh;">
+                    <div style="background: linear-gradient(135deg, #f1c40f, #f39c12); color:#000; font-weight:900; font-size:6vh; padding:1.8vh 8vh; border-radius:100px; text-transform:uppercase; letter-spacing:4px; box-shadow: 0px 15px 45px rgba(243,156,18,0.5); display:inline-block; border:4px solid #fff;">
                         🏆 Champion 🏆
                     </div>
                 </div>
 
                 ${winnerAvatarHtml}
 
-                <div style="animation: scale-up 0.8s ease-out 0.2s both; position:relative; z-index:10;">
+                <div style="animation: scale-up 0.8s ease-out 0.2s both; position:relative; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center;">
                     <h1 style="font-size:8.5vh; font-weight:900; margin:0 0 2vh 0; color:#fff; text-shadow: 0 0 30px rgba(255,255,255,0.3), 0 0 60px rgba(241,196,15,0.5); letter-spacing:1px; line-height:1.1; max-width:90vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                         ${state.winner}
                     </h1>
                     
                     ${pScore !== '' ? `
-                    <div style="font-size:3.5vh; opacity:0.9; color:#f1c40f; font-weight:800; text-transform:uppercase; letter-spacing:2px; margin-bottom:4vh;">
-                        WINNING SCORE: <span style="font-size:6vh; font-family:'JetBrains Mono', monospace; font-weight:900; color:#fff; margin-left:10px; text-shadow:0 0 20px rgba(255,255,255,0.5);">${pScore}</span>
+                    <div style="font-size:3.5vh; opacity:0.9; color:#f1c40f; font-weight:800; text-transform:uppercase; letter-spacing:2px; display:flex; align-items:center; justify-content:center; gap:15px; margin-top:1vh;">
+                        <span>WINNING SCORE:</span>
+                        <span style="font-size:6vh; font-family:'JetBrains Mono', monospace; font-weight:900; color:#fff; text-shadow:0 0 20px rgba(255,255,255,0.5);">${pScore}</span>
                     </div>` : ''}
-                </div>
-
-
-                <div style="margin-top:2vh; display:flex; gap:15px; position:relative; z-index:15; pointer-events:auto;">
                 </div>
             </div>
         `;
@@ -2328,23 +2368,33 @@ function renderTVContent() {
         return;
     }
 
+    // Esports Arena Header
     let h = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.8vh; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5vh; height: 3.5vh;">
-            <h1 style="font-size: ${headerFontSize}; margin:0; color: #fff; font-weight: 800; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${state.name}</h1>
-            <div style="font-size: calc(${headerFontSize} * 0.6); font-weight: bold; color: var(--danger); display:flex; align-items:center; gap:12px; line-height:1.1;">
-                <span style="width:calc(${headerFontSize} * 0.25); height:calc(${headerFontSize} * 0.25); background:red; border-radius:50%; box-shadow: 0 0 12px red; animation: tv-blink 1.5s infinite;"></span>
-                ${isGameOver ? 'FINAL RESULTS' : 'ROUND ' + displayRound}
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5vh; border-bottom: 2px solid rgba(255,255,255,0.12); padding-bottom: 1.5vh; height: 11vh; box-sizing: border-box;">
+            <div style="display: flex; flex-direction: column; gap: 0.5vh; max-width: 70%;">
+                <h1 style="font-size: 4.8vh; margin:0; color: #fff; font-weight: 900; line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: -0.5px; text-shadow: 0 0 15px rgba(255,255,255,0.25);">${state.name}</h1>
+                <div style="font-size: 1.8vh; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Elite Rummy Circle Tournament</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 3vh;">
+                <div style="text-align: right; display: flex; flex-direction: column; gap: 0.3vh;">
+                    <span style="font-size: 4.2vh; font-weight: 900; color: #f1c40f; text-shadow: 0 0 15px rgba(241,196,15,0.4); line-height: 1; font-family: 'JetBrains Mono', monospace;">ROUND ${displayRound}</span>
+                    <div style="display: flex; align-items: center; gap: 0.8vh; font-size: 1.6vh; font-weight: 800; color: #e74c3c; text-transform: uppercase; letter-spacing: 1px; justify-content: flex-end;">
+                        <span style="width: 1.2vh; height: 1.2vh; background: #e74c3c; border-radius: 50%; box-shadow: 0 0 10px #e74c3c; animation: tv-blink 1.5s infinite; display: inline-block;"></span>
+                        LIVE
+                    </div>
+                </div>
             </div>
         </div>
-        <table class="tv-table" style="height: ${remainingHeight}vh; table-layout: fixed;">
-            <thead>
-                <tr style="height: ${headerRowHeightVh}vh;">
-                    <th style="width: ${rankWidth}; font-size: 1.3vh; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; padding: 0 1vh; height: ${headerRowHeightVh}vh; vertical-align: middle;">Pos</th>
-                    <th style="font-size: 1.3vh; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; padding: 0 1vh; height: ${headerRowHeightVh}vh; vertical-align: middle;">Player</th>
-                    <th style="width: 20%; text-align:right; font-size: 1.3vh; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; padding: 0 1vh; height: ${headerRowHeightVh}vh; vertical-align: middle;">Total</th>
-                </tr>
-            </thead>
-            <tbody>
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; height: ${remainingHeight}vh; min-height: ${remainingHeight}vh; overflow: hidden; box-sizing: border-box;">
+            <table class="tv-table" style="height: ${tableHeightVh}vh; table-layout: fixed; margin: auto 0; border-collapse: separate; border-spacing: 0 0.8vh;">
+                <thead>
+                    <tr style="height: ${headerRowHeightVh}vh;">
+                        <th style="width: ${rankWidth}; font-size: max(1.8vh, calc(${rowHeightVh}vh * 0.22)); opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; padding: 0 1.5vh; height: ${headerRowHeightVh}vh; vertical-align: middle; font-weight: 800; text-align: center; border: none; color: #fff;">Pos</th>
+                        <th style="font-size: max(1.8vh, calc(${rowHeightVh}vh * 0.22)); opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; padding: 0 1.5vh; height: ${headerRowHeightVh}vh; vertical-align: middle; font-weight: 800; border: none; color: #fff;">Player</th>
+                        <th style="width: 25%; text-align:right; font-size: max(1.8vh, calc(${rowHeightVh}vh * 0.22)); opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; padding: 0 2vh; height: ${headerRowHeightVh}vh; vertical-align: middle; font-weight: 800; border: none; color: #fff;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
     `;
 
     const exitLimit = getExitLimitFor(state);
@@ -2378,22 +2428,88 @@ function renderTVContent() {
         const isOut = state.eliminated[p] || (state.totals[p] || 0) >= exitLimit;
         const score = state.totals[p] || 0;
 
+        // Gamified ranks & style values
+        let rankColor = 'rgba(255,255,255,0.4)';
+        let rankWeight = '600';
+        let rankDisplay = index + 1;
+        let rowBackground = 'rgba(255,255,255,0.02)';
+        let rowBorderLeft = '6px solid rgba(255,255,255,0.15)';
+        
+        if (!isOut) {
+            if (index === 0) {
+                rankColor = '#f1c40f'; // Gold
+                rankWeight = '900';
+                rowBackground = 'rgba(241,196,15,0.06)';
+                rowBorderLeft = '6px solid #f1c40f';
+            } else if (index === 1) {
+                rankColor = '#bdc3c7'; // Silver
+                rankWeight = '800';
+                rowBackground = 'rgba(189,195,199,0.04)';
+                rowBorderLeft = '6px solid #bdc3c7';
+            } else if (index === 2) {
+                rankColor = '#e67e22'; // Bronze
+                rankWeight = '700';
+                rowBackground = 'rgba(230,126,34,0.04)';
+                rowBorderLeft = '6px solid #e67e22';
+            } else {
+                rankColor = '#ffffff';
+                rankWeight = '700';
+                rowBackground = 'rgba(255,255,255,0.02)';
+                rowBorderLeft = '6px solid rgba(255,255,255,0.2)';
+            }
+        } else {
+            rankColor = 'rgba(231,76,60,0.3)';
+            rankWeight = '400';
+            rowBackground = 'rgba(231,76,60,0.02)';
+            rowBorderLeft = '6px solid rgba(231,76,60,0.25)';
+        }
+
+        // DP sizes & borders
+        const avatarBorder = isOut 
+            ? '3px solid rgba(231, 76, 60, 0.45)' 
+            : (index === 0 ? '4px solid #f1c40f' : '3px solid var(--accent)');
+        const avatarShadow = isOut
+            ? '0 0 10px rgba(231, 76, 60, 0.15)'
+            : (index === 0 ? '0 0 25px rgba(241, 196, 15, 0.5)' : '0 0 18px rgba(39, 174, 96, 0.3)');
+        const avatarFilter = isOut ? 'filter: grayscale(100%) opacity(0.65) brightness(0.7);' : '';
+
+        // Dynamic score colors
+        const scoreColor = isOut ? 'rgba(231, 76, 60, 0.65)' : (index === 0 ? '#f1c40f' : 'var(--warning)');
+        const scoreShadow = isOut ? 'none' : (index === 0 ? '0 0 15px rgba(241, 196, 15, 0.4)' : 'none');
+
+        // Dynamic font-size compression based on the player name's length to display the FULL name beautifully
+        let nameSize = rowHeightVh * 0.44; 
+        if (p.length > 20) {
+            nameSize = rowHeightVh * 0.32;
+        } else if (p.length > 15) {
+            nameSize = rowHeightVh * 0.36;
+        } else if (p.length > 10) {
+            nameSize = rowHeightVh * 0.40;
+        }
+        nameSize = Math.max(2.4, Math.min(5.5, nameSize)); // Bound gracefully to ensure outstanding TV legibility
+
+        // Scoring value size
+        let scoreSize = rowHeightVh * 0.70;
+        scoreSize = Math.max(3.3, Math.min(8.5, scoreSize));
+
         h += `
-            <tr class="${isOut ? 'is-out' : ''}" style="height: ${maxRowHeightVh}vh;">
-                <td style="color:rgba(255,255,255,0.3); font-weight:bold; font-size: calc(${baseFontSize} * 0.8); padding: 0 1vh; height: ${maxRowHeightVh}vh; vertical-align: middle;">${index + 1}</td>
-                <td style="padding: 0 1vh; height: ${maxRowHeightVh}vh; vertical-align: middle;">
-                    <div style="display:flex; align-items:center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        <img src="${getTVAvatar(p)}" class="avatar-tv" style="width: calc(${baseFontSize} * 1.5); height: calc(${baseFontSize} * 1.55); margin-right: 1.5vh; border-radius: 50%; object-fit: cover;">
-                        <span style="font-weight:bold; font-size: ${baseFontSize}; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${p}</span>
-                        ${p === dealer ? `<span class="dealer-badge" style="font-size: calc(${baseFontSize} * 0.4); padding: 1px 1vh; margin-left: 1.5vh; line-height: 1; border-radius:3px;">Dealer</span>` : ''}
+            <tr class="${isOut ? 'is-out' : ''}" style="height: ${rowHeightVh}vh; background: ${rowBackground}; border-left: ${rowBorderLeft}; margin-bottom: 0.8vh; transition: all 0.3s ease;">
+                <td style="color:${rankColor}; font-weight:${rankWeight}; font-size: max(2.5vh, calc(${rowHeightVh}vh * 0.48)); padding: 0 1.5vh; height: ${rowHeightVh}vh; vertical-align: middle; font-family: 'JetBrains Mono', monospace; text-align: center; border-radius: 0 0 0 0;">${rankDisplay}</td>
+                <td style="padding: 0 1.5vh; height: ${rowHeightVh}vh; vertical-align: middle;">
+                    <div style="display:flex; align-items:center; overflow: visible;">
+                        <img src="${getTVAvatar(p)}" class="avatar-tv" referrerPolicy="no-referrer" style="width: calc(${rowHeightVh}vh * 0.78); height: calc(${rowHeightVh}vh * 0.78); margin-right: 2.2vh; border-radius: 50%; object-fit: cover; border: ${avatarBorder}; box-shadow: ${avatarShadow}; ${avatarFilter} flex-shrink: 0;">
+                        <div style="display: flex; align-items: center; gap: 2vh; overflow: visible;">
+                            <span style="font-weight:900; font-size: ${nameSize}vh; white-space: nowrap; color: #fff; text-shadow: ${index === 0 && !isOut ? '0 0 12px rgba(241,196,15,0.4);' : 'none;'} ${isOut ? 'color: rgba(255,255,255,0.25); text-decoration: line-through; font-style: italic;' : ''}">${p}</span>
+                            ${p === dealer ? `<span class="dealer-badge" style="font-size: max(1.1vh, calc(${rowHeightVh}vh * 0.16)); padding: 0.3vh 1.4vh; border-radius:4px; font-weight:900; background:var(--warning); color:#000; text-transform:uppercase; letter-spacing:0.5px; height: calc(${rowHeightVh}vh * 0.32); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 10px rgba(241,196,15,0.3);">Dealer</span>` : ''}
+                        </div>
                     </div>
                 </td>
-                <td style="text-align:right; padding: 0 1vh; height: ${maxRowHeightVh}vh; vertical-align: middle;"><span class="score-val" style="font-size: calc(${baseFontSize} * 1.4); font-weight: 900; color: var(--warning);">${score}</span></td>
+                <td style="text-align:right; padding: 0 2.5vh; height: ${rowHeightVh}vh; vertical-align: middle; border-radius: 0 8px 8px 0;"><span class="score-val" style="font-size: ${scoreSize}vh; font-weight: 900; color: ${scoreColor}; text-shadow: ${scoreShadow}; font-family: 'JetBrains Mono', monospace;">${score}</span></td>
             </tr>
         `;
     });
 
-    h += `</tbody></table>`;
+    h += `</tbody></table></div>`;
 
     // Past Players (Single scrolling ticker row aligned horizontally to maximize vertical scoreboard space)
     if (past.length > 0) {
