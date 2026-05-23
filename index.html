@@ -2304,7 +2304,31 @@ function renderTVContent() {
     // CSS layout settings
     const rankWidth = '10%';
     const getTVAvatar = (pName) => {
-        const pData = playersDb.find(x => x.fullName === pName);
+        if (!pName) return 'https://ui-avatars.com/api/?name=Player&background=2c3e50&color=fff&size=200';
+        const searchName = pName.trim().toUpperCase();
+        
+        // 1. First seek a perfect case-insensitive match on the trimmed name
+        let pData = playersDb.find(x => (x.fullName || '').trim().toUpperCase() === searchName);
+        
+        // 2. Fallback: If no exact match, see if either name contains the other
+        if (!pData) {
+            pData = playersDb.find(x => {
+                const dbName = (x.fullName || '').trim().toUpperCase();
+                return dbName && (dbName.includes(searchName) || searchName.includes(dbName));
+            });
+        }
+        
+        // 3. Fallback: Try splitting and matching individual name parts (for names like "Anand Mohan" matching against "Anand")
+        if (!pData) {
+            const searchParts = searchName.split(/\s+/).filter(Boolean);
+            pData = playersDb.find(x => {
+                const dbName = (x.fullName || '').trim().toUpperCase();
+                if (!dbName) return false;
+                const dbParts = dbName.split(/\s+/).filter(Boolean);
+                return searchParts.some(sp => dbParts.includes(sp));
+            });
+        }
+        
         if (pData?.photoURL) return pData.photoURL;
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(pName)}&background=2c3e50&color=fff&size=200`;
     };
