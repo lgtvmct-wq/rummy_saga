@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v90.3</title>
+<title>Elite Rummy Circle - v91.1</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" sizes="152x152" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
@@ -273,7 +273,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v90.3</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v91.1</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -350,6 +350,21 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
          <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
          <div style="margin-bottom: 20px;">
+             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v91.1 - Scoreboard Floating Controls & Classical Left-Aligned Lineup</b>
+             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                 • <b>Right-Floating Scoreboard Actions:</b> Re-oriented the 'Full Screen' and 'Pause' controls in the active scoreboard to anchor cleanly on the right of the header section.<br>
+                 • <b>Centered Header with Classic Left Alignment:</b> Restored elegant left alignment for all player seating blocks (avatar, names, and badges) while keeping the 'Player' column table-header centered for supreme readability.<br>
+             </div>
+             <hr style="margin: 10px 0; opacity: 0.2;">
+             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v91.0 - Stable Esports Sorting & High-Contrast TV Precision</b>
+             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                 • <b>Uniform Leaderboard Serials:</b> Set all position numbers to share an elegant, consistent uniform color contrast for high-clarity viewing.<br>
+                 • <b>Protected Stable Eliminated Sorting:</b> Fast-locked the positioning order of OUT/eliminated players to ensure they remain perfectly stable and never shift relative to each other.<br>
+                 • <b>Enlarged Tournament Brand & Header:</b> Enlarged the Game Name (to 6.5vh) and Current Round display (to 5.5vh) in the TV screen for elite legibility.<br>
+                 • <b>Centered Competitor Seats:</b> Aligned the Player details (avatars, name, badges) to the center of the column to establish high aesthetic symmetry.<br>
+                 • <b>TV Re-entry Badging:</b> Extended the "RE" and "RE (Count)" badge to the full screen Esports view so live spectators can see who has reentered.<br>
+             </div>
+             <hr style="margin: 10px 0; opacity: 0.2;">
              <b style="color: var(--warning); display: block; margin-bottom: 5px;">v90.3 - Esports Arena Centering & Pure-Live Interface</b>
              <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
                  • <b>Centered Champion Screen:</b> Re-engineered the TV championship view to align the Champion title, recipient photo, team name, and winning score card with absolute precision.<br>
@@ -586,7 +601,7 @@
       <div class="tv-close" id="tvCloseBtn" onclick="closeFullScreen()">Close</div>
   </div>
   <div style="position: fixed; bottom: 8px; left: 12px; z-index: 4000; text-align: left; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v90.3</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v91.1</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
@@ -640,6 +655,55 @@ function canPlayerReEnter(p, targetState) {
     const currentCount = getPlayerReEntriesCount(p, sObj);
     const maxVal = getMaxReEntriesFor(sObj);
     return currentCount < maxVal;
+}
+
+function getDealerForState(sObj) {
+    const targetState = sObj || state;
+    if (!targetState || targetState.winner) return null;
+    
+    const exitLimit = getExitLimitFor(targetState);
+    const activeInRound = targetState.players.filter(p => !targetState.eliminated[p] && (targetState.totals[p] || 0) < exitLimit);
+    if (activeInRound.length === 0) return null;
+    
+    const roster = targetState.startingPlayers || targetState.players;
+    const dIdx = (targetState.round - 1) % roster.length;
+    let dealer = roster[dIdx];
+    
+    // Rule: If a player Y is slated to deal this round (sObj.round), and they exited in the playing round (sObj.round - 1) and reentered,
+    // the deal must go back to them. We force them as the dealer, bypassing standard skip/repeat dealer logic.
+    let forceReenteredDealer = false;
+    if (targetState.round > 1 && targetState.history) {
+        const lastRound = targetState.round - 1;
+        const lastEntry = targetState.history.find(h => h.round === lastRound);
+        if (lastEntry) {
+            const scoreInLastRound = lastEntry.scores && lastEntry.scores[dealer];
+            const wasBusted = (lastEntry.bustedTotals && lastEntry.bustedTotals[dealer] !== undefined) || (scoreInLastRound === 'OUT');
+            const hasReentered = (lastEntry.reentries && lastEntry.reentries[dealer] !== undefined) || 
+                                 (!targetState.eliminated[dealer] && (targetState.totals[dealer] || 0) < exitLimit);
+            
+            if (wasBusted && hasReentered) {
+                forceReenteredDealer = true;
+            }
+        }
+    }
+    
+    if (forceReenteredDealer && !targetState.eliminated[dealer] && (targetState.totals[dealer] || 0) < exitLimit) {
+        return dealer;
+    }
+    
+    // Standard rotation: If dealer is OUT, the previous active player repeats.
+    if (targetState.eliminated[dealer] || (targetState.totals[dealer] || 0) >= exitLimit) {
+        for (let i = 1; i <= roster.length; i++) {
+            let prevIdx = (dIdx - i + roster.length) % roster.length;
+            let prevP = roster[prevIdx];
+            if (!targetState.eliminated[prevP] && (targetState.totals[prevP] || 0) < exitLimit && targetState.players.includes(prevP)) {
+                dealer = prevP;
+                break;
+            }
+        }
+    }
+    
+    return dealer;
 }
 
 // --- AUTH ---
@@ -1005,36 +1069,19 @@ function renderActive(focusPlayer = null) {
   // Determine who to render: survivors or everyone from the last round if game is over
   let activePlayers = state.winner ? state.players : activeInRound;
 
-  let dealer = null;
-  if (!state.winner && activeInRound.length > 0) {
-      let roster = state.startingPlayers || state.players;
-      let dIdx = (state.round - 1) % roster.length;
-      dealer = roster[dIdx];
-      
-      // The "Dealer Rule": If player Y (next in rotation) is OUT, the previous active player (X) repeats.
-      if (state.eliminated[dealer] || (state.totals[dealer] || 0) >= exitLimit) {
-          for (let i = 1; i <= roster.length; i++) {
-              let prevIdx = (dIdx - i + roster.length) % roster.length;
-              let prevP = roster[prevIdx];
-              if (!state.eliminated[prevP] && (state.totals[prevP] || 0) < exitLimit && state.players.includes(prevP)) {
-                  dealer = prevP;
-                  break;
-              }
-          }
-      }
-  }
+  let dealer = getDealerForState(state);
 
   let titleHtml = '';
   if (state.winner) {
       titleHtml = `
-      <div id="activeGameTitleContainer" style="display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap; width: 100%;">
+      <div id="activeGameTitleContainer" style="display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap; flex-grow: 1;">
           <h3 style="margin:0; color:var(--warning)">GAME OVER</h3>
-          ${state.admin ? `<span style="font-size:11px; font-weight:bold; color:var(--accent); background:rgba(39,174,96,0.15); border:1px solid rgba(39,174,96,0.25); padding:2px 6px; border-radius:4px; margin-left:auto;">Admin: ${state.admin}${isAdmin() ? ' (You)' : ''}</span>` : ''}
+          ${state.admin ? `<span style="font-size:11px; font-weight:bold; color:var(--accent); background:rgba(39,174,96,0.15); border:1px solid rgba(39,174,96,0.25); padding:2px 6px; border-radius:4px; margin-left:10px;">Admin: ${state.admin}${isAdmin() ? ' (You)' : ''}</span>` : ''}
       </div>`;
   } else {
       const allowedToRename = isAdmin();
       titleHtml = `
-      <div id="activeGameTitleContainer" style="display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <div id="activeGameTitleContainer" style="display:inline-flex; align-items:center; gap:8px; flex-wrap:wrap; flex-grow: 1;">
           <h3 style="margin:0; ${allowedToRename ? 'cursor:pointer;' : ''}" ${allowedToRename ? 'onclick="editGameNameInline()" title="Click to edit game name"' : 'title="Only game admin can rename"'}>${state.name}</h3>
           ${allowedToRename ? `
           <span style="font-size:11px; color:#fff; font-weight:bold; opacity:0.8; background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px; display:inline-flex; align-items:center; gap:4px; cursor:pointer;" onclick="editGameNameInline()">
@@ -1048,7 +1095,7 @@ function renderActive(focusPlayer = null) {
 
   let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px; flex-wrap:wrap; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom:10px;">
     ${titleHtml}
-    <div style="display:flex; gap:5px;">
+    <div style="display:flex; gap:5px; margin-left: auto;">
         <button onclick="toggleFullScreen()" class="pause-btn" style="background: linear-gradient(to bottom, var(--accent), #1e8449); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 0 10px rgba(39, 174, 96, 0.3); width:80px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;">Full Screen</button>
         <button onclick="state=null; showScreen('newGame')" class="pause-btn" style="width:80px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;">${state.winner?'Home':'Pause'}</button>
     </div>
@@ -2280,9 +2327,9 @@ function renderTVContent() {
     
     // Modernized esports height budget out of 100vh:
     // Overlay vertical padding budget = 4vh (2vh top and 2vh bottom)
-    // Header section takes height of about 11vh
+    // Header section takes height of about 13.5vh
     // Past section takes about 6vh if present
-    const occupiedHeight = 4 + 11 + (hasPast ? 6 : 0);
+    const occupiedHeight = 4 + 13.5 + (hasPast ? 6 : 0);
     const remainingHeight = 100 - occupiedHeight; // vertical budget for the table in vh
     
     // Constant header row height to save vertical space
@@ -2394,15 +2441,15 @@ function renderTVContent() {
 
     // Esports Arena Header
     let h = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5vh; border-bottom: 2px solid rgba(255,255,255,0.12); padding-bottom: 1.5vh; height: 11vh; box-sizing: border-box;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5vh; border-bottom: 2px solid rgba(255,255,255,0.12); padding-bottom: 1.5vh; height: 13.5vh; box-sizing: border-box;">
             <div style="display: flex; flex-direction: column; gap: 0.5vh; max-width: 70%;">
-                <h1 style="font-size: 4.8vh; margin:0; color: #fff; font-weight: 900; line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: -0.5px; text-shadow: 0 0 15px rgba(255,255,255,0.25);">${state.name}</h1>
-                <div style="font-size: 1.8vh; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Elite Rummy Circle Tournament</div>
+                <h1 style="font-size: 6.5vh; margin:0; color: #fff; font-weight: 900; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: -0.5px; text-shadow: 0 0 15px rgba(255,255,255,0.25);">${state.name}</h1>
+                <div style="font-size: 2.0vh; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Elite Rummy Circle Tournament</div>
             </div>
             <div style="display: flex; align-items: center; gap: 3vh;">
                 <div style="text-align: right; display: flex; flex-direction: column; gap: 0.3vh;">
-                    <span style="font-size: 4.2vh; font-weight: 900; color: #f1c40f; text-shadow: 0 0 15px rgba(241,196,15,0.4); line-height: 1; font-family: 'JetBrains Mono', monospace;">ROUND ${displayRound}</span>
-                    <div style="display: flex; align-items: center; gap: 0.8vh; font-size: 1.6vh; font-weight: 800; color: #e74c3c; text-transform: uppercase; letter-spacing: 1px; justify-content: flex-end;">
+                    <span style="font-size: 5.5vh; font-weight: 900; color: #f1c40f; text-shadow: 0 0 15px rgba(241,196,15,0.4); line-height: 1.1; font-family: 'JetBrains Mono', monospace;">ROUND ${displayRound}</span>
+                    <div style="display: flex; align-items: center; gap: 0.8vh; font-size: 1.8vh; font-weight: 800; color: #e74c3c; text-transform: uppercase; letter-spacing: 1px; justify-content: flex-end;">
                         <span style="width: 1.2vh; height: 1.2vh; background: #e74c3c; border-radius: 50%; box-shadow: 0 0 10px #e74c3c; animation: tv-blink 1.5s infinite; display: inline-block;"></span>
                         LIVE
                     </div>
@@ -2414,7 +2461,7 @@ function renderTVContent() {
                 <thead>
                     <tr style="height: ${headerRowHeightVh}vh;">
                         <th style="width: ${rankWidth}; font-size: max(1.8vh, calc(${rowHeightVh}vh * 0.22)); opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; padding: 0 1.5vh; height: ${headerRowHeightVh}vh; vertical-align: middle; font-weight: 800; text-align: center; border: none; color: #fff;">Pos</th>
-                        <th style="font-size: max(1.8vh, calc(${rowHeightVh}vh * 0.22)); opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; padding: 0 1.5vh; height: ${headerRowHeightVh}vh; vertical-align: middle; font-weight: 800; border: none; color: #fff;">Player</th>
+                        <th style="font-size: max(1.8vh, calc(${rowHeightVh}vh * 0.22)); opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; padding: 0 1.5vh; height: ${headerRowHeightVh}vh; vertical-align: middle; font-weight: 800; text-align: center; border: none; color: #fff;">Player</th>
                         <th style="width: 25%; text-align:right; font-size: max(1.8vh, calc(${rowHeightVh}vh * 0.22)); opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; padding: 0 2vh; height: ${headerRowHeightVh}vh; vertical-align: middle; font-weight: 800; border: none; color: #fff;">Total</th>
                     </tr>
                 </thead>
@@ -2428,32 +2475,20 @@ function renderTVContent() {
         const bOut = state.eliminated[b] || (state.totals[b] || 0) >= exitLimit;
         if (aOut && !bOut) return 1;
         if (!aOut && bOut) return -1;
+        if (aOut && bOut) {
+            const roster = state.startingPlayers || state.players;
+            return roster.indexOf(a) - roster.indexOf(b);
+        }
         return (state.totals[a] || 0) - (state.totals[b] || 0); 
     });
 
-    let dealer = null;
-    let activePlayersForDealer = state.players.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < exitLimit);
-    if (activePlayersForDealer.length > 0) {
-        let roster = state.startingPlayers || state.players;
-        let dIdx = (state.round - 1) % roster.length;
-        dealer = roster[dIdx];
-        if (state.eliminated[dealer] || (state.totals[dealer] || 0) >= exitLimit) {
-            for (let i = 1; i <= roster.length; i++) {
-                let prevIdx = (dIdx - i + roster.length) % roster.length;
-                let prevP = roster[prevIdx];
-                if (!state.eliminated[prevP] && (state.totals[prevP] || 0) < exitLimit && state.players.includes(prevP)) {
-                    dealer = prevP; break;
-                }
-            }
-        }
-    }
+    let dealer = getDealerForState(state);
 
     sortedPlayersTV.forEach((p, index) => {
         const isOut = state.eliminated[p] || (state.totals[p] || 0) >= exitLimit;
         const score = state.totals[p] || 0;
 
         // Gamified ranks & style values
-        let rankColor = 'rgba(255,255,255,0.4)';
         let rankWeight = '600';
         let rankDisplay = index + 1;
         let rowBackground = 'rgba(255,255,255,0.02)';
@@ -2461,28 +2496,23 @@ function renderTVContent() {
         
         if (!isOut) {
             if (index === 0) {
-                rankColor = '#f1c40f'; // Gold
                 rankWeight = '900';
                 rowBackground = 'rgba(241,196,15,0.06)';
                 rowBorderLeft = '6px solid #f1c40f';
             } else if (index === 1) {
-                rankColor = '#bdc3c7'; // Silver
                 rankWeight = '800';
                 rowBackground = 'rgba(189,195,199,0.04)';
                 rowBorderLeft = '6px solid #bdc3c7';
             } else if (index === 2) {
-                rankColor = '#e67e22'; // Bronze
                 rankWeight = '700';
                 rowBackground = 'rgba(230,126,34,0.04)';
                 rowBorderLeft = '6px solid #e67e22';
             } else {
-                rankColor = '#ffffff';
                 rankWeight = '700';
                 rowBackground = 'rgba(255,255,255,0.02)';
                 rowBorderLeft = '6px solid rgba(255,255,255,0.2)';
             }
         } else {
-            rankColor = 'rgba(231,76,60,0.3)';
             rankWeight = '400';
             rowBackground = 'rgba(231,76,60,0.02)';
             rowBorderLeft = '6px solid rgba(231,76,60,0.25)';
@@ -2516,14 +2546,21 @@ function renderTVContent() {
         let scoreSize = rowHeightVh * 0.70;
         scoreSize = Math.max(3.3, Math.min(8.5, scoreSize));
 
+        // Get Player Re-entry marker count
+        const reCount = getPlayerReEntriesCount(p, state);
+        let reLabel = '';
+        if (reCount > 1) reLabel = `RE (${reCount})`;
+        else if (reCount === 1) reLabel = 'RE';
+
         h += `
             <tr class="${isOut ? 'is-out' : ''}" style="height: ${rowHeightVh}vh; background: ${rowBackground}; border-left: ${rowBorderLeft}; margin-bottom: 0.8vh; transition: all 0.3s ease;">
-                <td style="color:${rankColor}; font-weight:${rankWeight}; font-size: max(2.5vh, calc(${rowHeightVh}vh * 0.48)); padding: 0 1.5vh; height: ${rowHeightVh}vh; vertical-align: middle; font-family: 'JetBrains Mono', monospace; text-align: center; border-radius: 0 0 0 0;">${rankDisplay}</td>
-                <td style="padding: 0 1.5vh; height: ${rowHeightVh}vh; vertical-align: middle;">
+                <td style="color: rgba(255, 255, 255, 0.75); font-weight:${rankWeight}; font-size: max(2.5vh, calc(${rowHeightVh}vh * 0.48)); padding: 0 1.5vh; height: ${rowHeightVh}vh; vertical-align: middle; font-family: 'JetBrains Mono', monospace; text-align: center; border-radius: 0 0 0 0;">${rankDisplay}</td>
+                <td style="padding: 0 4vh; height: ${rowHeightVh}vh; vertical-align: middle; text-align: left;">
                     <div style="display:flex; align-items:center; overflow: visible;">
                         <img src="${getTVAvatar(p)}" class="avatar-tv" referrerPolicy="no-referrer" style="width: calc(${rowHeightVh}vh * 0.78); height: calc(${rowHeightVh}vh * 0.78); margin-right: 2.2vh; border-radius: 50%; object-fit: cover; border: ${avatarBorder}; box-shadow: ${avatarShadow}; ${avatarFilter} flex-shrink: 0;">
                         <div style="display: flex; align-items: center; gap: 2vh; overflow: visible;">
-                            <span style="font-weight:900; font-size: ${nameSize}vh; white-space: nowrap; color: #fff; text-shadow: ${index === 0 && !isOut ? '0 0 12px rgba(241,196,15,0.4);' : 'none;'} ${isOut ? 'color: rgba(255,255,255,0.25); text-decoration: line-through; font-style: italic;' : ''}">${p}</span>
+                            <span style="font-weight:900; font-size: ${nameSize}vh; white-space: nowrap; color: #fff; text-shadow: ${index === 0 && !isOut ? '0 0 12px rgba(241,196,15,0.4)' : 'none'}; ${isOut ? 'color: rgba(255,255,255,0.25); text-decoration: line-through; font-style: italic;' : ''}">${p}</span>
+                            ${reLabel ? `<span class="reentry-badge" style="font-size: max(1.1vh, calc(${rowHeightVh}vh * 0.16)); padding: 0.3vh 1.4vh; border-radius:4px; font-weight:900; background:var(--accent); color:#fff; text-transform:uppercase; letter-spacing:0.5px; height: calc(${rowHeightVh}vh * 0.32); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 10px rgba(46,204,113,0.3);">${reLabel}</span>` : ''}
                             ${p === dealer ? `<span class="dealer-badge" style="font-size: max(1.1vh, calc(${rowHeightVh}vh * 0.16)); padding: 0.3vh 1.4vh; border-radius:4px; font-weight:900; background:var(--warning); color:#000; text-transform:uppercase; letter-spacing:0.5px; height: calc(${rowHeightVh}vh * 0.32); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 10px rgba(241,196,15,0.3);">Dealer</span>` : ''}
                         </div>
                     </div>
@@ -3447,6 +3484,7 @@ function genPDF(id) {
     });
     doc.save(`${g.name}.pdf`);
 }
+
 </script>
 </body>
 </html>
