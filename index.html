@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v91.4</title>
+<title>Elite Rummy Circle - v91.6</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" sizes="152x152" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
@@ -273,7 +273,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v91.4</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v91.6</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -350,6 +350,20 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
          <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
          <div style="margin-bottom: 20px;">
+             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v91.6 - Custom Tactic Separation & Manual Keypad Decoupling</b>
+             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                 • <b>Manual Entry Separation:</b> Manually entered scores (like 20 or 40 points) on the keyboard/keypad no longer auto-click or highlight the Drop (D) or Middle Drop (MD) buttons.<br>
+                 • <b>Explicit Drop Rule:</b> The strict Drop/Declare consecutive rounds lockout rule (D rule) is preserved exclusively for players who clicked-to-drop, avoiding accidental application for raw scores.<br>
+                 • <b>Intelligent Active States:</b> Updated UI button status rendering to require explicit tactic identifiers, ensuring clean layout coherence during real-time database updates.<br>
+             </div>
+             <hr style="margin: 10px 0; opacity: 0.2;">
+             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v91.5 - Pixel-Perfect Header Alignments & Fit-to-Screen Formula</b>
+             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                 • <b>Mathematical Zero-Overflow Fitting:</b> Perfected a spacing-aware mathematical height algorithm that includes browser cell spacing directly in equations to accurately fit any number of players to the TV screen without any vertical cut-offs.<br>
+                 • <b>Pixel-Perfect Alignments:</b> Left-aligned column headers perfectly matching player avatars and text indentation coordinates, correcting previous misalignments.<br>
+                 • <b>Automated Column Safe Margin:</b> Added dynamic text clamping limits to long names on TV displays to ensure they never overlap neighboring elements.<br>
+             </div>
+             <hr style="margin: 10px 0; opacity: 0.2;">
              <b style="color: var(--warning); display: block; margin-bottom: 5px;">v91.4 - Zero-Overflow Dynamic Fitting & Screen Sleep Preventer</b>
              <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
                  • <b>Zero-Overflow Spacing Budget:</b> Created an dynamic mathematical spacing formula taking row sizes, player counts, and border spacing precisely into account to avoid any cut-offs.<br>
@@ -621,7 +635,7 @@
       <div class="tv-close" id="tvCloseBtn" onclick="closeFullScreen()">Close</div>
   </div>
   <div style="position: fixed; bottom: 8px; left: 12px; z-index: 4000; text-align: left; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v91.4</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v91.6</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
@@ -1129,6 +1143,7 @@ function renderActive(focusPlayer = null) {
     let rs = state.roundScores[p];
     let isOut = state.eliminated[p] || state.totals[p] >= exitLimit;
     let dLock = state.lastDropRound[p] === (state.round-1);
+    let tactic = state.roundTactics ? state.roundTactics[p] : null;
     
     // Custom RE count checking
     const reCount = getPlayerReEntriesCount(p, state);
@@ -1147,11 +1162,11 @@ function renderActive(focusPlayer = null) {
         </td>
         <td>
             <div style="display:flex; gap:3px; flex-wrap:wrap;">
-                <button class="tactic-btn t-S ${rs==='S'?'active':''}" style="background:var(--accent)" onclick="setTactic('${p}', 'S')" ${isOut || state.winner?'disabled':''}>S</button>
-                <button class="tactic-btn t-D ${rs===20?'active':''}" style="background:var(--warning)" onclick="setTactic('${p}', 'D')" ${isOut || dLock || state.winner?'disabled':''}>D</button>
-                <button class="tactic-btn t-MD ${rs===40?'active':''}" style="background:#8e44ad; color:white;" onclick="setTactic('${p}', 'MD')" ${isOut || state.winner?'disabled':''}>MD</button>
-                <button class="tactic-btn t-FC ${rs===80?'active':''}" style="background:var(--danger); color:white;" onclick="setTactic('${p}', 'FC')" ${isOut || state.winner?'disabled':''}>FC</button>
-                <button class="tactic-btn t-FS ${rs===0?'active':''}" style="background: linear-gradient(to bottom, #34495e, #1a232e); border: 1px solid rgba(255,255,255,0.4); color:white;" onclick="setTactic('${p}', 'FS')" ${isOut || state.winner?'disabled':''}>FS</button>
+                <button class="tactic-btn t-S ${(rs==='S' && tactic==='S')?'active':''}" style="background:var(--accent)" onclick="setTactic('${p}', 'S')" ${isOut || state.winner?'disabled':''}>S</button>
+                <button class="tactic-btn t-D ${(rs===20 && tactic==='D')?'active':''}" style="background:var(--warning)" onclick="setTactic('${p}', 'D')" ${isOut || dLock || state.winner?'disabled':''}>D</button>
+                <button class="tactic-btn t-MD ${(rs===40 && tactic==='MD')?'active':''}" style="background:#8e44ad; color:white;" onclick="setTactic('${p}', 'MD')" ${isOut || state.winner?'disabled':''}>MD</button>
+                <button class="tactic-btn t-FC ${(rs===80 && tactic==='FC')?'active':''}" style="background:var(--danger); color:white;" onclick="setTactic('${p}', 'FC')" ${isOut || state.winner?'disabled':''}>FC</button>
+                <button class="tactic-btn t-FS ${(rs===0 && tactic==='FS')?'active':''}" style="background: linear-gradient(to bottom, #34495e, #1a232e); border: 1px solid rgba(255,255,255,0.4); color:white;" onclick="setTactic('${p}', 'FS')" ${isOut || state.winner?'disabled':''}>FS</button>
             </div>
             <div style="display:flex; gap:5px; align-items:center; margin-top:5px;">
                 <button class="tactic-btn t-OUT" style="background:var(--danger); color:white; flex:none; width:35px; height:32px; padding:0; font-size:9px; font-weight:900;" onclick="markOut('${p}')" ${state.winner?'disabled':''}>OUT</button>
@@ -1373,7 +1388,7 @@ function manualInput(p, val) {
         if(v !== 'S' && isNaN(v)) v = null;
     }
     state.roundScores[p] = v;
-    state.roundTactics[p] = null; // Clear tactic highlight on manual input
+    state.roundTactics[p] = (v === 'S') ? 'S' : null; // Clear tactic highlight on manual input except for 'S'
     
     updateRoundScoresUI();
     const el = document.getElementById(`input-${p}`);
@@ -2464,32 +2479,33 @@ function renderTVContent() {
     const remainingHeight = 100 - occupiedHeight; // vertical budget for the table in vh
     
     // Constant header row height to save vertical space
-    const headerRowHeightVh = 5.0;
+    const headerRowHeightVh = 4.0;
     
-    // Dynamic row calculation to perfectly fit the screen including all spacings
-    // remainingHeight = headerRowHeightVh + (playerCount * rowHeightVh) + (playerCount * spacingVh)
-    const rowSliceHeight = (remainingHeight - headerRowHeightVh) / playerCount;
+    const spacingFactor = 0.10; // 10% of row height is for vertical row spacing gaps
     
-    let spacingVh = rowSliceHeight * 0.12; // 12% of the row slice goes to the spacing slot
-    if (spacingVh > 0.8) spacingVh = 0.8;
-    if (spacingVh < 0.1) spacingVh = 0.1; // Minimum separation
+    // Mathematically perfect fit calculation (Solving for rowHeightVh to guarantee Total Height <= remainingHeight):
+    // Total Height = headerRowHeightVh + (playerCount * rowHeightVh) + ((playerCount + 2) * spacingVh) = remainingHeight
+    // since spacingVh = rowHeightVh * spacingFactor, we substitute:
+    // headerRowHeightVh + (playerCount * rowHeightVh) + ((playerCount + 2) * spacingFactor * rowHeightVh) = remainingHeight
+    // rowHeightVh * (playerCount + (playerCount + 2) * spacingFactor) = remainingHeight - headerRowHeightVh
+    // rowHeightVh = (remainingHeight - headerRowHeightVh) / (playerCount + (playerCount + 2) * spacingFactor)
+    let rowHeightVh = (remainingHeight - headerRowHeightVh) / (playerCount + (playerCount + 2) * spacingFactor);
+    let spacingVh = rowHeightVh * spacingFactor;
     
-    let rowHeightVh = rowSliceHeight - spacingVh;
-    
-    // Adjust spacing to perfectly fit the screen depending on player count to prevent any overflow
+    // Adjust spacing & boundaries to perfectly fit the screen depending on player count to prevent any overflow
     if (rowHeightVh > 12.0) {
         rowHeightVh = 12.0; // Limit row height vertical sizing to keep it highly balanced
-        spacingVh = 0.8;
-    } else if (rowHeightVh < 1.2) {
-        rowHeightVh = 1.2;  // Dynamically scale down lower to guarantee fit on all screen sizes (up to 40 players)
+        spacingVh = 0.8; // Keep spacing tight and standard
+    } else if (rowHeightVh < 1.1) {
+        rowHeightVh = 1.1;  // Dynamically scale down lower to guarantee fit on all screen sizes (up to 50 players)
         spacingVh = 0.1;
     }
     
-    // Total table height calculation for vertical budget centering (including spacers)
-    const tableHeightVh = (rowHeightVh * playerCount) + headerRowHeightVh + (spacingVh * playerCount);
+    // Total table height calculation for vertical budget centering (including all spacing gaps)
+    const tableHeightVh = (rowHeightVh * playerCount) + headerRowHeightVh + (spacingVh * (playerCount + 2));
     
     // Dynamic vertical alignment strategy to prevent clipping of headers on large counts
-    const isOverflowing = tableHeightVh > remainingHeight;
+    const isOverflowing = tableHeightVh > remainingHeight + 0.1;
     const containerAlign = isOverflowing ? 'flex-start' : 'center';
     const tableMargin = isOverflowing ? '0' : 'auto 0';
     
@@ -2606,8 +2622,8 @@ function renderTVContent() {
                 <thead>
                     <tr style="height: ${headerRowHeightVh}vh;">
                         <th style="width: ${rankWidth}; font-size: max(1.2vh, calc(${rowHeightVh}vh * 0.24)); opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; padding: 0 1.5vh; height: ${headerRowHeightVh}vh; vertical-align: middle; font-weight: 800; text-align: center; border: none; color: #fff;">Pos</th>
-                        <th style="font-size: max(1.2vh, calc(${rowHeightVh}vh * 0.24)); opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; padding: 0 1.5vh; height: ${headerRowHeightVh}vh; vertical-align: middle; font-weight: 800; text-align: center; border: none; color: #fff;">Player</th>
-                        <th style="width: 25%; text-align:right; font-size: max(1.2vh, calc(${rowHeightVh}vh * 0.24)); opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; padding: 0 2vh; height: ${headerRowHeightVh}vh; vertical-align: middle; font-weight: 800; border: none; color: #fff;">Total</th>
+                        <th style="font-size: max(1.2vh, calc(${rowHeightVh}vh * 0.24)); opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; padding: 0 3vh; height: ${headerRowHeightVh}vh; vertical-align: middle; font-weight: 800; text-align: left; border: none; color: #fff;">Player</th>
+                        <th style="width: 25%; text-align: right; font-size: max(1.2vh, calc(${rowHeightVh}vh * 0.24)); opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; padding: 0 2.5vh; height: ${headerRowHeightVh}vh; vertical-align: middle; font-weight: 800; border: none; color: #fff;">Total</th>
                     </tr>
                 </thead>
                 <tbody>
