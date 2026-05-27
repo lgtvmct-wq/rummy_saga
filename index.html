@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>Elite Rummy Circle - v91.1</title>
+<title>Elite Rummy Circle - v91.2</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
 <link rel="apple-touch-icon" sizes="152x152" href="https://raw.githubusercontent.com/lgtvmct-wq/rummy_saga/main/favicon.png">
@@ -273,7 +273,7 @@
     </div>
 
     <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v91.1</span>
+        <span onclick="showReleaseNotes()" style="font-size: 11px; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--accent); font-weight: bold;">v91.2</span>
         <div style="font-size: 10px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
     </div>
   </div>
@@ -350,6 +350,12 @@
     <div class="modal-card" style="text-align: left; max-width: 400px;">
          <h2 style="color:var(--accent); border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; margin-top:0;">Release Notes</h2>
          <div style="margin-bottom: 20px;">
+             <b style="color: var(--warning); display: block; margin-bottom: 5px;">v91.2 - Left-Aligned Scorecard Full Screen & Split Layout</b>
+             <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
+                 • <b>Left-Pinned Full Screen Button:</b> Relocated the 'Full Screen' action to the far left of the scorecard header next to the Game Title/Round information.<br>
+                 • <b>Right-Pinned Pause Button:</b> Kept the 'Pause' / 'Home' button securely anchored to the far right margin for elegant visual separation.<br>
+             </div>
+             <hr style="margin: 10px 0; opacity: 0.2;">
              <b style="color: var(--warning); display: block; margin-bottom: 5px;">v91.1 - Scoreboard Floating Controls & Classical Left-Aligned Lineup</b>
              <div style="font-size: 11px; line-height: 1.4; opacity: 0.9;">
                  • <b>Right-Floating Scoreboard Actions:</b> Re-oriented the 'Full Screen' and 'Pause' controls in the active scoreboard to anchor cleanly on the right of the header section.<br>
@@ -601,7 +607,7 @@
       <div class="tv-close" id="tvCloseBtn" onclick="closeFullScreen()">Close</div>
   </div>
   <div style="position: fixed; bottom: 8px; left: 12px; z-index: 4000; text-align: left; pointer-events: auto;">
-      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v91.1</div>
+      <div onclick="showReleaseNotes()" style="font-size: 10px; opacity: 0.6; color: var(--accent); cursor: pointer; text-decoration: underline; font-weight: bold; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px;">v91.2</div>
       <div style="font-size: 9px; opacity: 0.4; margin-top: 4px;">Developer: Elite IT</div>
   </div>
 </div>
@@ -1093,10 +1099,12 @@ function renderActive(focusPlayer = null) {
       </div>`;
   }
 
-  let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px; flex-wrap:wrap; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom:10px;">
-    ${titleHtml}
-    <div style="display:flex; gap:5px; margin-left: auto;">
-        <button onclick="toggleFullScreen()" class="pause-btn" style="background: linear-gradient(to bottom, var(--accent), #1e8449); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 0 10px rgba(39, 174, 96, 0.3); width:80px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;">Full Screen</button>
+  let h = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:12px; flex-wrap:wrap; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom:10px;">
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; flex-grow: 1;">
+        <button onclick="toggleFullScreen()" class="pause-btn" style="background: linear-gradient(to bottom, var(--accent), #1e8449); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 0 10px rgba(39, 174, 96, 0.3); width:80px; height:32px; padding:0; display:flex; align-items:center; justify-content:center; flex-shrink: 0;">Full Screen</button>
+        ${titleHtml}
+    </div>
+    <div style="display:flex; gap:5px; flex-shrink: 0; margin-left: auto;">
         <button onclick="state=null; showScreen('newGame')" class="pause-btn" style="width:80px; height:32px; padding:0; display:flex; align-items:center; justify-content:center;">${state.winner?'Home':'Pause'}</button>
     </div>
   </div>`;
