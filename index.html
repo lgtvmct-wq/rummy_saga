@@ -2203,9 +2203,51 @@ function recalculateGameStateFromHistory() {
     state.lastDropRound = {};
     state.actionStats = {};
     
-    const starting = state.startingPlayers || state.players;
-    starting.forEach(p => {
-        state.totals[p] = 0;
+    // Gather all unique players across the entire game
+    const allUniquePlayers = new Set(state.startingPlayers || state.players || []);
+    if (state.players) {
+        state.players.forEach(p => allUniquePlayers.add(p));
+    }
+    if (state.history) {
+        state.history.forEach(r => {
+            if (r.players) {
+                r.players.forEach(p => allUniquePlayers.add(p));
+            }
+            if (r.scores) {
+                Object.keys(r.scores).forEach(p => allUniquePlayers.add(p));
+            }
+        });
+    }
+
+    const starting = state.startingPlayers || state.players || [];
+
+    // Clear & initialize everyone with correct baseline scores
+    allUniquePlayers.forEach(p => {
+        let startingScore = 0;
+        
+        // If they are a mid-game player (not in starting), find their join entry score
+        if (!starting.includes(p)) {
+            if (state.midGamePlayerEntries && state.midGamePlayerEntries[p] !== undefined) {
+                startingScore = state.midGamePlayerEntries[p];
+            } else {
+                // Find first round appearance and calculate baseline
+                const firstRound = state.history ? state.history.find(h => 
+                    (h.players && h.players.includes(p)) || 
+                    (h.scores && h.scores[p] !== undefined)
+                ) : null;
+                
+                if (firstRound && firstRound.totals && firstRound.totals[p] !== undefined) {
+                    let pts = 0;
+                    const val = firstRound.scores[p];
+                    if (val === 'S' || val === 'OUT') pts = 0;
+                    else pts = parseInt(val) || 0;
+                    startingScore = firstRound.totals[p] - pts;
+                    if (startingScore < 0) startingScore = 0;
+                }
+            }
+        }
+        
+        state.totals[p] = startingScore;
         state.eliminated[p] = false;
         state.reEntries[p] = 0;
         state.lastDropRound[p] = -1;
@@ -2222,6 +2264,11 @@ function recalculateGameStateFromHistory() {
         let activeThisRound = r.players || starting;
         
         activeThisRound.forEach(p => {
+            // If they are explicitly playing in this round, they aren't eliminated yet
+            if (r.players && r.players.includes(p)) {
+                state.eliminated[p] = false;
+            }
+            
             if (state.eliminated[p]) return;
             
             const val = r.scores[p];
@@ -2262,11 +2309,12 @@ function recalculateGameStateFromHistory() {
         });
     });
     
-    state.players = starting.filter(p => !state.eliminated[p] && (state.totals[p] || 0) < exitLimit);
+    // Set active players to all players who aren't eliminated and below limit
+    state.players = Array.from(allUniquePlayers).filter(p => !state.eliminated[p] && (state.totals[p] || 0) < exitLimit);
     
     let activeSurvivors = state.players;
     if (activeSurvivors.length === 0) {
-        let allInLast = starting.filter(p => !state.eliminated[p] || state.totals[p] >= exitLimit);
+        let allInLast = Array.from(allUniquePlayers).filter(p => !state.eliminated[p] || state.totals[p] >= exitLimit);
         let minScore = Math.min(...allInLast.map(p => state.totals[p]));
         let winners = allInLast.filter(p => state.totals[p] === minScore);
         state.winner = (winners.length > 1 ? winners.join(' & ') : winners[0]) || "Tie";
@@ -2915,6 +2963,11 @@ async function confirmAddMidGame() {
         state.players.push(name); 
         state.totals[name] = es; 
         state.eliminated[name] = false;
+        
+        // Track the mid-game player join score for bulletproof recalculations
+        if (!state.midGamePlayerEntries) state.midGamePlayerEntries = {};
+        state.midGamePlayerEntries[name] = es;
+
         if (previouslyInGame) {
             if(!state.reEntries) state.reEntries = {};
             const currentCount = state.reEntries[name] ? (state.reEntries[name] === true ? 1 : state.reEntries[name]) : 0;
