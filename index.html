@@ -204,6 +204,584 @@
   @media print {
     #fullscreenOverlay { display: none !important; }
   }
+
+  /* --- ELITE ESC CASINO MUSIC DOCK STYLES --- */
+  :root {
+    --emp-accent: #27ae60;
+    --emp-glass-bg: rgba(10, 16, 26, 0.75);
+    --emp-glass-blur: blur(20px) saturate(160%);
+    --emp-border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .emp-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 8000; /* Floats on top, even over full screen video/TV (z: 6000) */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    user-select: none;
+    transition: opacity 0.3s, transform 0.3s;
+    touch-action: none; /* Prevents default scroll drag behaviors on mobile touch */
+  }
+
+  .emp-card {
+    width: 330px;
+    background: var(--emp-glass-bg);
+    backdrop-filter: var(--emp-glass-blur);
+    -webkit-backdrop-filter: var(--emp-glass-blur);
+    border: var(--emp-border);
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 15px rgba(39, 174, 96, 0.05);
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  /* Grabbing cursor for title area drag */
+  .emp-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: grab;
+  }
+
+  .emp-header:active {
+    cursor: grabbing;
+  }
+
+  .emp-logo-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .emp-dot-live {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #e74c3c;
+    box-shadow: 0 0 8px #e74c3c;
+    position: relative;
+  }
+
+  .emp-dot-live::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    border: 1px solid #e74c3c;
+    animation: emp-ping 1.5s infinite;
+  }
+
+  @keyframes emp-ping {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  .emp-badge-live {
+    background: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.25);
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-size: 8px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .emp-header-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: #888;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .emp-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .emp-header-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .emp-header-btn:hover {
+    color: #fff;
+    transform: scale(1.1);
+  }
+
+  /* Vinyl Album Art */
+  .emp-body {
+    padding: 18px 20px 14px 20px;
+  }
+
+  .emp-station-display {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .emp-vinyl-wrapper {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+  }
+
+  .emp-vinyl {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #2c3e50 0%, #111e29 35%, #0d0d10 80%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    position: relative;
+    animation: emp-spin 20s linear infinite;
+    animation-play-state: paused;
+  }
+
+  .emp-vinyl-art {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .emp-vinyl::before {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #a1b0cb;
+    z-index: 2;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+  }
+
+  @keyframes emp-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .emp-metadata-block {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .emp-meta-freq {
+    font-size: 10px;
+    font-weight: bold;
+    color: var(--emp-accent);
+    letter-spacing: 0.8px;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+  }
+
+  .emp-meta-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+
+  .emp-meta-genre {
+    font-size: 11px;
+    color: #7f8c9d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Premium Equalizer Animation */
+  .emp-equalizer {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 24px;
+  }
+
+  .emp-eq-bar {
+    width: 3px;
+    height: 3px;
+    background-color: var(--emp-accent);
+    border-radius: 2px;
+    transition: height 0.1s ease;
+  }
+
+  .emp-playing .emp-eq-bar {
+    animation: emp-eq-bounce 1s infinite alternate ease-in-out;
+  }
+
+  .emp-playing .emp-eq-bar:nth-child(1) { animation-delay: 0.1s; animation-duration: 0.8s; }
+  .emp-playing .emp-eq-bar:nth-child(2) { animation-delay: 0.3s; animation-duration: 1.2s; }
+  .emp-playing .emp-eq-bar:nth-child(3) { animation-delay: 0.5s; animation-duration: 0.9s; }
+  .emp-playing .emp-eq-bar:nth-child(4) { animation-delay: 0.2s; animation-duration: 1.1s; }
+  .emp-playing .emp-eq-bar:nth-child(5) { animation-delay: 0.4s; animation-duration: 0.7s; }
+  .emp-playing .emp-eq-bar:nth-child(6) { animation-delay: 0.6s; animation-duration: 1.0s; }
+
+  @keyframes emp-eq-bounce {
+    0% { height: 3px; }
+    100% { height: 20px; }
+  }
+
+  /* Controls Block */
+  .emp-playback-deck {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .emp-btn-control {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #a0aec0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 6px;
+  }
+
+  .emp-btn-control:hover {
+    color: #fff;
+    transform: scale(1.1);
+  }
+
+  .emp-btn-control:active {
+    transform: scale(0.95);
+  }
+
+  .emp-btn-play-pause {
+    background: var(--emp-accent);
+    color: #fff;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .emp-btn-play-pause:hover {
+    background: #2ecc71;
+    color: #fff;
+    transform: scale(1.08);
+    box-shadow: 0 4px 20px rgba(39, 174, 96, 0.6);
+  }
+
+  /* Volume Slider Overlay */
+  .emp-utility-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: rgba(255,255,255,0.03);
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.02);
+  }
+
+  .emp-volume-dock {
+    display: flex;
+    padding: 0;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .emp-slider-volume {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.15);
+    outline: none;
+    cursor: pointer;
+  }
+
+  .emp-slider-volume::-webkit-slider-value {
+    background: var(--emp-accent);
+  }
+
+  .emp-slider-volume::-webkit-slider-runnable-track {
+    height: 4px;
+  }
+
+  .emp-slider-volume::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    transition: transform 0.1s;
+  }
+
+  .emp-slider-volume::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+    background: var(--emp-accent);
+  }
+
+  .emp-slider-volume::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+
+  /* Spotify List Group */
+  .emp-station-group {
+    max-height: 154px;
+    overflow-y: auto;
+    padding-right: 4px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    margin-top: 12px;
+    padding-top: 8px;
+  }
+
+  /* Beautiful custom scrollbar for stream selection list */
+  .emp-station-group::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .emp-station-group::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .emp-station-group::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+  }
+
+  .emp-station-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .emp-station-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .emp-station-item.active-station {
+    background: rgba(39, 174, 96, 0.12);
+    border-left: 3px solid var(--emp-accent);
+  }
+
+  .emp-item-photo {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-size: 8px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    line-height: 1.1;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .emp-item-metablock {
+    flex: 1;
+    margin-left: 10px;
+    min-width: 0;
+  }
+
+  .emp-item-text-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .emp-item-text-desc {
+    font-size: 10px;
+    color: #7f8c9d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .emp-item-status-equalizer {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 10px;
+    margin-left: 8px;
+    width: 14px;
+  }
+
+  .emp-mini-eq-b {
+    width: 2px;
+    height: 2px;
+    background: var(--emp-accent);
+    border-radius: 1px;
+  }
+
+  .active-station .emp-mini-eq-b {
+    animation: emp-mini-eq-bounce 0.8s infinite alternate ease-in-out;
+  }
+
+  .active-station .emp-mini-eq-b:nth-child(1) { animation-delay: 0.1s; }
+  .active-station .emp-mini-eq-b:nth-child(2) { animation-delay: 0.3s; animation-duration: 0.6s; }
+  .active-station .emp-mini-eq-b:nth-child(3) { animation-delay: 0.5s; }
+
+  @keyframes emp-mini-eq-bounce {
+    0% { height: 1px; }
+    100% { height: 10px; }
+  }
+
+  /* MINIMIZED PLAYER INTERFACE */
+  .emp-circle-pill {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--emp-glass-bg);
+    backdrop-filter: var(--emp-glass-blur);
+    -webkit-backdrop-filter: var(--emp-glass-blur);
+    border: var(--emp-border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 12px rgba(39, 174, 96, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .emp-circle-pill:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 
+                0 0 18px rgba(39, 174, 96, 0.4);
+  }
+
+  .emp-circle-art {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  }
+
+  /* Orbiting play status glow */
+  .emp-playing .emp-circle-pill {
+    border-color: rgba(39, 174, 96, 0.4);
+  }
+
+  .emp-playing .emp-circle-art {
+    animation: emp-spin 20s linear infinite;
+  }
+
+  .emp-floating-eq-anchor {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #111e29;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  }
+
+  /* Layout hiding toggles */
+  .emp-hide {
+    display: none !important;
+  }
+
+  /* Connect error alerts */
+  .emp-alert-connecting {
+    font-size: 9px;
+    background: rgba(243, 156, 18, 0.15);
+    color: #f39c12;
+    border: 1px solid rgba(243, 156, 18, 0.3);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    animation: tv-blink 1.5s infinite;
+  }
+
+  /* Adjustments for mobile viewports */
+  @media (max-width: 500px) {
+    .emp-container {
+      bottom: 16px;
+      right: 16px;
+      z-index: 8500;
+    }
+    .emp-card {
+      width: 295px;
+    }
+    .emp-station-group {
+      max-height: 120px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -3651,6 +4229,1180 @@ function genPDF(id) {
     doc.save(`${g.name}.pdf`);
 }
 
+// --- PREMIUM MUSIC & RADIO SYSTEM IMPLEMENTATION ---
+(function() {
+  const STORAGE_KEY = 'elite_rummy_bgm_state_yt';
+  
+  const MUSIC_ICON_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle;"><path d="M12 3v10.55c-.59-.34-1.34-.55-2.15-.55-2.3 0-4.15 1.61-4.15 3.6s1.85 3.6 4.15 3.6 4.15-1.61 4.15-3.6V8.56l8-1.6v6.59c-.59-.34-1.34-.55-2.15-.55-2.3 0-4.15 1.61-4.15 3.6s1.85 3.6 4.15 3.6 4.15-1.61 4.15-3.6V3H12z"/></svg>`;
+  
+  // High-availability curated YouTube live streams and playlists
+  const CHANNELS = [
+    {
+      id: 'uae_malayalam',
+      name: 'Home 92.2 FM UAE',
+      freq: '92.2 FM Dubai',
+      genre: 'Live UAE Malayalam Broadcast',
+      type: 'iframe',
+      targetId: 'https://922homefm.ae/',
+      fallbackUrl: 'https://stream.zeno.fm/tvx68z2z2feuv',
+      theme: 'linear-gradient(135deg, #27ae60, #11998e)',
+      abbr: MUSIC_ICON_SVG
+    }
+  ];
+
+  // Load configuration or set defaults
+  let state = {
+    channelIndex: 0,
+    volume: 80,
+    isMuted: false,
+    isMinimized: true,
+    wasPlaying: false,
+    showVideoMonitor: false,
+    forceDirectAudio: false,
+    positions: {
+      desktop: { x: window.innerWidth - 360, y: window.innerHeight - 100 },
+      isSet: false
+    }
+  };
+
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) {
+      const parsed = JSON.parse(data);
+      state = Object.assign(state, parsed);
+    }
+  } catch (err) {
+    console.error("Failed to load local BGM settings:", err);
+  }
+
+  // Ensure channelIndex is valid for the modified CHANNELS array
+  if (state.channelIndex < 0 || state.channelIndex >= CHANNELS.length) {
+    state.channelIndex = 0;
+  }
+
+  let isPlaying = false;
+  let isConnecting = false;
+  let player = null;
+  let playerReady = false;
+  
+  // Safe lazy-initialized direct audio stream fallback support
+  let nativeAudio = null;
+  let ytPlaybackTimeout = null;
+
+  // DOM Elements
+  let container, card, miniPlayer;
+  let playPauseBtn, prevBtn, nextBtn, muteBtn, volumeSlider, minimizeBtn, toggleVideoBtn;
+  let playIcon, pauseIcon, muteIcon, volumeHighIcon;
+  let brandName, brandFreq, brandGenre, discVinyl, discVinylArt, loadingIndicator;
+  let miniArt, miniEq;
+  let videoMonitorWrapper, videoLoader, btnDirectToggle, badgeDirectMode;
+
+  function initPlayerElements() {
+    container = document.getElementById('eliteMusicContainer');
+    card = document.getElementById('eliteMusicCard');
+    miniPlayer = document.getElementById('eliteMusicMini');
+    
+    playPauseBtn = document.getElementById('empBtnPlayPause');
+    prevBtn = document.getElementById('empBtnPrev');
+    nextBtn = document.getElementById('empBtnNext');
+    muteBtn = document.getElementById('empBtnMute');
+    volumeSlider = document.getElementById('empVolumeSlider');
+    minimizeBtn = document.getElementById('empBtnMinimize');
+    toggleVideoBtn = document.getElementById('empBtnToggleVideo');
+    btnDirectToggle = document.getElementById('empBtnDirectToggle');
+    badgeDirectMode = document.getElementById('empDirectBadgeMode');
+    
+    playIcon = document.getElementById('empPlayIcon');
+    pauseIcon = document.getElementById('empPauseIcon');
+    muteIcon = document.getElementById('empMuteIcon');
+    volumeHighIcon = document.getElementById('empVolumeHighIcon');
+    
+    brandName = document.getElementById('empCurrentName');
+    brandFreq = document.getElementById('empCurrentFreq');
+    brandGenre = document.getElementById('empCurrentGenre');
+    discVinyl = document.getElementById('empVinyl');
+    discVinylArt = document.getElementById('empVinylArt');
+    loadingIndicator = document.getElementById('empLoadingState');
+    
+    miniArt = document.getElementById('empMiniArt');
+    miniEq = document.getElementById('empMiniEq');
+    
+    videoMonitorWrapper = document.getElementById('empVideoMonitorWrapper');
+    videoLoader = document.getElementById('empVideoLoader');
+
+    restoreLayoutPositions();
+    renderStationSelector();
+    updateUIStates();
+    attachInteractionEvents();
+    loadYouTubeIframeAPI();
+  }
+
+  function saveCurrentState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      console.warn("Could not save BGM state to localStorage", e);
+    }
+  }
+
+  function restoreLayoutPositions() {
+    if (state.positions.isSet) {
+      let boundX = Math.max(10, Math.min(state.positions.desktop.x, window.innerWidth - 65));
+      let boundY = Math.max(10, Math.min(state.positions.desktop.y, window.innerHeight - 65));
+      
+      container.style.left = boundX + 'px';
+      container.style.top = boundY + 'px';
+      container.style.bottom = 'auto';
+      container.style.right = 'auto';
+    } else {
+      container.style.bottom = '24px';
+      container.style.right = '24px';
+      container.style.left = 'auto';
+      container.style.top = 'auto';
+    }
+
+    if (state.isMinimized) {
+      card.classList.add('emp-hide');
+      miniPlayer.classList.remove('emp-hide');
+    } else {
+      card.classList.remove('emp-hide');
+      miniPlayer.classList.add('emp-hide');
+    }
+
+    // Restore video monitor expanded status
+    toggleVideoMonitorDisplay(state.showVideoMonitor);
+  }
+
+  function toggleVideoMonitorDisplay(show) {
+    state.showVideoMonitor = show;
+    saveCurrentState();
+    if (show) {
+      videoMonitorWrapper.style.maxHeight = '180px';
+      videoMonitorWrapper.style.opacity = '1';
+      toggleVideoBtn.classList.add('emp-header-btn-active');
+    } else {
+      videoMonitorWrapper.style.maxHeight = '1px';
+      videoMonitorWrapper.style.opacity = '0.01';
+      toggleVideoBtn.classList.remove('emp-header-btn-active');
+    }
+  }
+
+  function renderStationSelector() {
+    const listContainer = document.getElementById('empStationList');
+    if (!listContainer) return;
+
+    let html = '';
+    CHANNELS.forEach((channel, idx) => {
+      const isSelected = idx === state.channelIndex;
+      html += `
+        <button class="emp-tab-btn ${isSelected ? 'active-tab' : ''}" data-index="${idx}">
+          <div class="emp-tab-abbr-wrap">
+            <span class="emp-tab-abbr" style="color: ${isSelected ? 'var(--emp-accent)' : '#a0aec0'}">${channel.abbr}</span>
+            ${isSelected && isPlaying ? '<span class="emp-live-pulse-ring"></span>' : ''}
+          </div>
+          <div class="emp-tab-title">${channel.name}</div>
+          <div class="emp-tab-desc">${channel.genre}</div>
+        </button>
+      `;
+    });
+    listContainer.innerHTML = html;
+
+    const items = listContainer.querySelectorAll('.emp-tab-btn');
+    items.forEach(item => {
+      item.addEventListener('click', function() {
+        const index = parseInt(this.getAttribute('data-index'));
+        selectChannel(index);
+      });
+    });
+  }
+
+  function updateUIStates() {
+    const ch = CHANNELS[state.channelIndex];
+    if (!ch) return;
+
+    brandName.innerText = ch.name;
+    brandFreq.innerText = ch.freq;
+    brandGenre.innerText = ch.genre;
+
+    miniArt.style.background = ch.theme;
+    miniArt.innerHTML = ch.abbr;
+    discVinylArt.style.background = ch.theme;
+    discVinylArt.innerHTML = ch.abbr;
+
+    volumeSlider.value = state.volume;
+
+    if (state.isMuted) {
+      muteIcon.classList.remove('emp-hide');
+      volumeHighIcon.classList.add('emp-hide');
+    } else {
+      muteIcon.classList.add('emp-hide');
+      volumeHighIcon.classList.remove('emp-hide');
+    }
+
+    if (isPlaying) {
+      playIcon.classList.add('emp-hide');
+      pauseIcon.classList.remove('emp-hide');
+      discVinyl.style.animationPlayState = 'running';
+      container.classList.add('emp-playing');
+      miniEq.classList.remove('emp-hide');
+    } else {
+      playIcon.classList.remove('emp-hide');
+      pauseIcon.classList.add('emp-hide');
+      discVinyl.style.animationPlayState = 'paused';
+      container.classList.remove('emp-playing');
+      miniEq.classList.add('emp-hide');
+    }
+
+    if (isConnecting) {
+      loadingIndicator.classList.remove('emp-hide');
+      if (videoLoader) videoLoader.classList.remove('emp-hide');
+    } else {
+      loadingIndicator.classList.add('emp-hide');
+      if (videoLoader) videoLoader.classList.add('emp-hide');
+    }
+
+    if (badgeDirectMode) {
+      if (state.forceDirectAudio) {
+        badgeDirectMode.innerText = "Direct Stream ⚡";
+        badgeDirectMode.style.color = "var(--emp-accent)";
+      } else {
+        badgeDirectMode.innerText = "Auto (YouTube) 📺";
+        badgeDirectMode.style.color = "#cbd5e0";
+      }
+    }
+  }
+
+  function selectChannel(index) {
+    if (index < 0 || index >= CHANNELS.length) return;
+    state.channelIndex = index;
+    saveCurrentState();
+    
+    renderStationSelector();
+    updateUIStates();
+
+    playCurrentChannel();
+  }
+
+  function loadYouTubeIframeAPI() {
+    if (window.YT && window.YT.Player) {
+      onYouTubeIframeAPIReady();
+      return;
+    }
+    
+    // Global callback defined first to bypass strict browser script load race conditions
+    window.onYouTubeIframeAPIReady = function() {
+      player = new window.YT.Player('empYoutubePlayer', {
+        height: '100%',
+        width: '100%',
+        videoId: '',
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          rel: 0,
+          modestbranding: 1,
+          iv_load_policy: 3,
+          playsinline: 1,
+          enablejsapi: 1,
+          origin: window.location.origin || '*'
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange,
+          'onError': onPlayerError
+        }
+      });
+    };
+
+    // Inject script second
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  }
+
+  function onPlayerReady() {
+    playerReady = true;
+    console.log("YouTube Radio Player Engine Initialized.");
+    
+    if (player && player.setVolume) {
+      player.setVolume(state.isMuted ? 0 : state.volume);
+    }
+
+    // Auto load last playing channel state if queued to play
+    if (state.wasPlaying || isPlaying) {
+      playCurrentChannel();
+    }
+  }
+
+  function onPlayerStateChange(event) {
+    // Skip YouTube states if active channel uses an iframe layout element
+    const ch = CHANNELS[state.channelIndex];
+    if (ch && ch.type === 'iframe') return;
+
+    // 1 Playing, 2 Paused, 3 Buffering, 5 Cued, 0 Ended
+    if (event.data === window.YT.PlayerState.PLAYING) {
+      isPlaying = true;
+      isConnecting = false;
+      if (ytPlaybackTimeout) {
+        clearTimeout(ytPlaybackTimeout);
+        ytPlaybackTimeout = null;
+      }
+    } else if (event.data === window.YT.PlayerState.BUFFERING) {
+      isConnecting = true;
+    } else if (event.data === window.YT.PlayerState.PAUSED) {
+      isPlaying = false;
+      isConnecting = false;
+      if (ytPlaybackTimeout) {
+        clearTimeout(ytPlaybackTimeout);
+        ytPlaybackTimeout = null;
+      }
+    } else if (event.data === window.YT.PlayerState.ENDED) {
+      if (isPlaying) {
+        nextChannel();
+      }
+    }
+    updateUIStates();
+    renderStationSelector();
+  }
+
+  function onPlayerError(e) {
+    const ch = CHANNELS[state.channelIndex];
+    if (ch && ch.type === 'iframe') return;
+
+    console.warn("YouTube Stream API warning or blockage, error code " + e.data + ". Activating direct stream fallback.");
+    
+    if (ch && ch.fallbackUrl) {
+      activateDirectAudioFallback(ch);
+    } else {
+      isConnecting = true;
+      updateUIStates();
+      setTimeout(() => {
+        if (isPlaying) {
+          playCurrentChannel();
+        }
+      }, 4000);
+    }
+  }
+
+  function playCurrentChannel() {
+    // Safely stop background-running fallback streams first
+    stopNativeAudio();
+
+    const ch = CHANNELS[state.channelIndex];
+    if (!ch) return;
+
+    isConnecting = true;
+    isPlaying = true;
+    updateUIStates();
+    renderStationSelector();
+
+    const ytPlayerEl = document.getElementById('empYoutubePlayer');
+    const iframeContainer = document.getElementById('empIframePlayerContainer');
+
+    // Instantly use high-fidelity direct audio streams if manual select direct audio mode is enabled
+    if (state.forceDirectAudio && ch.fallbackUrl) {
+      ytPlayerEl.classList.add('emp-hide');
+      iframeContainer.classList.add('emp-hide');
+      activateDirectAudioFallback(ch);
+      state.wasPlaying = true;
+      saveCurrentState();
+      return;
+    }
+
+    if (ch.type === 'iframe') {
+      // Pause YouTube if it's currently streaming audio
+      if (player && playerReady && player.pauseVideo) {
+        try { player.pauseVideo(); } catch(err) {}
+      }
+
+      ytPlayerEl.classList.add('emp-hide');
+      iframeContainer.classList.remove('emp-hide');
+
+      // Inject the Home 92.2 FM official iframe!
+      iframeContainer.innerHTML = `
+        <iframe id="empIframe" src="${ch.targetId}" 
+          style="width: 100%; height: 100%; border: none; background: #000;" 
+          allow="autoplay; encrypted-media"></iframe>
+      `;
+
+      const iframe = document.getElementById('empIframe');
+      let loaded = false;
+      
+      const timeoutId = setTimeout(() => {
+        if (!loaded) {
+          console.warn("Direct site loader timed out. Launching robust custom audio player fallback.");
+          showFallbackUI();
+        }
+      }, 7000);
+
+      iframe.onload = function() {
+        loaded = true;
+        clearTimeout(timeoutId);
+        isConnecting = false;
+        isPlaying = true;
+        updateUIStates();
+        // Force slide down the visualiser bento monitor to show live official controls!
+        toggleVideoMonitorDisplay(true);
+      };
+
+      state.wasPlaying = true;
+      saveCurrentState();
+      return;
+    }
+
+    // Standard YouTube channels
+    ytPlayerEl.classList.remove('emp-hide');
+    iframeContainer.classList.add('emp-hide');
+    iframeContainer.innerHTML = ''; // Safely clear memory references
+
+    // If API/Player has not loaded yet, instantly activate direct stream audio fallback
+    if (!player || !playerReady) {
+      if (ch.fallbackUrl) {
+        console.log("YouTube player not ready yet. Booting direct stream fallback.");
+        activateDirectAudioFallback(ch);
+      } else {
+        console.warn("Player engine booting up, queuing current requested channel.");
+      }
+      return;
+    }
+
+    // Direct audio watchdog: if YouTube doesn't start playing within 4.5 seconds, fall back beautifully to streaming audio!
+    if (ch.fallbackUrl) {
+      ytPlaybackTimeout = setTimeout(() => {
+        if (isPlaying && isConnecting) {
+          console.warn("YouTube streaming blocked or throttled by browser. Loading high-fidelity direct fallback...");
+          activateDirectAudioFallback(ch);
+        }
+      }, 4500);
+    }
+
+    if (ch.type === 'live') {
+      player.loadVideoById({
+        videoId: ch.targetId,
+        suggestedQuality: 'small'
+      });
+    } else {
+      player.loadPlaylist({
+        list: ch.targetId,
+        listType: 'playlist',
+        index: 0,
+        suggestedQuality: 'small'
+      });
+      player.setLoop(true);
+      player.setShuffle(true);
+    }
+
+    if (state.isMuted) {
+      player.mute();
+    } else {
+      player.unMute();
+      player.setVolume(state.volume);
+    }
+
+    state.wasPlaying = true;
+    saveCurrentState();
+  }
+
+  function togglePlayPause() {
+    const ch = CHANNELS[state.channelIndex];
+    if (isPlaying) {
+      isPlaying = false;
+      isConnecting = false;
+      state.wasPlaying = false;
+      saveCurrentState();
+
+      if (ch && ch.type === 'iframe') {
+        const iframe = document.getElementById('empIframe');
+        if (iframe) {
+          iframe.src = 'about:blank'; // Mutes any running iframe playback sounds perfectly
+        }
+      } else {
+        if (player && playerReady) {
+          try { player.pauseVideo(); } catch (err) {}
+        }
+      }
+      stopNativeAudio();
+      updateUIStates();
+      renderStationSelector();
+    } else {
+      playCurrentChannel();
+    }
+  }
+
+  function nextChannel() {
+    let nextIdx = state.channelIndex + 1;
+    if (nextIdx >= CHANNELS.length) nextIdx = 0;
+    selectChannel(nextIdx);
+  }
+
+  function prevChannel() {
+    let prevIdx = state.channelIndex - 1;
+    if (prevIdx < 0) prevIdx = CHANNELS.length - 1;
+    selectChannel(prevIdx);
+  }
+
+  function toggleMute() {
+    state.isMuted = !state.isMuted;
+    if (player && playerReady) {
+      if (state.isMuted) {
+        player.mute();
+      } else {
+        player.unMute();
+        player.setVolume(state.volume);
+      }
+    }
+    if (nativeAudio) {
+      nativeAudio.muted = state.isMuted;
+    }
+    saveCurrentState();
+    updateUIStates();
+  }
+
+  function handleVolumeInput(e) {
+    state.volume = parseInt(e.target.value);
+    if (state.volume > 0) {
+      state.isMuted = false;
+    }
+    if (player && playerReady) {
+      player.setVolume(state.isMuted ? 0 : state.volume);
+      if (state.isMuted) {
+        player.mute();
+      } else {
+        player.unMute();
+      }
+    }
+    if (nativeAudio) {
+      nativeAudio.volume = state.isMuted ? 0 : state.volume / 100;
+      nativeAudio.muted = state.isMuted;
+    }
+    saveCurrentState();
+    updateUIStates();
+  }
+
+  function showFallbackUI() {
+    isConnecting = false;
+    updateUIStates();
+    
+    const iframeContainer = document.getElementById('empIframePlayerContainer');
+    iframeContainer.innerHTML = `
+      <div class="emp-fallback-player-ui">
+        <div class="emp-fallback-text" style="color: #e74c3c;">FRAME WORK BLOCK</div>
+        <div class="emp-tab-desc" style="white-space: normal; text-align: center; margin-bottom: 12px; font-size: 9px; line-height: 1.3; max-width: 220px;">
+          Website headers restricting embedding in some browser environments. Try direct audio or open the official live tab.
+        </div>
+        <button id="empBtnDirectPlay" class="emp-direct-play-btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="margin-right:2px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span id="empDirectPlayStateText">Play Direct Audio</span>
+        </button>
+        <a href="https://922homefm.ae/" target="_blank" class="emp-direct-link-btn" style="margin-top: 4px;">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:2px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          Launch Live Website Player
+        </a>
+      </div>
+    `;
+
+    const btnDirectPlay = document.getElementById('empBtnDirectPlay');
+    if (btnDirectPlay) {
+      btnDirectPlay.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleNativeAudioDirect();
+      });
+    }
+  }
+
+  function toggleNativeAudioDirect() {
+    if (!nativeAudio) {
+      // High-availability fall-back live direct Malayalam radio stream on stream.zeno.fm
+      nativeAudio = new Audio("https://stream.zeno.fm/tvx68z2z2feuv");
+      nativeAudio.volume = state.isMuted ? 0 : state.volume / 100;
+      nativeAudio.muted = state.isMuted;
+      
+      nativeAudio.addEventListener('playing', () => {
+        isConnecting = false;
+        isPlaying = true;
+        const textSpan = document.getElementById('empDirectPlayStateText');
+        if (textSpan) textSpan.innerText = "Mute Direct Audio";
+        updateUIStates();
+      });
+      
+      nativeAudio.addEventListener('waiting', () => {
+        isConnecting = true;
+        updateUIStates();
+      });
+      
+      nativeAudio.addEventListener('pause', () => {
+        isPlaying = false;
+        isConnecting = false;
+        const textSpan = document.getElementById('empDirectPlayStateText');
+        if (textSpan) textSpan.innerText = "Play Direct Audio";
+        updateUIStates();
+      });
+    }
+
+    if (nativeAudio.paused) {
+      if (player && playerReady && player.pauseVideo) {
+        try { player.pauseVideo(); } catch (err) {}
+      }
+      isConnecting = true;
+      updateUIStates();
+      nativeAudio.play().catch(err => {
+        console.warn("Direct stream load failed, attempting cold reload...", err);
+        nativeAudio.load();
+        nativeAudio.play();
+      });
+    } else {
+      nativeAudio.pause();
+    }
+  }
+
+  function activateDirectAudioFallback(ch) {
+    if (!ch || !ch.fallbackUrl) return;
+    
+    // Pause YouTube player if active
+    if (player && playerReady && player.pauseVideo) {
+      try { player.pauseVideo(); } catch(err) {}
+    }
+    
+    stopNativeAudio();
+    
+    console.log("Activating direct HTML5 fallback stream:", ch.fallbackUrl);
+    nativeAudio = new Audio(ch.fallbackUrl);
+    nativeAudio.volume = state.isMuted ? 0 : state.volume / 100;
+    nativeAudio.muted = state.isMuted;
+    
+    nativeAudio.addEventListener('playing', () => {
+      isConnecting = false;
+      isPlaying = true;
+      updateUIStates();
+    });
+    
+    nativeAudio.addEventListener('waiting', () => {
+      isConnecting = true;
+      updateUIStates();
+    });
+    
+    nativeAudio.addEventListener('pause', () => {
+      isPlaying = false;
+      isConnecting = false;
+      updateUIStates();
+    });
+    
+    nativeAudio.addEventListener('error', (err) => {
+      console.error("Direct HTML5 stream fallback error:", err);
+      isConnecting = false;
+      updateUIStates();
+    });
+
+    isConnecting = true;
+    updateUIStates();
+    
+    nativeAudio.play().catch(err => {
+      console.warn("Direct HTML5 stream playback failed or was blocked by autoplay policies:", err);
+      isConnecting = false;
+      updateUIStates();
+    });
+  }
+
+  function stopNativeAudio() {
+    if (ytPlaybackTimeout) {
+      clearTimeout(ytPlaybackTimeout);
+      ytPlaybackTimeout = null;
+    }
+    if (nativeAudio) {
+      try {
+        nativeAudio.pause();
+        nativeAudio = null;
+      } catch (err) {}
+    }
+  }
+
+  function minimizeToPill() {
+    state.isMinimized = true;
+    saveCurrentState();
+    
+    card.classList.add('emp-hide');
+    miniPlayer.classList.remove('emp-hide');
+  }
+
+  function expandToDeck() {
+    state.isMinimized = false;
+    saveCurrentState();
+    
+    card.classList.remove('emp-hide');
+    miniPlayer.classList.add('emp-hide');
+  }
+
+  function attachInteractionEvents() {
+    playPauseBtn.addEventListener('click', togglePlayPause);
+    prevBtn.addEventListener('click', prevChannel);
+    nextBtn.addEventListener('click', nextChannel);
+    muteBtn.addEventListener('click', toggleMute);
+    volumeSlider.addEventListener('input', handleVolumeInput);
+    
+    if (btnDirectToggle) {
+      btnDirectToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        state.forceDirectAudio = !state.forceDirectAudio;
+        saveCurrentState();
+        updateUIStates();
+        if (isPlaying) {
+          playCurrentChannel();
+        }
+      });
+    }
+    
+    toggleVideoBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleVideoMonitorDisplay(!state.showVideoMonitor);
+    });
+
+    minimizeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      minimizeToPill();
+    });
+    
+    miniPlayer.addEventListener('click', function() {
+      expandToDeck();
+    });
+
+    // Make position draggable on desktop
+    const dragHeader = document.getElementById('eliteMusicHeader');
+    let isMoving = false;
+    let initialX, initialY;
+    let offsetX = 0, offsetY = 0;
+
+    dragHeader.addEventListener('pointerdown', function(e) {
+      if (e.target.closest('.emp-header-btn')) return;
+
+      isMoving = true;
+      dragHeader.style.cursor = 'grabbing';
+      
+      const rect = container.getBoundingClientRect();
+      initialX = e.clientX;
+      initialY = e.clientY;
+      offsetX = rect.left;
+      offsetY = rect.top;
+      
+      container.setPointerCapture(e.pointerId);
+    });
+
+    window.addEventListener('pointermove', function(e) {
+      if (!isMoving) return;
+      
+      const dx = e.clientX - initialX;
+      const dy = e.clientY - initialY;
+      
+      let newX = offsetX + dx;
+      let newY = offsetY + dy;
+      
+      newX = Math.max(10, Math.min(newX, window.innerWidth - 65));
+      newY = Math.max(10, Math.min(newY, window.innerHeight - 65));
+
+      state.positions.desktop = { x: newX, y: newY };
+      state.positions.isSet = true;
+      
+      container.style.left = newX + 'px';
+      container.style.top = newY + 'px';
+      container.style.right = 'auto';
+      container.style.bottom = 'auto';
+    });
+
+    const stopDragging = function(e) {
+      if (!isMoving) return;
+      isMoving = false;
+      dragHeader.style.cursor = 'grab';
+      
+      try {
+        container.releasePointerCapture(e.pointerId);
+      } catch (err) {}
+      
+      saveCurrentState();
+    };
+
+    window.addEventListener('pointerup', stopDragging);
+    window.addEventListener('pointercancel', stopDragging);
+
+    window.addEventListener('resize', function() {
+      if (state.positions.isSet) {
+        let nX = Math.max(10, Math.min(state.positions.desktop.x, window.innerWidth - container.offsetWidth));
+        let nY = Math.max(10, Math.min(state.positions.desktop.y, window.innerHeight - container.offsetHeight));
+        
+        container.style.left = nX + 'px';
+        container.style.top = nY + 'px';
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPlayerElements);
+  } else {
+    initPlayerElements();
+  }
+})();
 </script>
+
+<!-- ELITE PREMIUM RADIO & MUSIC DOCK styles local wrapper -->
+<style>
+  /* Local YouTube Radio Addons & Bento Grids */
+  .emp-tabs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 12px;
+  }
+  
+  .emp-tab-btn {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 9px 10px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    min-height: 56px;
+    text-align: left;
+    outline: none;
+  }
+  
+  .emp-tab-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+  
+  .emp-tab-btn.active-tab {
+    background: rgba(39, 174, 96, 0.12);
+    border-color: var(--emp-accent);
+    box-shadow: 0 0 12px rgba(39, 174, 96, 0.2);
+  }
+  
+  .emp-tab-abbr-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 3px;
+  }
+  
+  .emp-tab-abbr {
+    font-size: 8px;
+    font-weight: 900;
+    color: var(--emp-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: monospace;
+  }
+
+  .emp-tab-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+  
+  .emp-tab-desc {
+    font-size: 8px;
+    color: #a0aec0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    margin-top: 1px;
+  }
+  
+  .emp-live-pulse-ring {
+    width: 6px;
+    height: 6px;
+    background: #e74c3c;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #e74c3c;
+    animation: emp-live-pulse-glow 1.2s infinite alternate;
+  }
+
+  @keyframes emp-live-pulse-glow {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.4); opacity: 1; }
+  }
+
+  .emp-video-monitor-wrapper {
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+    width: 100%;
+    max-height: 1px;
+    opacity: 0.01;
+  }
+
+  .emp-video-monitor {
+    position: relative;
+    width: 100%;
+    height: 144px;
+    background: #000;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.9) inset, 0 8px 16px rgba(0,0,0,0.5);
+  }
+  
+  .emp-video-monitor-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #101626 0%, #030508 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  
+  .emp-v-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255,255,255,0.1);
+    border-top-color: var(--emp-accent);
+    border-radius: 50%;
+    animation: emp-spin 1s linear infinite;
+    margin-bottom: 8px;
+  }
+  
+  .emp-v-loader-text {
+    font-size: 8px;
+    color: #7f8c9d;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .emp-header-btn-active {
+    color: var(--emp-accent) !important;
+    text-shadow: 0 0 8px var(--emp-accent);
+  }
+
+  /* Iframe and direct HTML5 state overlays */
+  .emp-vplayer-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .emp-fallback-player-ui {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: radial-gradient(circle, #201e2c 0%, #111019 100%);
+    padding: 16px;
+    text-align: center;
+    color: #fff;
+    border-radius: 8px;
+  }
+  
+  .emp-fallback-text {
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #cbd5e0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .emp-direct-play-btn {
+    background: var(--emp-accent, #27ae60);
+    border: none;
+    border-radius: 20px;
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+    outline: none;
+  }
+  
+  .emp-direct-play-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(39, 174, 96, 0.5);
+  }
+  
+  .emp-direct-link-btn {
+    color: #a0aec0;
+    font-size: 10px;
+    text-decoration: underline;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+  }
+  
+  .emp-direct-link-btn:hover {
+    color: #fff;
+  }
+  
+  .emp-direct-toggle-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cbd5e0;
+    font-size: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .emp-direct-toggle-btn:hover {
+    background: rgba(39, 174, 96, 0.15);
+    border-color: var(--emp-accent, #27ae60);
+    color: #fff;
+    box-shadow: 0 0 8px rgba(39, 174, 96, 0.25);
+  }
+</style>
+
+<!-- ELITE PREMIUM RADIO & MUSIC DOCK -->
+<div id="eliteMusicContainer" class="emp-container">
+  <!-- FULL DETAILED DECK MODULE -->
+  <div id="eliteMusicCard" class="emp-card emp-hide">
+    <!-- Header with Drag Grip -->
+    <div class="emp-header" id="eliteMusicHeader">
+      <div class="emp-logo-section">
+        <div class="emp-dot-live"></div>
+        <span class="emp-badge-live">Live Match BGM</span>
+      </div>
+      <div id="empLoadingState" class="emp-alert-connecting emp-hide">LOADING...</div>
+      <div class="emp-header-controls">
+        <!-- Interactive Video Monitor Toggle -->
+        <button id="empBtnToggleVideo" class="emp-header-btn" title="Toggle Live Player Visualizer">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        </button>
+        <!-- Minimize toggle -->
+        <button id="empBtnMinimize" class="emp-header-btn" title="Minimize Radio">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+      </div>
+    </div>
+ 
+    <!-- Active Song Media Section -->
+    <div class="emp-body">
+      <!-- Collapsible Live Video Stream Viewfinder -->
+      <div id="empVideoMonitorWrapper" class="emp-video-monitor-wrapper">
+        <div class="emp-video-monitor">
+          <div id="empVideoLoader" class="emp-video-monitor-loader">
+            <div class="emp-v-spinner"></div>
+            <div class="emp-v-loader-text">Loading stream...</div>
+          </div>
+          <div id="empYoutubePlayer"></div>
+          <div id="empIframePlayerContainer" class="emp-vplayer-container emp-hide"></div>
+        </div>
+      </div>
+
+      <div class="emp-station-display">
+        <div class="emp-vinyl-wrapper">
+          <div id="empVinyl" class="emp-vinyl">
+            <div id="empVinylArt" class="emp-vinyl-art" style="background: linear-gradient(135deg, #27ae60, #11998e);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle;"><path d="M12 3v10.55c-.59-.34-1.34-.55-2.15-.55-2.3 0-4.15 1.61-4.15 3.6s1.85 3.6 4.15 3.6 4.15-1.61 4.15-3.6V8.56l8-1.6v6.59c-.59-.34-1.34-.55-2.15-.55-2.3 0-4.15 1.61-4.15 3.6s1.85 3.6 4.15 3.6 4.15-1.61 4.15-3.6V3H12z"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="emp-metadata-block">
+          <div id="empCurrentFreq" class="emp-meta-freq">Superhit Radio</div>
+          <div id="empCurrentName" class="emp-meta-name">Malayalam Hits</div>
+          <div id="empCurrentGenre" class="emp-meta-genre">Non-Stop Malayalam Melodies</div>
+        </div>
+        
+        <!-- Live Visualizing Equalizer -->
+        <div class="emp-equalizer">
+          <div class="emp-eq-bar"></div>
+          <div class="emp-eq-bar"></div>
+          <div class="emp-eq-bar"></div>
+          <div class="emp-eq-bar"></div>
+          <div class="emp-eq-bar"></div>
+          <div class="emp-eq-bar"></div>
+        </div>
+      </div>
+
+      <!-- Playback Controls Frame -->
+      <div class="emp-playback-deck">
+        <button id="empBtnPrev" class="emp-btn-control" title="Previous Radio Channel">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
+        </button>
+        <button id="empBtnPlayPause" class="emp-btn-control emp-btn-play-pause" title="Play / Pause">
+          <!-- Play icon default -->
+          <svg id="empPlayIcon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <!-- Pause icon hidden by default -->
+          <svg id="empPauseIcon" class="emp-hide" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+        </button>
+        <button id="empBtnNext" class="emp-btn-control" title="Next Radio Channel">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
+        </button>
+      </div>
+
+      <!-- Compact Utility volume row -->
+      <div class="emp-utility-row" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <div class="emp-volume-dock">
+          <button id="empBtnMute" class="emp-btn-control" style="padding: 2px" title="Toggle Mute">
+            <!-- Loudspeaker icon -->
+            <svg id="empVolumeHighIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            <!-- Mute icon hidden by default -->
+            <svg id="empMuteIcon" class="emp-hide" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+          </button>
+          <input type="range" id="empVolumeSlider" class="emp-slider-volume" min="0" max="100" value="80" title="Volume">
+        </div>
+        <button id="empBtnDirectToggle" class="emp-direct-toggle-btn" title="Click to toggle high fidelity direct HTML5 stream fallback">
+          <span id="empDirectBadgeMode">Auto Stream Mode</span>
+        </button>
+      </div>
+
+      <!-- curating responsive channels grid selector -->
+      <div id="empStationList" class="emp-tabs-grid">
+        <!-- Dyn selection buttons -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MINIMIZED GLOWING VINYL BUBBLE -->
+  <div id="eliteMusicMini" class="emp-circle-pill">
+    <div id="empMiniArt" class="emp-circle-art" style="background: linear-gradient(135deg, #27ae60, #11998e);">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle;"><path d="M12 3v10.55c-.59-.34-1.34-.55-2.15-.55-2.3 0-4.15 1.61-4.15 3.6s1.85 3.6 4.15 3.6 4.15-1.61 4.15-3.6V8.56l8-1.6v6.59c-.59-.34-1.34-.55-2.15-.55-2.3 0-4.15 1.61-4.15 3.6s1.85 3.6 4.15 3.6 4.15-1.61 4.15-3.6V3H12z"/></svg>
+    </div>
+    <div class="emp-floating-eq-anchor">
+      <div id="empMiniEq" class="emp-item-status-equalizer emp-hide">
+        <div class="emp-mini-eq-b"></div>
+        <div class="emp-mini-eq-b"></div>
+        <div class="emp-mini-eq-b"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
